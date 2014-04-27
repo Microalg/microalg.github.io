@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>MicroAlg - Web IDE</title>
+    <meta name="description"
+          content="Environnement en ligne pour MicroAlg." />
+    <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="web_ide/style.css" />
+    <script type="text/javascript" src="web_ide/ide_injections.js"></script>
+    <!-- http://code.google.com/p/simplemodal/ -->
+    <script type="text/javascript" src="web_ide/jquery.simplemodal.1.4.4.min.js"></script>
+    <link type="text/css" href="web_ide/jquery.simplemodal.css" rel="stylesheet" />
+    <script type="text/javascript" src="web_ide/parenedit.js"></script>
+    <link type="text/css" href="web_ide/parenedit.css" rel="stylesheet" />
+</head>
+<body>
+    <noscript>
+        <div style="color:#CC0000; text-align:center">
+        Besoin de Javascript pour utiliser cet IDE.
+        </div>
+    </noscript>
+    <div id="content" class="web-ide" style="display:none;">
+        <div id="links"><a href="#questce">Qu’est-ce ?</a> - <a href="#instructions">Instructions</a></div>
+        <div id="script-container"></div>
+        <div id="repl-container"></div>
+        <div id="bla">
+            <h1>MicroAlg - web IDE</h1>
+            <h2 id="questce">Qu’est-ce ?</h2>
+            <p>Cette page est un
+            <a href="https://fr.wikipedia.org/wiki/Environnement_de_d%C3%A9veloppement_int%C3%A9gr%C3%A9">environnement
+                de développement intégré</a> de fortune pour
+            <a href="http://microalg.info">MicroAlg</a>.</p>
+            <p>Elle permet pour l’instant de faire quelques tests mais aussi
+            d’avoir une vitrine en ligne pour ce langage.</p>
+            <p>D’autres façons d’utiliser MicroAlg sont en cours de
+            développement. Il est prévu par exemple d’utiliser :
+            <ul>
+                <li><a href="https://github.com/replit/jsrepl">jsrepl</a> pour
+                    obtenir un <a href="http://repl.it/languages/Scheme">meilleur résultat dans
+                    une page web</a>,</li>
+                <li>voire même, hors navigateur,
+                    <a href="http://picolisp.com">un interpréteur plus efficace</a> que
+                    <a href="http://grahack.github.io/EmuLisp/">celui de cette page</a>,
+                    écrit en Javascript.</li>
+            </ul></p>
+            <p><a href="#content">Retour</a></p>
+            <h2 id="instructions">Instructions</h2>
+            <h3>Édition de scripts</h3>
+            <p>La <a href="script-container">première zone de texte</a> permet
+            d’éditer des scripts. Pour les exécuter, appuyer sur
+            <code>Ctrl</code>+<code>Entrée</code>.</p>
+            <p>Aucun résultat ne sera affiché sans utiliser la commande
+            <code>Afficher</code>. L’affichage se fait juste après la fenêtre
+            d’édition.</p>
+            <h3>Console interactive</h3>
+            <p>La <a href="repl-container">deuxième zone de texte</a> permet un
+            échange « instructions après instructions » avec l’environnement.</p>
+            <p>C’est pratique pour tester des instructions quand on développe
+            un programme dans la zone d’édition de scripts.</p>
+            <p><a href="#top">Retour</a></p>
+        </div>
+        <div id="post-footer">  <!-- Juste pour pouvoir accéder à la doc. -->
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </div>
+    </div>
+    <script>
+        onload = function () {
+        $('#content').show();
+        EMULISP_CORE.loadLisp("microalg.l");
+        inject_microalg_editor_in('#script-container',
+            '(Afficher (Aide))  # Voici l’éditeur en ligne de MicroAlg. Ctrl + Entrée pour exécuter le code.');
+        $('#script-container').find('.malg-editor').first().focus();
+        inject_microalg_repl_in('#repl-container',
+            '(Aide)  # Voici la console interactive de MicroAlg. Ctrl + Entrée pour exécuter le code.');
+        }
+    </script>
+</body>
+</html>

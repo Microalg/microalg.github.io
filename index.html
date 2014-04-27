@@ -16,6 +16,16 @@
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
+    <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="web_ide/style.css" />
+    <script type="text/javascript" src="web_ide/ide_injections.js"></script>
+    <!-- http://code.google.com/p/simplemodal/ -->
+    <script type="text/javascript" src="web_ide/jquery.simplemodal.1.4.4.min.js"></script>
+    <link type="text/css" href="web_ide/jquery.simplemodal.css" rel="stylesheet" />
+    <script type="text/javascript" src="web_ide/parenedit.js"></script>
+    <link type="text/css" href="web_ide/parenedit.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -36,7 +46,10 @@
         <article class="markdown-body">
         <p><img src="http://www.art-decor.org/mediawiki/images/9/9f/Attention_icon.svg" alt="En travaux" height="50">
           <strong>En cours de développement!</strong></p>
-        <p>Patience…</p>
+        <p>Patience… En attendant, une console interactive (de fortune) :</p>
+        <div id="repl-container"></div>
+        <p>Besoin d’aide&nbsp;? Taper «&nbsp;(Aide)&nbsp;» puis <code>Ctrl</code>+<code>Entrée</code>.</p>
+        <p><a href="ide.html">Voir l’IDE en ligne</a></p>
         </article>
       </div>
     </div>
@@ -61,6 +74,14 @@
     <p class="name"></p>
   </div>
 
-  
+    <script>
+        onload = function () {
+        $('#content').show();
+        EMULISP_CORE.loadLisp("microalg.l");
+        inject_microalg_repl_in('#repl-container',
+            '(Aide)  # Ctrl + Entrée pour exécuter le code.');
+        $('#repl-container').find('.malg-repl').first().focus();
+        }
+    </script>
 </body>
 </html>
