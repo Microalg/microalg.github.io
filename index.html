@@ -19,13 +19,13 @@
     <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="web_ide/style.css" />
-    <script type="text/javascript" src="web_ide/ide_injections.js"></script>
+    <link rel="stylesheet" type="text/css" href="web/style.css" />
+    <script type="text/javascript" src="web/ide_injections.js"></script>
     <!-- http://code.google.com/p/simplemodal/ -->
-    <script type="text/javascript" src="web_ide/jquery.simplemodal.1.4.4.min.js"></script>
-    <link type="text/css" href="web_ide/jquery.simplemodal.css" rel="stylesheet" />
-    <script type="text/javascript" src="web_ide/parenedit.js"></script>
-    <link type="text/css" href="web_ide/parenedit.css" rel="stylesheet" />
+    <script type="text/javascript" src="web/jquery.simplemodal.1.4.4.min.js"></script>
+    <link type="text/css" href="web/jquery.simplemodal.css" rel="stylesheet" />
+    <script type="text/javascript" src="web/parenedit.js"></script>
+    <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -39,7 +39,10 @@
       <div id="main" role="main">
         <div class="download-bar">
         <div class="inner">
-          <a href="https://github.com/Microalg" class="code">View Microalg on GitHub</a>
+          <a href="tuto.html">Tutoriel</a> &mdash;
+          <a href="ide.html">Utiliser en ligne</a> &mdash;
+          <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">Installer sur sa machine ou son site</a> &mdash;
+          <a href="https://github.com/Microalg/Microalg">GitHub</a>
         </div>
         <span class="blc"></span><span class="trc"></span>
         </div>
@@ -49,7 +52,6 @@
         <p>Patience… En attendant, une console interactive (de fortune) :</p>
         <div id="repl-container"></div>
         <p>Besoin d’aide&nbsp;? Taper «&nbsp;(Aide)&nbsp;» puis <code>Ctrl</code>+<code>Entrée</code>.</p>
-        <p><a href="ide.html">Voir l’IDE en ligne</a></p>
         </article>
       </div>
     </div>
@@ -78,7 +80,8 @@
         onload = function () {
         $('#content').show();
         EMULISP_CORE.loadLisp("microalg.l");
-        inject_microalg_repl_in('#repl-container',
+        inject_microalg_repl_in('repl-container',
+            '# <- le # indique que la fin de la ligne est un commentaire.\n' +
             '(Aide)  # Ctrl + Entrée pour exécuter le code.');
         $('#repl-container').find('.malg-repl').first().focus();
         }

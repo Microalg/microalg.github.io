@@ -1,30 +1,24 @@
-/* 12feb14jk
+/* 13may14jk
  * (c) Jon Kleiser
  */
 
 var EMULISP_CORE = (function () {
 
-var VERSION = [2, 0, 0, 1],
+var VERSION = [2, 0, 0, 3],
 	BOXNAT_EXP = "Boxed native object expected",
 	BOOL_EXP = "Boolean expected", CELL_EXP = "Cell expected", LIST_EXP = "List expected",
 	NUM_EXP = "Number expected", SYM_EXP = "Symbol expected", VAR_EXP = "Variable expected",
 	EXEC_OR_NUM_EXP = "Executable or Number expected",
+	CHANNEL_NOT_SUPPORTED = "EmuLisp only supports the NIL channel",
 	BAD_ARG = "Bad argument", BAD_DOT = "Bad dotted pair", BAD_INPUT = "Bad input", DIV_0 = "Div/0",
 	NOT_MAK = "Not making", PROT_SYM = "Protected symbol", UNDEF = "Undefined",
 	JS_CTORNAME_EXP = "Constructor name expected", JS_RESERVED = "Reserved word";
 
-var platform;
-if (typeof window === 'undefined') {
-	platform = 'nodejs';
-} else {
-	platform = 'browser';
-}
-
 function getFileSync(fileUrl) {
 	var req = new XMLHttpRequest();
-	var OK = fileUrl.match(/^https?:/) ? 200 : 200;
+	var OK = fileUrl.match(/^file:/) ? 0 : 200;
 	req.open("GET", fileUrl, false);		// synchronous
-	req.overrideMimeType("text/plain; charset=utf-8");
+	if (req.overrideMimeType) req.overrideMimeType("text/plain; charset=utf-8");
 	req.send(null);
 	if (req.status == OK) {
 		return req.responseText;
@@ -137,6 +131,7 @@ Symbol.prototype.setVal = function(val) {
 // by escaping them with a backslash '\'.
 Symbol.prototype.escName = function() {
 	var eName = this.name.replace(/\\/g, "\\\\");
+	eName = eName.replace(/\"/g, "\\\"");
 	eName = eName.replace(/\^/g, "\\^");
 	eName = eName.replace(/\t/g, "^I");
 	eName = eName.replace(/\r/g, "^M");
@@ -190,7 +185,7 @@ function Source(text, chars) {
 	// character limitation for symbols
 	if (chars instanceof Symbol) {
 		this.charset = chars.valueOf();
-	} else if (typeof chars == "string") {
+	} else if (typeof chars === "string") {
 		//alert("Source2: " + chars);
 		this.charset = chars;
 	}
@@ -272,6 +267,12 @@ var ZERO = new Number(0), ONE = new Number(1);
 var gEmptyObj = {};
 var cst, QUOTE;
 
+function emuEnv() {
+	if (typeof window != "undefined") return "browser";
+	if (typeof process != "undefined") return "nodejs";
+	return NIL;
+}
+
 function prepareNewState(optionalState) {
 	cst = optionalState || {
 		iSym: internalSymbolsInclPrimitives(),
@@ -284,6 +285,7 @@ function prepareNewState(optionalState) {
 		startupMillis: (new Date()).getTime()
 	};
 	QUOTE = getSymbol("quote");
+	getSymbol("*EMUENV").setVal(new Symbol(emuEnv()));
 }
 
 //var gSym = {NIL: NIL, T: T, "@": A1, "@@": A2, "@@@": A3};	// dictionary/index for internal symbols
@@ -370,6 +372,8 @@ function getAlg(c) {
 				} else {
 					do { s = s.cdr; } while ((s !== NIL) && (++k < 0));
 				}
+			} else {
+				return NIL;
 			}
 		} else throw new Error(newErrMsg(SYM_EXP));
 		c = c.cdr;
@@ -546,12 +550,12 @@ function parseList(src, evaluate, editMode) {
 				item = tmp;
 			} else if (ch == "\"") {
 				s = "";
-				while (typeof (ch = src.getNextStringChar()) == "string") s += ch;
+				while (typeof (ch = src.getNextStringChar()) === "string") s += ch;
 				item = (s == "") ? NIL : getString(s, editMode);
 				src.traceItemEnd(item);		// in case we would like to know item's position
 			} else {
 				s = ch;
-				while (typeof (ch = src.getNextSymbolChar()) == "string") s += ch;
+				while (typeof (ch = src.getNextSymbolChar()) === "string") s += ch;
 				item = isNaN(s) ? getSymbol(s, editMode) : new Number(s);
 				src.traceItemEnd(item);		// in case we would like to know item's position
 			}
@@ -636,11 +640,10 @@ var coreFunctions = {
 		_stdPrint(((new Date()).getTime() - t0) / 1000 + " sec\n"); return r;
 	},
 	"box": function(c) { return box(evalLisp(c.car)); },
-	"bye": function(c) {
-		if (platform == 'nodejs') {
-			process.exit();
-		} else {
-			throw "bye";
+	"bye": function(c) { prog(getSymbol("*Bye").getVal());
+		if (emuEnv() == "nodejs") { var prv = evalLisp(c.car);
+			process.exit((prv instanceof Number) ? prv : 0); } else {
+			throw new Error(newErrMsg("Function 'bye' not supported"));
 		}
 	},
 	"caar": function(c) { return car(car(evalLisp(c.car))); },
@@ -739,8 +742,9 @@ var coreFunctions = {
 			s.pushValue(evalLisp(c.car.cdr.car));	if (s2 != null) s2.pushValue(ZERO);
 			var a2p = c.car.cdr.cdr, a2 = a2p.car, b = c.cdr, i = 0;
 			var p = (a2p.cdr instanceof Cell) ? a2p.cdr.car : null;
-			while (evalLisp(a2) !== NIL) {
-				if (s2 != null) s2.setVal(new Number(++i));
+			while (true) {
+				if (s2 != null) s2.setVal(new Number(++i));	// increment before condition
+				if (evalLisp(a2) === NIL) break;
 				var r = iter(b); v = r.v; if (r.m) break;
 				if (p != null) s.setVal(evalLisp(p));
 			}
@@ -762,6 +766,14 @@ var coreFunctions = {
 	},
 	"if": function(c) { return aTrue(evalLisp(c.car)) ? aPop(evalLisp(c.cdr.car)) : prog(c.cdr.cdr); },
 	"ifn": function(c) { return aTrue(evalLisp(c.car)) ? aPop(prog(c.cdr.cdr)) : evalLisp(c.cdr.car); },
+	"in": function(c) { // For now only the NIL channel is supported, just for compat with the use of 'read'.
+		var chan = c.car;
+		if (chan === NIL) {
+			return prog(c.cdr);
+		} else {
+			throw new Error(newErrMsg(CHANNEL_NOT_SUPPORTED, chan));
+		}
+	},
 	"inc": function(c) {
 		if (c === NIL) return NIL;
 		var ns = evalLisp(c.car);
@@ -832,10 +844,14 @@ var coreFunctions = {
 		}
 		return mkResult();
 	},
+	"n0": function(c) { return eqVal(evalLisp(c.car), ZERO) ? NIL : T; },
 	"next": function(c) { cst.evFrames.car = cst.evFrames.car.cdr; return cst.evFrames.car.car; },
 	"not": function(c) { return (evalLisp(c.car) === NIL) ? T : NIL; },
 	"nth": function(c) { var lst = evalArgs(c); c = lst.cdr;
 		do { lst = nth(lst.car, numeric(c.car)); c = c.cdr; } while(c !== NIL); return lst; },
+	"or": function(c) { while (c instanceof Cell) { var v = evalLisp(c.car);
+			if (v !== NIL) return v; c = c.cdr; } return NIL;
+	},
 	// pack has no support for circular lists, same as in PicoLisp
 	"pack": function(c) { return (c !== NIL) ? newTransSymbol(valueToStr(evalArgs(c))) : NIL; },
 	"pass": function(c) { return applyFn(c.car, cst.evFrames.car.cdr, c.cdr); },
@@ -919,6 +935,12 @@ var coreFunctions = {
 		mkNew(); do { link(n); n = new Number(n + s); } while ((s > 0) ? (n <= n2) : (n >= n2));
 		return mkResult();
 	},
+	"read": function(c) { // No support (yet) for the two parameters (non-split chars and comment char).
+		if (emuEnv() == 'nodejs') {
+			var prompt = require('sync-prompt').prompt;
+		}
+		return newTransSymbol(prompt());
+	},
 	"rest": function(c) { return cst.evFrames.car.cdr; },
 	"reverse": function(c) { var lst = evalLisp(c.car), r = NIL;
 		if (!(lst instanceof Cell)) return NIL;
@@ -975,10 +997,7 @@ var coreFunctions = {
 		if (cv === NIL) return NIL;
 		throw new Error(newErrMsg(CELL_EXP, cv));
 	},
-	"sym": function(c) {
-		if (c.car === NIL) return newTransSymbol("NIL");
-		else return newTransSymbol(evalArgs(c).toString().slice(1, -1));
-	},
+	"sym": function(c) { return newTransSymbol(evalLisp(c.car).toString()); },
 	"tail": function(c) {
 		var cl = evalLisp(c.car), lst = evalLisp(c.cdr.car);
 		if (cl instanceof Cell) {
@@ -1099,8 +1118,7 @@ var coreFunctions = {
 };
 
 function internalSymbolsInclPrimitives() {
-	var symbols = {NIL: NIL, T: T, "@": A1, "@@": A2, "@@@": A3,
-		"*OS": new Symbol("*OS", "TODO")};
+	var symbols = {NIL: NIL, T: T, "@": A1, "@@": A2, "@@@": A3};
 	var names = Object.keys(coreFunctions);
 	for (var i=0; i<names.length; i++) {
 		var name = names[i];
@@ -1197,7 +1215,7 @@ function _stdPrint(text) {
 	if (typeof stdPrint === "function") stdPrint(text)
 	else // when function stdPrint is not available in front end
 	//if (!confirm("_stdPrint:\n" + text)) throw new Error("_stdPrint aborted");
-	console.log(text);
+	console.log(text.replace(/\n$/g,''));
 }
 
 function _warn(msg) {
@@ -1303,19 +1321,12 @@ var pub = {
 	isCell: function(obj) { return (obj instanceof Cell); },
 	isSymbol: function(obj) { return (obj instanceof Symbol); },
 	
-	loadLisp: loadLisp,  // ok there is (load), but...
-	evalArgs: evalArgs, evalLisp: evalLisp, lispToStr: lispToStr, newErrMsg: newErrMsg,
+	evalArgs: evalArgs, evalLisp: evalLisp, lispToStr: lispToStr, loadLisp: loadLisp, newErrMsg: newErrMsg,
 	newTransSymbol: newTransSymbol, prog: prog, valueToStr: valueToStr, Params: Params,
 	NIL: NIL, T: T,
 	
 	eval: function(code) {
-		try {
-			return prog(parseList(new Source(code))).toString();
-		} catch (e) {
-			console.log(e);
-			if (e == "bye") {}  // (bye) called
-			else throw e;
-		}
+		return prog(parseList(new Source(code))).toString();
 	}
 }
 

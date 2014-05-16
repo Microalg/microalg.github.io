@@ -8,15 +8,15 @@
     <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="web_ide/style.css" />
-    <script type="text/javascript" src="web_ide/ide_injections.js"></script>
+    <link rel="stylesheet" type="text/css" href="web/style.css" />
+    <script type="text/javascript" src="web/ide_injections.js"></script>
     <!-- http://code.google.com/p/simplemodal/ -->
-    <script type="text/javascript" src="web_ide/jquery.simplemodal.1.4.4.min.js"></script>
-    <link type="text/css" href="web_ide/jquery.simplemodal.css" rel="stylesheet" />
-    <script type="text/javascript" src="web_ide/parenedit.js"></script>
-    <link type="text/css" href="web_ide/parenedit.css" rel="stylesheet" />
+    <script type="text/javascript" src="web/jquery.simplemodal.1.4.4.min.js"></script>
+    <link type="text/css" href="web/jquery.simplemodal.css" rel="stylesheet" />
+    <script type="text/javascript" src="web/parenedit.js"></script>
+    <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
 </head>
-<body>
+<body class="microalg">
     <noscript>
         <div style="color:#CC0000; text-align:center">
         Besoin de Javascript pour utiliser cet IDE.
@@ -33,10 +33,10 @@
             <a href="https://fr.wikipedia.org/wiki/Environnement_de_d%C3%A9veloppement_int%C3%A9gr%C3%A9">environnement
                 de développement intégré</a> de fortune pour
             <a href="http://microalg.info">MicroAlg</a>.</p>
-            <p>Elle permet pour l’instant de faire quelques tests mais aussi
+            <p>Elle permet pour l’instant de faire quelques tests, mais aussi
             d’avoir une vitrine en ligne pour ce langage.</p>
             <p>D’autres façons d’utiliser MicroAlg sont en cours de
-            développement. Il est prévu par exemple d’utiliser :
+            développement. Il est prévu par exemple d’utiliser :</p>
             <ul>
                 <li><a href="https://github.com/replit/jsrepl">jsrepl</a> pour
                     obtenir un <a href="http://repl.it/languages/Scheme">meilleur résultat dans
@@ -45,7 +45,7 @@
                     <a href="http://picolisp.com">un interpréteur plus efficace</a> que
                     <a href="http://grahack.github.io/EmuLisp/">celui de cette page</a>,
                     écrit en Javascript.</li>
-            </ul></p>
+            </ul>
             <p><a href="#content">Retour</a></p>
             <h2 id="instructions">Instructions</h2>
             <h3>Édition de scripts</h3>
@@ -69,13 +69,19 @@
     </div>
     <script>
         onload = function () {
-        $('#content').show();
-        EMULISP_CORE.loadLisp("microalg.l");
-        inject_microalg_editor_in('#script-container',
-            '(Afficher (Aide))  # Voici l’éditeur en ligne de MicroAlg. Ctrl + Entrée pour exécuter le code.');
-        $('#script-container').find('.malg-editor').first().focus();
-        inject_microalg_repl_in('#repl-container',
-            '(Aide)  # Voici la console interactive de MicroAlg. Ctrl + Entrée pour exécuter le code.');
+            $('#content').show();
+            EMULISP_CORE.loadLisp("microalg.l");
+            inject_microalg_editor_in('script-container', {localStorage: true},
+                '# Voici l’éditeur en ligne de MicroAlg.\n' +
+                '# <- le # indique que la fin de la ligne est un commentaire.\n' +
+                '# Ctrl + Entrée pour exécuter le code.\n' +
+                '(Afficher (Aide))');
+            $('#script-container').find('.malg-editor').first().focus();
+            inject_microalg_repl_in('repl-container',
+                '# Voici la console interactive de MicroAlg.\n' +
+                ': # <- le # indique que la fin de la ligne est un commentaire.\n' +
+                ': # Ctrl + Entrée pour exécuter le code.\n' +
+                ': (Aide)');
         }
     </script>
 </body>

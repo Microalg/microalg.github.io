@@ -30,12 +30,43 @@
 
 # L’affichage se fait au travers de la variable globale *StdOut.
 (put 'Affecter_a 'doc (pack
-"Commande qui permet d’afficher l’argument qu’on lui passe."))
+"Commande qui évalue son premier argument et l’affiche.<br />"
+"Attention, certains symboles particuliers comme `aide’ ou `version’ "
+"ont des comportements différents suivant qu’on les évalue, qu’on les "
+"affiche ou qu’on les appelle."))
 (setq *StdOut "")
-(de Afficher (obj) (setq *StdOut (pack *StdOut obj)))
+(de Afficher args (let (first (car args)
+                        text (get first 'text)
+                        a_afficher (if text text (eval first)))
+                       (setq *StdOut (pack *StdOut a_afficher))))
+(put 'Afficher 'text "Commande 'Afficher'.")
 
 # Gestion des variables
 (put 'Affecter_a 'doc (pack
 "Commande qui permet d’affecter une valeur à une variable."))
 (de Affecter_a arg_lst (set (car arg_lst) (cadr arg_lst)))
 
+# Demander.
+(put 'Demander 'doc (pack
+"Commande qui permet de demander une valeur à l’utilisateur."))
+(de Demander () (in NIL (read " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")))
+# Références:
+# https://fr.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange#Table_des_128_caract.C3.A8res_ASCII
+# https://en.wikipedia.org/wiki/ASCII#ASCII_printable_character_code_chart
+# >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
+# ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+# Structure conditionnelle
+(put 'Vrai 'doc (pack "Booléen valant Vrai."))
+(setq Vrai 'Vrai)
+(put 'Vrai 'doc (pack "Booléen valant Faux."))
+(setq Faux 'Faux)
+(de Si arg_lst (let (condition (car arg_lst)
+                     bloc_vrai (cadr arg_lst)
+                     bloc_faux (caddr arg_lst))
+                    (if (= Vrai (eval condition))
+                        (eval bloc_vrai) (eval bloc_faux))))
+
+# Prédicats
+(de Vrai? (x) (if (= x Vrai) Vrai Faux))
+(de Faux? (x) (if (= x Faux) Vrai Faux))

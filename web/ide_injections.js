@@ -6,19 +6,18 @@ function onCtrlEnter(elt, f) {
     });
 }
 
-function inject_microalg_editor_in(selector, msg) {
-    var script_container = $(selector);
-    var script_string = '<textarea id="malg-editor" class="malg-editor" cols="80" rows="5" >' + msg + '</textarea>' +
+function inject_microalg_editor_in(elt_id, config, msg) {
+    var script_container = $('#' + elt_id);
+    var script_string = '<textarea id="' + elt_id + '-malg-editor" class="malg-editor" cols="80" rows="2" >' + msg + '</textarea>' +
             '<div class="malg-error" style="color: red;"></div>' +
             '<div class="malg-display">&nbsp;</div>';
     script_container.html(script_string);
     var editor = script_container.find('.malg-editor').first();
     // Load local storage in the editor.
-    if (typeof(Storage)!=="undefined") {
-        if (localStorage.microalg_src) {
-            editor.val(localStorage.microalg_src);
-        } else {
-            editor.val('(Afficher "MicroAlg FTW!")');
+    if (config.localStorage && typeof(Storage)!=="undefined") {
+        var key = 'microalg_src_' + elt_id;
+        if (localStorage[key]) {
+            editor.val(localStorage[key]);
         }
     }
     createRichInput(editor);
@@ -42,14 +41,16 @@ function inject_microalg_editor_in(selector, msg) {
         }
         display_elt.html(stdout);
         EMULISP_CORE.currentState().iSym['*StdOut'].cdr.name = '';
-        localStorage.microalg_src = src;
+        if (config.localStorage && typeof(Storage)!=="undefined") {
+            localStorage[key] = src;
+        }
     }
 }
 
-function inject_microalg_repl_in(selector, msg) {
+function inject_microalg_repl_in(elt_id, msg) {
     var malg_prompt = ": ";
-    var repl_container = $(selector);
-    var repl_string = '<textarea id="malg-repl" class="malg-repl" rows="5" >' + malg_prompt + msg + '</textarea>';
+    var repl_container = $('#' + elt_id);
+    var repl_string = '<textarea id="malg-repl" class="malg-repl" rows="2" >' + malg_prompt + msg + '</textarea>';
     repl_container.html(repl_string);
     var repl = repl_container.find('.malg-repl').first();
     createRichInput(repl);
@@ -62,7 +63,11 @@ function inject_microalg_repl_in(selector, msg) {
         try {
             result = EMULISP_CORE.eval(src).toString();
         } catch(e) {
-            repl_elt.val(repl_elt.val() + "\n" + e.toString());
+            if (e.toString() == "Error: Function 'bye' not supported") {
+                repl_container.html('');
+            } else {
+                repl_elt.val(repl_elt.val() + "\n" + e.toString());
+            }
         }
         if (result != '' && result != 'NIL') {
             repl_elt.val(repl_elt.val() + "\n-> " + result);
