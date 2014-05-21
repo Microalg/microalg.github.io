@@ -81,8 +81,8 @@
         $('#content').show();
         EMULISP_CORE.loadLisp("microalg.l");
         inject_microalg_repl_in('repl-container',
-            '# <- le # indique que la fin de la ligne est un commentaire.\n' +
-            '(Aide)  # Ctrl + Entrée pour exécuter le code.');
+            '# <- le # indique que le reste de la ligne est un commentaire.\n' +
+            ': (Aide)  # Ctrl + Entrée pour exécuter le code.');
         $('#repl-container').find('.malg-repl').first().focus();
         }
     </script>
