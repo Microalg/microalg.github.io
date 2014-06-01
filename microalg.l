@@ -13,6 +13,15 @@
                  )
 )
 
+# picolisp.l shimz
+(de glue (c l)
+  (cond
+    ((= 0 (length l)) "")
+    ((= 1 (length l)) (car l))
+    (T                (pack (car l) c  (glue c (cdr l))))
+  )
+)
+
 # Aide
 (put 'Aide 'doc (pack
 "Commande qui permet d’obtenir de l’aide."))
@@ -20,7 +29,7 @@
                    doc (get truc 'doc)
                   (cond
                     ((== truc NIL) (get 'Aide 'text))
-                    ((== truc 'commandes) commandes)
+                    ((== truc 'commandes) (glue " " commandes))
                     (doc (pack "Aide pour `" truc "’:<br />" doc))
                     ((eval truc) (pack "Pas d’aide pour " truc "."))
                     (T (pack "`" truc "’ n’existe pas."))
@@ -36,7 +45,7 @@
 "<ul>"))
 
 # L’affichage se fait au travers de la variable globale *StdOut.
-(put 'Affecter_a 'doc (pack
+(put 'Afficher 'doc (pack
 "Commande qui évalue son premier argument et l’affiche.<br />"
 "Attention, certains symboles particuliers comme `aide’ ou `version’ "
 "ont des comportements différents suivant qu’on les évalue, qu’on les "
@@ -86,5 +95,9 @@
                         (eval bloc_vrai) (eval bloc_faux))))
 
 # Prédicats
+(put 'Vrai? 'doc (pack
+"Prédicat retournant Vrai si son argument est Vrai, et Faux sinon."))
 (de Vrai? (x) (if (= x Vrai) Vrai Faux))
+(put 'Faux? 'doc (pack
+"Prédicat retournant Vrai si son argument est Faux, et Faux sinon."))
 (de Faux? (x) (if (= x Faux) Vrai Faux))
