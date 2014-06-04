@@ -44,17 +44,23 @@
 "    MicroAlg.</li>"
 "<ul>"))
 
-# L’affichage se fait au travers de la variable globale *StdOut.
+# Afficher.
+# Avec EmuLisp, l’affichage se fait au travers de la fonction _stdPrint,
+# surchargée par stdPrint dans piljs ou ide_injection.js
+# On garde une trace du dernier affichage dans la variable globale *LastStdOut.
 (put 'Afficher 'doc (pack
 "Commande qui évalue son premier argument et l’affiche.<br />"
 "Attention, certains symboles particuliers comme `aide’ ou `version’ "
 "ont des comportements différents suivant qu’on les évalue, qu’on les "
 "affiche ou qu’on les appelle."))
-(setq *StdOut "")
+(setq *LastStdOut "")
 (de Afficher args (let (first (car args)
                         text (get first 'text)
                         a_afficher (if text text (eval first)))
-                       (setq *StdOut (pack *StdOut a_afficher))))
+                       (setq *LastStdOut a_afficher)
+                       (println a_afficher)
+                  )
+)
 (put 'Afficher 'text "Commande 'Afficher'.")
 
 # Concaténer
@@ -74,6 +80,10 @@
 (de Affecter_a arg_lst (set (car arg_lst) (cadr arg_lst)))
 
 # Demander.
+# Avec EmuLisp, les entrées utilisateur se font au travers de la fonction
+# _stdPrompt, surchargée dans ide_injection.js. Dans un navigateur, la dernière
+# ligne ayant été affichée précédemment est réutilisée lors de l’appel à
+# window.prompt.
 (put 'Demander 'doc (pack
 "Commande qui permet de demander une valeur à l’utilisateur."))
 (de Demander () (in NIL (read " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")))
