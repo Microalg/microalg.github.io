@@ -37,6 +37,10 @@ body.microalg {
 .malg-editor, .malg-repl {
     width: 100%;
 }
+.malg-ok {
+    margin: 2px;
+    background-color: #ddd;
+}
 .malg-display {
     border-color: black;
     border-style: solid;
@@ -49,6 +53,13 @@ body.microalg {
 .malg-display p {
     margin: 0px;
     margin-left: 3px;
+}
+.microalg .terminal, .microalg .cmd {
+    width: 93%;
+    margin: 0px auto;
+    color: black;
+    background-color: white;
+    font-family: 'Courier New', Courier, monospace;
 }
 #links {
     text-align: right;
