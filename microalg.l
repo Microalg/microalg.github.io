@@ -52,11 +52,11 @@ Si vous ne l’avez pas déjà fait, commencez par le
 Attention, certains symboles particuliers comme `aide` ou `version` ont des
 comportements différents suivant qu’on les évalue, qu’on les affiche ou qu’on
 les appelle.")
-(setq *LastStdOut "")
+(setq *LastStdOut "?")
 (de Afficher args (let (first (car args)
                         text (get first 'text)
                         a_afficher (if text text (eval first)))
-                       (setq *LastStdOut a_afficher)
+                       (setq *LastStdOut (if a_afficher a_afficher "?"))
                        (println a_afficher)
                        NIL  # Pas de valeur de retour
                   )

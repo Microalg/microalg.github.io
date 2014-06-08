@@ -16,7 +16,7 @@ function isTouch() {
 function cleanTransient(text) {
     text = text.replace(/\^J/g,'\n');  // PicoLisp control char
     text = text.replace(/\n$/,'');     // remove last newline
-    if (text.charAt(0) == '"' && text.charAt(text.charAt(text.length-1))) {
+    if (text.charAt(0) == '"' && text.charAt(text.length-1) == '"') {
         text = text.slice(1, -1);      // remove enclosing quotes
     }
     return text;
@@ -46,7 +46,7 @@ function stdPrint(text, state) {
 }
 
 function stdPrompt() {
-    var last_line_displayed = EMULISP_CORE.eval('*LastStdOut').slice(1, -1);
+    var last_line_displayed = cleanTransient(EMULISP_CORE.eval('*LastStdOut'));
     var user_input = window.prompt(last_line_displayed);
     if (user_input !== null) return user_input;
     else throw new Error("Opération 'Demander' annulée.")
@@ -77,6 +77,7 @@ function ide_action(editor_elt) {
     } catch(e) {
         error_elt.text(e.toString());
     }
+    EMULISP_CORE.eval('(setq *LastStdOut "?")');
     if (typeof(Storage) !== "undefined") {
         var key = 'microalg_src_' + elt_id;
         localStorage[key] = src;
@@ -129,6 +130,7 @@ function repl_action(repl_elt) {
     if (result != '""') {
         repl_elt.val(repl_elt.val() + "\n-> " + cleanTransient(result));
     }
+    EMULISP_CORE.eval('(setq *LastStdOut "?")');
     repl_elt.val(repl_elt.val() + "\n" + malg_prompt);
     EMULISP_CORE.currentState().old_src = repl_elt.val();
 }
@@ -169,6 +171,7 @@ function inject_microalg_jrepl_in(elt_id, msg) {
                     term.error(new String(e));
                 }
             }
+            EMULISP_CORE.eval('(setq *LastStdOut "?")');
         }
     }, {
         greetings: msg,
