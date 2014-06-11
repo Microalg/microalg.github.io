@@ -131,6 +131,7 @@ Symbol.prototype.setVal = function(val) {
 // It is possible, though, to include these special characters into symbol names
 // by escaping them with a backslash '\'.
 Symbol.prototype.escName = function() {
+	if (this.name instanceof Number) return this.name;
 	var eName = this.name.replace(/\\/g, "\\\\");
 	eName = eName.replace(/\"/g, "\\\"");
 	eName = eName.replace(/\^/g, "\\^");
@@ -753,6 +754,13 @@ var coreFunctions = {
 		s.popValue();	if (s2 != null) s2.popValue();
 		return v;
 	},
+	"format": function(c) { var cv = evalLisp(c.car);
+		// Decimal and thousands separators not implemented yet:
+		// http://www.software-lab.de/doc/refF.html#format
+		if (cv instanceof Number) return newTransSymbol(cv);
+		if (cv.trans) return new Number(parseFloat(cv.name));
+		return NIL;
+	},
 	"ge0": function(c) { var cv = evalLisp(c.car);
 		return ((cv instanceof Number) && (cv >= 0)) ? cv : NIL; },
 	"get": function(c) { return getAlg(evalArgs(c)); },
@@ -858,6 +866,10 @@ var coreFunctions = {
 	"not": function(c) { return (evalLisp(c.car) === NIL) ? T : NIL; },
 	"nth": function(c) { var lst = evalArgs(c); c = lst.cdr;
 		do { lst = nth(lst.car, numeric(c.car)); c = c.cdr; } while(c !== NIL); return lst; },
+	"num?": function(c) { c = evalArgs(c);
+		if (c.car instanceof Number) return c.car;
+		return NIL;
+	},
 	"or": function(c) { while (c instanceof Cell) { var v = evalLisp(c.car);
 			if (aTrue(v)) return v; c = c.cdr; } return NIL;
 	},
@@ -1011,6 +1023,10 @@ var coreFunctions = {
 		}
 		if (cv === NIL) return NIL;
 		throw new Error(newErrMsg(CELL_EXP, cv));
+	},
+	"str?": function(c) { c = evalArgs(c);
+		if (c.car.trans) return c.car;
+		return NIL;
 	},
 	"sym": function(c) { return newTransSymbol(evalLisp(c.car).toString()); },
 	"tail": function(c) {
@@ -1348,9 +1364,9 @@ var pub = {
 	NIL: NIL, T: T,
 	
 	eval: function(code) {
-		var result = prog(parseList(new Source(code))).toString();
+		var result = prog(parseList(new Source(code)));
 		A3.setVal(A2.getVal()); A2.setVal(A1.getVal()); A1.setVal(result);
-		return result;
+		return result.toString();
 	}
 }
 

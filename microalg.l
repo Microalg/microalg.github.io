@@ -77,7 +77,7 @@ les appelle.")
 # Gestion des variables
 (put 'Affecter_a 'doc
 "Commande qui permet d’affecter une valeur à une variable.")
-(de Affecter_a arg_lst (set (car arg_lst) (cadr arg_lst)))
+(de Affecter_a arg_lst (set (car arg_lst) (eval (cadr arg_lst))))
 
 # Demander.
 # Avec EmuLisp, les entrées utilisateur se font au travers de la fonction
@@ -92,6 +92,22 @@ les appelle.")
 # https://en.wikipedia.org/wiki/ASCII#ASCII_printable_character_code_chart
 # >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
 # ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+# Conversions
+(put 'Texte 'doc
+"Commande qui retourne le texte correspondant à son paramètre.")
+(de Texte (x) (cond
+                ((str? x) x)
+                ((num? x) (format x))
+                (T NIL)
+              ))
+(put 'Nombre 'doc
+"Commande qui retourne le nombre correspondant à son paramètre textuel.")
+(de Nombre (x) (cond
+                ((num? x) x)
+                ((str? x) (format x))
+                (T NIL)
+              ))
 
 # Structure conditionnelle
 (put 'Vrai 'doc "Booléen valant Vrai.")
@@ -111,3 +127,9 @@ les appelle.")
 (put 'Faux? 'doc
 "Prédicat retournant Vrai si son argument est Faux, et Faux sinon.")
 (de Faux? (x) (if (= x Faux) Vrai Faux))
+(put 'Texte? 'doc
+"Prédicat retournant Vrai si son argument est du texte, et Faux sinon.")
+(de Texte? (x) (if (str? x) Vrai Faux))
+(put 'Nombre? 'doc
+"Prédicat retournant Vrai si son argument est un nombre, et Faux sinon.")
+(de Nombre? (x) (if (num? x) Vrai Faux))
