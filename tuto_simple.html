@@ -194,7 +194,7 @@
     <script>inject_microalg_editor_in('ex-demander', {localStorage: false},
         '(Demander)');
     </script>
-    <p>Mais si on affiche pas le résultat de cette commande, rien ne se passe
+    <p>Mais si on n’affiche pas le résultat de cette commande, rien ne se passe
     bien sûr. Il faut afficher le résultat de la demande.</p>
     <div id="afficher-demander"></div>
     <script>inject_microalg_editor_in('afficher-demander', {localStorage: false},
@@ -245,14 +245,14 @@
     </script>
     <div id="script-deux-et-deux"></div>
     <script>inject_microalg_editor_in('script-deux-et-deux', {localStorage: false},
-        '# Noter comme MicroAlg n’affiche rien si on ne lui demande pas :\n' +
+        '# Noter que MicroAlg n’affiche rien si on ne lui demande pas :\n' +
         '(+ 2 2)');
     </script>
     <div id="script-emboite"></div>
     <script>inject_microalg_editor_in('script-emboite', {localStorage: false},
         '# Une expression peut prendre la place d’un nombre.\n' +
-        '# Ici le deuxième 2 a été remplacé par (- 5 3) :\n' +
-        '(Afficher (+ 2 (- 5 3)))');
+        '# Ici le deuxième 2 a été remplacé par (+ 1 1) :\n' +
+        '(Afficher (+ 2 (+ 1 1)))');
     </script>
     <p>Autres exemples (papier crayon ou calculatrice autorisés si le calcul
     mental ne suit pas).</p>
@@ -268,7 +268,7 @@
     <h2 id="fin">Fin</h2>
     <p>Voilà, c’est fini. Si ça vous a plu et que vous avez une envie de créer
     votre propre tutoriel, il faut installer MicroAlg localement. Pour cela,
-    chercher « utilisation possible sans connextion » sur
+    chercher « utilisation possible sans connexion » sur
     <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.
     <p>Si ça vous a plu et que vous avez une envie de contribuer, suivre les
     instructions de <a href="#contact">cette section</a>.</p>
