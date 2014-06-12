@@ -115,6 +115,8 @@ les appelle.")
 (setq Vrai 'Vrai)
 (put 'Vrai 'doc "Booléen valant Faux.")
 (setq Faux 'Faux)
+(put 'Si 'doc
+"Structure conditionnelle.")
 (de Si arg_lst (let (condition (car arg_lst)
                      bloc_vrai (cadr arg_lst)
                      bloc_faux (caddr arg_lst))
