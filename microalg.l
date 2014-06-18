@@ -11,15 +11,19 @@ Voir <http://microalg.info>.")
 (setq commandes '("Aide" "Affecter_a" "Afficher" "Concatener" "Demander"
                   "Texte" "Nombre"
                   "Si" "Vrai?" "Faux?" "Texte?" "Nombre?"
+                  "=" "=/" "<" "<=" ">" ">="
+                  "Bloc"
                  )
 )
 
 # picolisp.l shimz
-(de glue (c l)
-  (cond
-    ((= 0 (length l)) "")
-    ((= 1 (length l)) (car l))
-    (T                (pack (car l) c  (glue c (cdr l))))
+(ifn glue
+  (de glue (c l)
+    (cond
+      ((= 0 (length l)) "")
+      ((= 1 (length l)) (car l))
+      (T                (pack (car l) c  (glue c (cdr l))))
+    )
   )
 )
 
@@ -106,9 +110,14 @@ les appelle.")
 "Commande qui retourne le nombre correspondant à son paramètre textuel.")
 (de Nombre (x) (cond
                 ((num? x) x)
-                ((str? x) (format x))
+                ((str? x) (or (format x) Rien))
                 (T NIL)
               ))
+
+# Blocs
+(put 'Bloc 'doc
+"Commande qui permet de regrouper plusieurs instructions en une seule.")
+(de Bloc arg_lst (run arg_lst))
 
 # Structure conditionnelle
 (put 'Vrai 'doc "Booléen valant Vrai.")
@@ -120,19 +129,57 @@ les appelle.")
 (de Si arg_lst (let (condition (car arg_lst)
                      bloc_vrai (cadr arg_lst)
                      bloc_faux (caddr arg_lst))
-                    (if (= Vrai (eval condition))
-                        (eval bloc_vrai) (eval bloc_faux))))
+                    (if (<> Faux (eval condition))  # = retourne Vrai ou Faux
+                        (eval bloc_vrai)
+                        (if (== NIL bloc_faux)
+                            Rien
+                            (eval bloc_faux)))))
 
 # Prédicats
 (put 'Vrai? 'doc
-"Prédicat retournant `Vrai` si son argument est `Vrai`, et `Faux` sinon.")
-(de Vrai? (x) (if (= x Vrai) Vrai Faux))
+"Prédicat retournant `Vrai` si la valeur de son argument est `Vrai`,
+et `Faux` sinon.")
+(de Vrai? (x) (if (<> x Faux) Vrai Faux))
 (put 'Faux? 'doc
-"Prédicat retournant `Vrai` si son argument est `Faux`, et `Faux` sinon.")
-(de Faux? (x) (if (= x Faux) Vrai Faux))
+"Prédicat retournant `Vrai` si la valeur de son argument est `Faux`,
+et `Faux` sinon.")
+(de Faux? (x) (if (<> x Vrai) Vrai Faux))
 (put 'Texte? 'doc
-"Prédicat retournant `Vrai` si son argument est du texte, et `Faux` sinon.")
+"Prédicat retournant `Vrai` si la valeur de son argument est du texte,
+et `Faux` sinon.")
 (de Texte? (x) (if (str? x) Vrai Faux))
 (put 'Nombre? 'doc
-"Prédicat retournant `Vrai` si son argument est un nombre, et `Faux` sinon.")
+"Prédicat retournant `Vrai` si la valeur de son argument est un nombre,
+et `Faux` sinon.")
 (de Nombre? (x) (if (num? x) Vrai Faux))
+# Sans le suffixe '?'
+(put '= 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont égales,
+et `Faux` sinon.")
+(de = (x y) (ifn (<> x y) Vrai Faux))
+(put '=/ 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
+différentes, et `Faux` sinon.")
+(de =/ (x y) (if (<> x y) Vrai Faux))
+(put '< 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
+dans l’ordre croissant
+(strictement), et `Faux` sinon.")
+(de < (x y) (ifn (ge0 (- x y)) Vrai Faux))
+(put '<= 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
+dans l’ordre croissant.")
+(de <= (x y) (if (le0 (- x y)) Vrai Faux))
+(put '> 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
+dans l’ordre décroissant (strictement), et `Faux` sinon.")
+(de > (x y) (ifn (le0 (- x y)) Vrai Faux))
+(put '>= 'doc
+"Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
+dans l’ordre décroissant.")
+(de >= (x y) (if (ge0 (- x y)) Vrai Faux))
+
+# Rien
+(put 'Rien 'doc
+"Valeur de contenant aucune information.")
+(setq Rien 'Rien)
