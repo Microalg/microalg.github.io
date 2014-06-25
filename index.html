@@ -43,10 +43,29 @@
         <span class="blc"></span><span class="trc"></span>
         </div>
         <article class="markdown-body">
-        <p style="text-align: center;"><code>/!\</code>&nbsp;&nbsp;<strong>En cours de développement!</strong>&nbsp;&nbsp;<code>/!\</code></p>
-        <p>Patience… En attendant, une console interactive (de fortune) :</p>
-        <div id="repl-container"></div>
-        <p>Besoin d’aide&nbsp;? Taper «&nbsp;(Aide)&nbsp;» puis <code>Ctrl</code>+<code>Entrée</code>.</p>
+        <p><strong><em>MicroAlg</em></strong> est un langage (en cours de
+        développement) dédié à l’algorithmique et à son enseignement. Il est
+        <strong>simple</strong> : des parenthèses pour seule syntaxe, mais
+        offre un cadre <strong>rigoureux</strong> pour l’apprentissage des
+        concepts les plus importants de l’algorithmique et de la programmation.</p>
+        <p>Elle peut être utilisée sans installation, dans un navigateur, mais
+        aussi depuis par exemple NotePad++, afin de permettre à l’utilisateur
+        d’organiser son travail en fichiers.
+        Voir <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">les
+        instructions d’installation</a>.</p>
+        <p>Le mieux est de se faire un avis en suivant
+        <a href="tuto.html">le tutoriel</a> !</p>
+        <p><em>MicroAlg</em> s’interface(ra) avec:</p>
+        <ul>
+            <li><a href="https://blockly-demo.appspot.com/static/apps/index.html">Blockly</a>
+                pour pouvoir programmer avec des blocs,</li>
+            <li>une tortue pour imiter une partie de
+                <a href="http://fr.wikipedia.org/wiki/Logo_%28langage%29">Logo</a>,</li>
+            <li>d’autres outils de visualisation des résultats.</li>
+        </ul>
+        <p>Sa <a href="http://fr.wikipedia.org/wiki/Bidouillabilit%C3%A9">bidouillabilité</a>
+        permet à d’autres enseignants/développeurs de créer d’autres
+        documents pédagogiques ou d’autres interfaces.</p>
         </article>
       </div>
     </div>
@@ -73,17 +92,5 @@
     <a href="https://github.com/Microalg/microalg.github.io/tarball/master" class="tar">tar</a><a href="https://github.com/Microalg/microalg.github.io/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
     <p class="name"></p>
   </div>
-
-    <script>
-        onload = function () {
-        $('#content').show();
-        EMULISP_CORE.loadLisp("microalg.l");
-        inject_microalg_repl_in('repl-container',
-            '# <- indique que le reste de la ligne\n' +
-            ': #    est un commentaire.\n' +
-            ': (Aide)  # Ctrl + Entrée pour exécuter le code.');
-        $('#repl-container').find('.malg-repl').first().focus();
-        }
-    </script>
 </body>
 </html>

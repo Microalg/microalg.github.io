@@ -702,7 +702,7 @@ footer .owner p a {
 .markdown-body dl,
 .markdown-body table,
 .markdown-body blockquote {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .markdown-body h1,
@@ -771,13 +771,6 @@ footer .owner p a {
 
 .markdown-body ol {
   list-style-type: decimal;
-}
-
-.markdown-body li,
-.markdown-body li p,
-.markdown-body dd,
-.markdown-body dd p {
-  margin-bottom: 10px;
 }
 
 .markdown-body li pre,
