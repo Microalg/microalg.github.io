@@ -645,6 +645,10 @@ a.download-button span {
   color: #fff;
 }
 
+.right {
+  text-align: right;
+}
+
 footer {
   margin-bottom: 60px;
   padding-bottom: 60px;
