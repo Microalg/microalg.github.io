@@ -80,13 +80,13 @@
     <script>
         onload = function () {
             $('#content').show();
-            EMULISP_CORE.loadLisp("microalg.l");
             // Éditeur:
             inject_microalg_editor_in('script-container', {localStorage: true},
                 '# Voici l’éditeur en ligne de MicroAlg.\n' +
                 '# <- le # indique que la fin de la ligne est un commentaire.\n' +
                 '# Ctrl + Entrée pour exécuter le code.\n' +
                 '(Afficher (Aide))');
+            // Focus et curseur final dans l’éditeur:
             var txtarea = $('#script-container').find('.malg-editor').first();
             txtarea.focus().selectRange(txtarea.val().length, txtarea.val().length);
             // REPL de fortune:
