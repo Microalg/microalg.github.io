@@ -36,11 +36,12 @@
       <div id="main" role="main">
         <div class="link-bar">
         <div class="inner">
-          <a href="tuto.html" title="Pour apprendre MicroAlg en ligne">Tutoriel</a> &mdash;
+          <a href="tuto.html" title="Pour apprendre ou essayer MicroAlg en ligne">Tuto interactif</a> &mdash;
           <a href="doc.html" title="La référence">Documentation</a> &mdash;
-          <a href="ide.html" title="Et donc sans installation!">Utiliser en ligne</a> &mdash;
+          <a href="http://qr.microalg.info" title="La foire aux questions">Questions/Réponses</a> &mdash;
           <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md" title="Sur sa machine ou sur son site">Installer</a> &mdash;
-          <a href="https://github.com/Microalg/Microalg" title="QG du développement de MicroAlg">GitHub</a>
+          <a href="https://github.com/Microalg/Microalg" title="QG du développement de MicroAlg">GitHub</a> &mdash;
+          <a href="https://twitter.com/search?f=realtime&q=%23MicroAlg%20from%3Amicroalg&src=typd" title="via Twitter">News</a>
         </div>
         <span class="blc"></span><span class="trc"></span>
         </div>
@@ -58,20 +59,33 @@
         son développement a commencé fin mars 2014.</p>
         <p><strong>Simple</strong> (des parenthèses pour seule syntaxe), elle
         offre un cadre <strong>rigoureux</strong> pour l’apprentissage des
-        concepts les plus importants de l’algorithmique et de la programmation.
-        Elle peut être utilisée sans installation, dans un navigateur, mais
-        aussi depuis par exemple NotePad++, afin de permettre à l’utilisateur
-        d’organiser son travail en fichiers.
+        concepts les plus importants de l’algorithmique et de la programmation,
+        tout en étant utilisable <strong>dans un navigateur</strong> :</p>
+        <div class="microalg">
+        <div id="script-si-majeur-mineur"></div>
+        <script>inject_microalg_editor_in('script-si-majeur-mineur', {localStorage: false},
+            '(Afficher "Quel âge as-tu ?")\n' +
+            '(Si (< (Nombre (Demander)) 18)\n' +
+            '    (Afficher "Tu es mineur.")\n' +
+            '    (Afficher "Tu es majeur.")\n' +
+            ')');
+        </script>
+        </div>
+        <p>…mais aussi depuis par exemple NotePad++, afin de permettre à
+        l’utilisateur d’organiser son travail en fichiers.
         Voir <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">les
         instructions d’installation</a>.</p>
         <p>Le mieux est de se faire un avis en suivant
         <a href="tuto.html">le tutoriel</a> ! Pour les connaisseurs : une
         description plus scientifique est proposée dans la
         <a href="doc.html#syntaxe">section « syntaxe » de la documentation</a>.</p>
+        <p>Si après toutes ces lectures vous avez encore des questions, vous
+        pourrez les poser dans
+        <a href="http://qr.microalg.info">la foire aux questions</a>.</p>
         <p><em>MicroAlg</em> s’interface(ra) avec:</p>
         <ul>
             <li><a href="https://blockly-demo.appspot.com/static/apps/index.html">Blockly</a>
-                pour pouvoir programmer avec des blocs,</li>
+                pour pouvoir programmer avec des blocs, comme un puzzle,</li>
             <li>une tortue pour imiter une partie de
                 <a href="http://fr.wikipedia.org/wiki/Logo_%28langage%29">Logo</a>,</li>
             <li>d’autres outils de visualisation des résultats.</li>
