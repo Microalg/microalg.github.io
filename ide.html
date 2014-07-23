@@ -15,6 +15,8 @@
     <script src="web/showdown.js"></script>
     <script src="web/jquery.terminal-min.js"></script>
     <link href="web/jquery.terminal.css" rel="stylesheet"/>
+  <script type="text/javascript" src="web/blockly/blockly_compressed.js"></script>
+  <script type="text/javascript" src="web/blockly_microalg.js"></script>
 </head>
 <body class="microalg">
     <noscript>
@@ -22,18 +24,22 @@
         Besoin de Javascript pour utiliser cet IDE.
         </div>
     </noscript>
-    <div id="content" class="web-ide" style="display:none;">
+    <div id="content" class="web-ide">
         <div class="link-right">
             <a href="#questce">Qu’est-ce ?</a> :
             <a href="#instructions">Instructions</a> :
             <a href="./">Accueil</a> :
             <a href="#content">Haut de page</a>
         </div>
-        <div id="script-container"></div>
+        <br>
+        <div id="blockly-container" style="height: 400px;" class="malg-container"></div>
         &nbsp;
-        <div id="repl-container"></div>
+        <div id="script-container" class="malg-container"></div>
         &nbsp;
-        <div id="repl-container2"></div>
+        <div id="repl-container" class="malg-container"></div>
+        &nbsp;
+        <div id="repl-container2" class="malg-container"></div>
+        <br><br>
         <div id="bla">
             <h1>MicroAlg - web IDE</h1>
             <h2 id="questce">Qu’est-ce ?</h2>
@@ -48,6 +54,10 @@
             <p class="link-right"><a href="#content">Retour</a></p>
             <h2 id="instructions">Instructions</h2>
             <h3>Édition de scripts</h3>
+            <p>La <a href="#blockly-container">zone avec les pièces de puzzle</a>
+            permet de programmer visuellement, avec la souris. Fini les fautes
+            de frappe. Elle crée le code MicroAlg correspondant et l’envoie
+            dans la zone de texte juste en dessous.</p>
             <p>La <a href="#script-container">première zone de texte</a> permet
             d’éditer des scripts. Pour les exécuter, appuyer sur
             <code>Ctrl</code>+<code>Entrée</code> ou cliquer sur le bouton
@@ -79,7 +89,9 @@
     </div>
     <script>
         onload = function () {
-            $('#content').show();
+            // Blockly:
+            inject_microalg_blockly_in('blockly-container',
+                                       'script-container-malg-editor');
             // Éditeur:
             inject_microalg_editor_in('script-container', {localStorage: true},
                 '# Voici l’éditeur en ligne de MicroAlg.\n' +
