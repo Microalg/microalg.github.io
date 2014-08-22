@@ -71,34 +71,69 @@ embarqué dans PicoLisp.
 
 MicroAlg se veut :
 
-* **Minimal** : peu d’instructions sont disponibles dans le cœur du langage.
-  Si l’utilisateur a besoin d’autre chose, il doit l’implémenter
-  lui-même. Il n’y a pas de bibliothèque standard, donc il faut s’en constituer
-  une et apprécier celle offerte par les « vrais » langages.
-* **Simple à installer** : car utilisable dans un navigateur.
-* **Connecté à des outils** : de codage graphique, de visualisation…
+* **Minimale** : MicroAlg ne se veut pas puissante mais pédagogique.
+    * **Peu d’instructions** sont disponibles dans le cœur du langage, elle est
+      donc **plus simple à apprendre**.
+    * Elle ne comporte **pas toute une batterie de commandes sophistiquées**. Si
+      l’utilisateur a besoin d’autre chose, il doit l’**implémenter lui-même**.
+    * Il n’y a **pas de bibliothèque standard**, donc il faut **se constituer sa
+      propre boîte à outils**. Cela permet d’apprécier celle offerte par les
+      « vrais » langages.
+* **Simple à installer** : MicroAlg veut faciliter la vie des maîtres et des
+  disciples.
+    * Elle est utilisable directement **dans un navigateur**.
+    * L’installation est **portable**, on peut l’emmener avec soi.
+* **Bidouillable** : MicroAlg veut s’interfacer avec d’autres systèmes.
+    * Elle est **connectée à des outils** : de codage graphique, de
+      visualisation d’exécution ou de résultats…
+    * Elle est **insérable** facilement dans une page web ou tout autre système
+      via Javascript, Java, ou C.
 
 ## Syntaxe
 
 ### Instructions
 
-Une *instruction* est constituée de parenthèses, contenant une *commande* et ses
-*arguments* : `(Commande arg1 arg2 ...)`.
+* Un *programme* est constitué d’une ou plusieurs *instructions*.
+* Une *instruction* est constituée de parenthèses, contenant une *commande* et
+  ses *arguments* :  
+  `(Commande arg1 arg2 ...)`
+* C’est absolument universel dans MicroAlg. Même les commentaires sont de cette
+  forme :  
+  `(!!! "Ceci est un commentaire")`
+* Si une *commande* ne prend pas d’*argument*, on écrira simplement :  
+`(Commande)`
+* Les *instructions* peuvent être imbriquées. En effet, dans une *instruction*,
+  un des *arguments* d’une *commande* peut être remplacé par une autre
+  *instruction* :
+  `(Commande2 (Commande1 arg1 arg2 ...) arg3 ...)`  
+  Dans ce cas, c’est la commande qui est à l’intérieur qui est exécutée en
+  premier.
 
-Les instructions peuvent être imbriquées. En effet, un des arguments d’une
-commande peut être remplacé par une autre instruction :
-`(Commande2 (Commande1 arg1 arg2 ...) arg3 ...)`.  
-Dans ce cas, c’est la commande qui est à l’intérieur qui est exécutée en
-premier.
+### Symboles
+
+À part les **parenthèses**, les **nombres** (le séparateur est le `.`) et les
+**textes** (délimités par des `"`), le langage comporte des symboles. Ils sont
+organisés comme ceci :
+
+* symboles
+    * commandes
+        * prédéfinies
+            * flot (`Si`, `Tant_que`…)
+            * structures de données (`Liste`…)
+            * autres (`Afficher`, `Concatener`…)
+        * définies par l’utilisateur
+    * mots-clefs
+        * intermédiaires (`Alors`, `Sinon`…)
+        * autres (`Vrai`, `Faux`, `Rien`…)
 
 ### Conventions
 
 Le nom d’une commande :
 
-* ne contient pas d’accent
-* commence par une majuscule
-* le « tiret du 8 » ou « underscore » (`_`) en sépare les mots
-* se termine par `?` si retourne un booléen
+* ne contient pas d’accent ;
+* commence par une majuscule ;
+* le « tiret du 8 » ou « underscore » (`_`) en sépare les mots ;
+* se termine par `?` si la commande retourne un booléen.
 
 ## Liste des symboles prédéfinis
 
@@ -186,6 +221,15 @@ Toutes les bonnes volontés sont les bienvenues pour contribuer à MicroAlg. Il
 y aura de la place pour tout le monde. Voici une liste non exhaustive suivant
 les compétences techniques au autres du contributeur :
 
+* **aucune compétence** :
+    * lire, installer, tester, et rapporter des bugs ou des suggestions ;
+    * versions web, Windows, Android, iOS, Mac…
+* compétences en **pédagogie** (en maths, en algorithmique, en informatique ou
+  même en général) :
+    * lire et tester les tutoriels ;
+    * critiquer le langage ;
+    * critiquer les interfaces ;
+    * créer des tutoriels ;
 * compétences en **communication**, **marketing**, ou juste un gros réseau :
     * buzzer le projet ;
 * compétences en **orthographe**, **expression ecrite** :
@@ -198,6 +242,7 @@ les compétences techniques au autres du contributeur :
     * travailler sur l’apparence du site ;
 * compétences en **développement** (Java, Javascript, jQuery, PicoLisp…) :
     * améliorer l’interface web ;
+    * applis Android ou iOS, installateurs pour Mac ou PC ;
     * construire de nouvelles interfaces, par exemple avec GeoGebra ;
     * travailler sur le cœur du projet (émettre des messages d’erreur
       compréhensibles et « actionnables » pour l’utilisateur) ;
@@ -276,6 +321,8 @@ Relecteurs, testeurs et commentateurs :
 * Clément G. (8 ans au moment du test)
 * [Nathann Cohen](https://www.lri.fr/membre.php?mb=1727)
 * quelques collègues des listes **SIO Maths** et **IDE Gest**
+* Samuel B.
+* Jéjé
 
 Modèles et contre-modèles :
 
@@ -283,7 +330,15 @@ Modèles et contre-modèles :
 * **Scratch** &mdash; [article Wikipedia](http://fr.wikipedia.org/wiki/Scratch_%28langage%29)
 * **Algobox**, par Pascal Brachet &mdash; [site officiel](http://www.xm1math.net/algobox/)
 * **Java’s Cool** &mdash; [site officiel](http://javascool.gforge.inria.fr)
+* **Blockly** &mdash; [page expliquant certaines décisions](https://code.google.com/p/blockly/wiki/Language)
 * **PicoLisp**, par Alexander Burger &mdash; [site officiel](http://picolisp.com)
+* **Scheme**, par Sussman et Steele &mdash;
+  [article Wikipedia](http://fr.wikipedia.org/wiki/Scheme)
+* **SICP**, par Abelson et Sussman &mdash;
+  [article Wikipedia](http://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
+  (en anglais)
+* **Arc**, par [Paul Graham](http://fr.wikipedia.org/wiki/Paul_Graham) &mdash;
+  [site officiel](http://arclanguage.org/)
 
 Bases techniques et bibliothèques :
 
