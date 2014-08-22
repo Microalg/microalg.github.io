@@ -10,7 +10,7 @@ Voir <http://microalg.info>.")
 
 (setq symboles '(
 "+" "-" "*" "/"
-"=" "=/" "<" "<=" ">" ">="
+"!!!" "=" "=/" "<" "<=" ">" ">="
 "Affecter_a" "Afficher" "Aide" "Alors"
 "Bloc" "Booleen?"
 "Concatener"
@@ -74,6 +74,10 @@ Voir <http://microalg.info>.")
 (put '/ 'doc
 "Commande qui divise son premier paramètre par son second paramètre.")
 
+# Commentaires
+(put '!!! 'doc
+"Commande qui ne fait rien et sert pour les commentaires.")
+(de !!! () Rien)
 
 # Aide
 (put 'Aide 'doc
