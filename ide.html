@@ -15,8 +15,6 @@
     <script src="web/showdown.js"></script>
     <script src="web/jquery.terminal-min.js"></script>
     <link href="web/jquery.terminal.css" rel="stylesheet"/>
-  <script type="text/javascript" src="web/blockly/blockly_compressed.js"></script>
-  <script type="text/javascript" src="web/blockly_microalg.js"></script>
 </head>
 <body class="microalg">
     <noscript>
@@ -32,7 +30,7 @@
             <a href="#content">Haut de page</a>
         </div>
         <br>
-        <div id="blockly-container" style="height: 400px;" class="malg-container"></div>
+        <div id="blockly-container" class="malg-container"></div>
         &nbsp;
         <div id="script-container" class="malg-container"></div>
         &nbsp;
@@ -58,6 +56,14 @@
             permet de programmer visuellement, avec la souris. Fini les fautes
             de frappe. Elle crée le code MicroAlg correspondant et l’envoie
             dans la zone de texte juste en dessous.</p>
+            <p>Commencer par cliquer sur <code>Commandes</code> et glisser un
+            bloc <code>Afficher</code> dans le bloc <code>Programme</code> de
+            l’espace de travail. Puis dans la catégorie <code>Autres</code>,
+            prendre un bloc de texte (avec les guillemets <code>"..."</code>),
+            le glisser au bout du bloc <code>Afficher</code> puis taper un
+            message dans ce dernier bloc. Le code correspondant s’affichera
+            dans la fenêtre en dessous, et pourra être exécuté en cliquant sur
+            le bouton <code>OK</code>.</p>
             <p>La <a href="#script-container">première zone de texte</a> permet
             d’éditer des scripts. Pour les exécuter, appuyer sur
             <code>Ctrl</code>+<code>Entrée</code> ou cliquer sur le bouton
@@ -74,7 +80,6 @@
             est un terminal de fortune, bricolé pour l’occasion. Pour exécuter
             le code, appuyer sur <code>Ctrl</code>+<code>Entrée</code> ou
             cliquer sur le bouton <code>OK</code>.</p>
-            </p>
             <p>La <a href="#repl-container2">troisième zone de texte</a>
             utilise <a href="http://terminal.jcubic.pl/">un plugin jQuery</a>
             d’émulation de terminal. Elle est donc assez confortable mais ses
@@ -93,11 +98,7 @@
             inject_microalg_blockly_in('blockly-container',
                                        'script-container-malg-editor');
             // Éditeur:
-            inject_microalg_editor_in('script-container', {localStorage: true},
-                '# Voici l’éditeur en ligne de MicroAlg.\n' +
-                '# <- le # indique que la fin de la ligne est un commentaire.\n' +
-                '# Ctrl + Entrée pour exécuter le code.\n' +
-                '(Afficher (Aide))');
+            inject_microalg_editor_in('script-container', {localStorage: true});
             // Focus et curseur final dans l’éditeur:
             var txtarea = $('#script-container').find('.malg-editor').first();
             txtarea.focus().selectRange(txtarea.val().length, txtarea.val().length);

@@ -9,9 +9,13 @@ var this_script_url = (function(scripts) {
     return script.getAttribute('src', -1)
 }());
 var this_script_path = 'web/ide_injections.js';
-var microalg_l_path = this_script_url.slice(0, -this_script_path.length)
-                      + 'microalg.l';
-var microalg_l_src = EMULISP_CORE.getFileSync(microalg_l_path);
+var root_path = this_script_url.slice(0, -this_script_path.length);
+var microalg_l_src =
+    EMULISP_CORE.getFileSync(root_path + 'microalg.l');
+var microalg_export_src =
+    EMULISP_CORE.getFileSync(root_path + 'microalg_export.l');
+var microalg_export_blockly_src =
+    EMULISP_CORE.getFileSync(root_path + 'microalg_export_blockly.l');
 
 // Editor states are stored with key = div id to print
 var emulisp_states = {};
@@ -78,10 +82,11 @@ function ide_action(editor_elt) {
     EMULISP_CORE.currentState().context = {type: 'editor', display_elt: display_target_id};
     // Process src.
     var src = editor_elt.val();
-    // createRichInput put the editor in a sub div, that's why we use
-    // parent().parent()
-    var error_elt = editor_elt.parent().parent().find('.malg-error').first();
-    var display_elt = editor_elt.parent().parent().find('.malg-display').first();
+    // The editor is in a hiddable div,
+    // createRichInput put the editor in a sub div,
+    // that's why we use parent().parent().parent()
+    var error_elt = editor_elt.parent().parent().parent().find('.malg-error').first();
+    var display_elt = editor_elt.parent().parent().parent().find('.malg-display').first();
     display_elt.html('&nbsp;');
     try {
         error_elt.text('');
@@ -100,7 +105,10 @@ function inject_microalg_editor_in(elt_id, config, msg) {
     // Build the html and bind to ide_action.
     var display_target_id = elt_id + '-displaytarget';
     var script_container = $('#' + elt_id);
-    var script_string = '<textarea id="' + elt_id + '-malg-editor" class="malg-editor" cols="80" rows="2" spellcheck="false">' + msg + '</textarea>' +
+    var hidden = config.hidden ? ' style="display:none;"' : '';
+    var script_string = '<div ' + hidden + '><textarea id="' + elt_id + '-malg-editor" ' +
+                        'class="malg-editor" cols="80" rows="2"' +
+                        'spellcheck="false">' + msg + '</textarea></div>' +
             '<input type="button" onclick="ide_action($(\'#' + elt_id + '-malg-editor\'))" value="OK" class="malg-ok"/>' +
             '<div class="malg-error" style="color: red;"></div>' +
             '<div id="' + display_target_id + '" class="malg-display">&nbsp;</div>';
@@ -212,8 +220,33 @@ function inject_microalg_jrepl_in(elt_id, msg) {
     });
 }
 
-function inject_microalg_blockly_in(elt_id, editor_id) {
+function malg2blockly(src) {
+    EMULISP_CORE.init();
+    EMULISP_CORE.eval(microalg_export_src);
+    var litteraux_proteges = EMULISP_CORE.eval("(proteger_litteraux  " + src + ")");
+    EMULISP_CORE.eval(microalg_export_blockly_src);
+    var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + litteraux_proteges + ")");
+    // Le car pour récupérer l’unique élément de la liste finale.
+    var xml = cleanTransient(EMULISP_CORE.eval('(pack (car ' + avec_des_next + ')'));
+    xml = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="programme"><value name="VALUE">' +
+          xml +
+          '</value></block></xml>';
+    EMULISP_CORE.init();
+    EMULISP_CORE.eval(microalg_l_src);
+    return xml;
+}
+
+function inject_microalg_blockly_in(elt_id, editor_id, msg) {
     var blockly_container = $('#' + elt_id);
+    // Injection de HTML dans une iframe car besoin de plusieurs Blockly.
+    // http://stackoverflow.com/questions/13214419/alternatives-to-iframe-srcdoc
+    // Le code MicroAlg doit être sur une ligne pour passer dans le js généré:
+    if (typeof msg != "undefined") {
+        msg = msg.replace(/(\r\n|\n|\r)/gm, "");
+    } else {
+        msg = "";
+    }
+    // Ensuite le contenu de la toolbox:
     var toolbox_string =
             '<xml id="' + elt_id + '-toolbox" style="display: none">' +
             ' <category name="Commandes">' +
@@ -228,13 +261,65 @@ function inject_microalg_blockly_in(elt_id, editor_id) {
             '  <block type="nombre"></block>' +
             ' </category>' +
             '</xml>';
-    blockly_container.html(toolbox_string);
-    // Can't use jQuery here…
-    Blockly.inject(document.getElementById(elt_id),
-        {path: 'web/blockly/', toolbox: document.getElementById(elt_id + '-toolbox')});
-    Blockly.addChangeListener(function () {
+    // La page:
+    var content = '<!DOCTYPE html>' +
+'<html>\n' +
+'  <head>\n' +
+'    <meta charset="utf-8">\n' +
+'    <script type="text/javascript" src="web/blockly/blockly_compressed.js"></script>\n' +
+'    <script type="text/javascript" src="web/blockly_microalg.js"></script>\n' +
+'    <style>\n' +
+'      html, body {\n' +
+'        background-color: #fff;\n' +
+'        margin: 0;\n' +
+'        padding: 0;\n' +
+'        overflow: hidden;\n' +
+'        height: 100%;\n' +
+'      }\n' +
+'      .blocklySvg {\n' +
+'        height: 100%;\n' +
+'        width: 100%;\n' +
+'      }\n' +
+'    </style>\n' +
+'    <script>\n' +
+'      function init() {\n' +
+'        Blockly.inject(document.body,\n' +
+'            {path: "../../web/blockly/",\n' +
+'             comments: false,\n' +
+'             disable: false,\n' +
+'             toolbox: document.getElementById("' + elt_id + '-toolbox")});\n' +
+'        // Let the top-level application know that Blockly is ready.\n' +
+'        window.parent.blocklyLoaded(Blockly, "' + editor_id + '", \'' + msg + '\');\n' +
+'      }\n' +
+'    </script>\n' +
+'  </head>\n' +
+'  <body onload="init()">\n' + toolbox_string
+'  </body>\n' +
+'</html>';
+    // Création de l’iframe et injection.
+    var iframe_id = elt_id + '-iframe';
+    var style = 'seamless class="malg-blockly-iframe" scrolling="no"';
+    blockly_container.html('<iframe id="' + iframe_id + '" ' + style + '></iframe>');
+    var iframeDocument = document.querySelector('#' + iframe_id).contentWindow.document;
+    iframeDocument.open('text/html', 'replace');
+    iframeDocument.write(content);
+    iframeDocument.close();
+    // La suite se passe dans blocklyLoaded ci-dessous, une fois que chaque
+    // iframe est chargée.
+}
+
+function blocklyLoaded(blockly, editor_id, msg) {
+    if (typeof msg != 'undefined') {
+        var xml_text = malg2blockly(msg);
+        var xml = blockly.Xml.textToDom(xml_text);
+        blockly.Xml.domToWorkspace(blockly.mainWorkspace, xml);
+    }
+    blockly.addChangeListener(function () {
+        var raw_src = blockly.MicroAlg.workspaceToCode();
+        // Ne garder que le code entre les marqueurs:
+        var src = /.*««««««««««([^]*)»»»»»»»»»».*/.exec(raw_src)[1];
         var textarea = $('#' + editor_id);
-        textarea.val(Blockly.MicroAlg.workspaceToCode());
+        textarea.val(src);
         textarea.click();  // Trigger a parenedit redraw.
     });
 }
