@@ -218,7 +218,7 @@ Blockly.MicroAlg['commentaire'] = function(block) {
 // Bloc Afficher
 Blockly.Blocks['afficher'] = {
   init: function() {
-    this.setHelpUrl(malg_url);
+    this.setHelpUrl(malg_url + '#cmd-Afficher');
     this.setColour(160);
     this.appendValueInput('VALUE')
         .appendField('Afficher');
@@ -250,7 +250,7 @@ Blockly.MicroAlg['afficher'] = function(block) {
 // Bloc Concatener
 Blockly.Blocks['concatener'] = {
   init: function() {
-    this.setHelpUrl(malg_url);
+    this.setHelpUrl(malg_url + '#cmd-Concatener');
     this.setColour(160);
     this.appendValueInput('ADD0')
         .appendField('Concaténer');
@@ -385,8 +385,8 @@ Blockly.MicroAlg['concatener'] = function(block) {
 // Bloc Demander
 Blockly.Blocks['demander'] = {
   init: function() {
-    this.setHelpUrl(malg_url);
-    this.setColour(160);
+    this.setHelpUrl(malg_url + '#cmd-Demander');
+    this.setColour(0);
     this.appendDummyInput()
         .appendField('Demander');
     this.setOutput(true, 'String');
@@ -535,7 +535,7 @@ Blockly.MicroAlg['texte?'] = function(block) {
 // Bloc texte littéral
 Blockly.Blocks['texte_litteral'] = {
   init: function() {
-    this.setHelpUrl(malg_url);
+    this.setHelpUrl(malg_url + '#textesavecblockly');
     this.setColour(160);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
@@ -564,7 +564,7 @@ Blockly.MicroAlg['texte_litteral'] = function(block) {
 // Bloc nombre littéral
 Blockly.Blocks['nombre_litteral'] = {
   init: function() {
-    this.setHelpUrl(malg_url);
+    this.setHelpUrl(malg_url + '#nombresavecblockly');
     this.setColour(230);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
@@ -587,7 +587,7 @@ Blockly.Blocks['operations'] = {
          ['-', 'MINUS'],
          ['×', 'MULTIPLY'],
          ['÷', 'DIVIDE']];
-    this.setHelpUrl(malg_url);
+    this.setHelpUrl(malg_url + '#oprationsavecblockly');
     this.setColour(230);
     this.setOutput(true, 'Number');
     this.appendDummyInput()
