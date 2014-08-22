@@ -69,8 +69,8 @@
         <script>inject_microalg_editor_in('script-si-majeur-mineur', {localStorage: false},
             '(Afficher "Quel âge as-tu ?")\n' +
             '(Si (< (Nombre (Demander)) 18)\n' +
-            '    (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
-            '    (Afficher "Tu prétends être majeur.")\n' +
+            ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
+            ' Sinon (Afficher "Tu prétends être majeur.")\n' +
             ')');
         </script>
         </div>
