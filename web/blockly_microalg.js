@@ -214,8 +214,6 @@ Blockly.MicroAlg['commentaire'] = function(block) {
 
 // Bloc Affecter_a
 // Gen Affecter_a
-// Bloc Aide
-// Gen Aide
 
 // Bloc Afficher
 Blockly.Blocks['afficher'] = {
@@ -242,6 +240,9 @@ Blockly.MicroAlg['afficher'] = function(block) {
     return '(Afficher\n' + arg + '\n)';
   }
 };
+
+// Bloc Aide
+// Gen Aide
 
 // Bloc Bloc
 // Gen Bloc
@@ -436,8 +437,8 @@ Blockly.MicroAlg['demander'] = function(block) {
 // Bloc Vrai?
 // Gen Vrai?
 
-// Bloc texte litéral
-Blockly.Blocks['texte'] = {
+// Bloc texte littéral
+Blockly.Blocks['texte_litteral'] = {
   init: function() {
     this.setHelpUrl(malg_url);
     this.setColour(160);
@@ -459,14 +460,14 @@ Blockly.Blocks['texte'] = {
   }
 };
 
-// Gen texte litéral
-Blockly.MicroAlg['texte'] = function(block) {
+// Gen texte littéral
+Blockly.MicroAlg['texte_litteral'] = function(block) {
   var code = Blockly.MicroAlg.quote_(block.getFieldValue('TEXT'));
   return code;
 };
 
-// Bloc nombre litéral
-Blockly.Blocks['nombre'] = {
+// Bloc nombre littéral
+Blockly.Blocks['nombre_litteral'] = {
   init: function() {
     this.setHelpUrl(malg_url);
     this.setColour(230);
@@ -478,8 +479,8 @@ Blockly.Blocks['nombre'] = {
   }
 };
 
-// Gen nombre litéral
-Blockly.MicroAlg['nombre'] = function(block) {
+// Gen nombre littéral
+Blockly.MicroAlg['nombre_litteral'] = function(block) {
   return block.getFieldValue('NUM');
 };
 
