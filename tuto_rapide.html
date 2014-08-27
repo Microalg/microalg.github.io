@@ -35,13 +35,16 @@
     <a href="#texte-et-concatenation">Texte et concaténation</a>,
     <a href="#parentheses">Parenthèses</a>,
     <a href="#demander">Demander à l’utilisateur</a>,
-    <a href="#calculs_nombres">Calculs avec des nombres</a>,
-    <a href="#calculs_nombres_demandes">Calculs avec des nombres demandés à l’utilisateur</a>,
+    <a href="#calculs-nombres">Calculs avec des nombres</a>,
+    <a href="#calculs-nombres-demandes">Calculs avec des nombres demandés à l’utilisateur</a>,
     <a href="#booleens">Booléens</a>,
     <a href="#si">Si</a>,
     <a href="#variables">Variables</a>,
+    <a href="#operations-logiques">Opérations logiques</a>,
+    <a href="#manipulation-de-texte">Manipulation de texte</a>,
     <a href="#faire-tant-que">Faire… tant que…</a>,
     <a href="#tant-que-faire">Tant que… faire…</a>,
+    <a href="#definir">Définir ses commandes</a>,
     <a href="#contact">Contact</a>.
     </p>
 
@@ -211,7 +214,7 @@
         ')');
     </script>
 
-    <h2 id="calculs_nombres"><a href="#calculs_nombres">: </a>Calculs avec des nombres</h2>
+    <h2 id="calculs-nombres"><a href="#calculs-nombres">: </a>Calculs avec des nombres</h2>
     <div id="script-aff-deux-et-deux"></div>
     <script>inject_microalg_editor_in('script-aff-deux-et-deux', {localStorage: false},
         '(Afficher (+ 2 2))');
@@ -253,7 +256,7 @@
         '(Afficher (/ 6 (+ 1 1 1)))');
     </script>
 
-    <h2 id="calculs_nombres_demandes"><a href="#calculs_nombres_demandes">: </a>Calculs avec des nombres demandés à l’utilisateur</h2>
+    <h2 id="calculs-nombres-demandes"><a href="#calculs-nombres-demandes">: </a>Calculs avec des nombres demandés à l’utilisateur</h2>
     <p>La commande <code>Demander</code> renvoie du texte. Les opérations
     <code>+</code>, <code>-</code>, <code>*</code> et <code>/</code> ne
     travaillent qu'avec des nombres.</p>
@@ -451,6 +454,23 @@
         '    )\n' +
         ')');
     </script>
+    <p>Voici une application concrète d’une structure avec des <code>Si</code>
+    emboîtés :</p>
+    <div id="script-si-emboites-appli"></div>
+    <script>inject_microalg_editor_in('script-si-emboites-appli', {localStorage: false},
+        '(Afficher "Veuillez taper un nombre.")\n' +
+        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Si (>= nbre 0)\n' +
+        '    Alors (Si (>= nbre 1000)\n' +
+        '              Alors (Afficher "Ce nombre est positif et assez grand.")\n' +
+        '              Sinon (Afficher "Ce nombre est positif ou nul et pas trop grand.")\n' +
+        '          )\n' +
+        '    Sinon (Si (<= nbre -1000)\n' +
+        '              Alors (Afficher "Ce nombre est négatif et assez grand.")\n' +
+        '              Sinon (Afficher "Ce nombre est négatif et pas trop grand.")\n' +
+        '    )\n' +
+        ')');
+    </script>
     <h3 id="si-valeurs"><a href="#si-valeurs">: </a>Si avec des valeurs uniquement</h3>
     <div id="script-si-valeurs"></div>
     <script>inject_microalg_editor_in('script-si-valeurs', {localStorage: false},
@@ -615,6 +635,66 @@
         );
     </script>
 
+    <h2 id="operations-logiques"><a href="#operations-logiques">: </a>Opérations logiques</h2>
+    <div id="script-operations-logiques"></div>
+    <script>inject_microalg_editor_in('script-operations-logiques', {localStorage: false},
+        '(Afficher (Concatener "`(Non Faux)` donne : " (Non Faux)))\n' +
+        '(Afficher (Concatener "`(Non Vrai)` donne : " (Non Vrai)))\n' +
+        '(Afficher "")\n' +
+        '(Afficher (Concatener "`(Et Faux Faux)` donne : " (Et Faux Faux)))\n' +
+        '(Afficher (Concatener "`(Et Faux Vrai)` donne : " (Et Faux Vrai)))\n' +
+        '(Afficher (Concatener "`(Et Vrai Faux)` donne : " (Et Vrai Faux)))\n' +
+        '(Afficher (Concatener "`(Et Vrai Vrai)` donne : " (Et Vrai Vrai)))\n' +
+        '(Afficher "")\n' +
+        '(Afficher (Concatener "`(Ou Faux Faux)` donne : " (Ou Faux Faux)))\n' +
+        '(Afficher (Concatener "`(Ou Faux Vrai)` donne : " (Ou Faux Vrai)))\n' +
+        '(Afficher (Concatener "`(Ou Vrai Faux)` donne : " (Ou Vrai Faux)))\n' +
+        '(Afficher (Concatener "`(Ou Vrai Vrai)` donne : " (Ou Vrai Vrai)))\n' +
+        '');
+    </script>
+
+    <h2 id="manipulation-de-texte"><a href="#manipulation-de-texte">: </a>Manipulation de texte</h2>
+    <p>Un texte, ou <em>chaîne de caractères</em> n’est qu’une liste de lettres.</p>
+    <div id="longueur-vide"></div>
+    <script>inject_microalg_editor_in('longueur-vide', {localStorage: false},
+        '(Afficher (Longueur "salut"))\n' +
+        '(Afficher (Vide? "salut"))\n' +
+        '(Afficher (Longueur ""))\n' +
+        '(Afficher (Vide? ""))\n' +
+        '\n' +
+        '(!!! "Cela fonctionne aussi avec une variable contenant du texte.")\n' +
+        '(Initialiser txt "bonjour")\n' +
+        '(Afficher (Longueur txt))\n' +
+        '(Afficher (Vide? txt))\n' +
+        '(Affecter_a txt "")\n' +
+        '(Afficher (Longueur txt))\n' +
+        '(Afficher (Vide? txt))\n' +
+        '');
+    </script>
+    <p>La commande <code>Nieme</code> se prononce « énième ».</p>
+    <div id="nieme"></div>
+    <script>inject_microalg_editor_in('nieme', {localStorage: false},
+        '(Afficher (Nieme "salut" 1))\n' +
+        '(Afficher (Nieme "salut" 2))\n' +
+        '(!!! "Attention, il faut que l’indice soit\n' +
+        '      un entier strictement positif,\n' +
+        '      inférieur ou égal à la longueur du texte.")\n' +
+        '(!!! "Essayez de modifier le code ci-dessus pour qu’il génère une erreur.")\n' +
+        '\n' +
+        '(!!! "Cela fonctionne aussi avec une variable contenant du texte.")\n' +
+        '(Initialiser txt "bonjour")\n' +
+        '(Afficher (Nieme txt 4))\n' +
+        '');
+    </script>
+    <div id="tete-queue"></div>
+    <script>inject_microalg_editor_in('tete-queue', {localStorage: false},
+        '(Afficher (Tete "salut" ))\n' +
+        '(Afficher (Queue "salut" ))\n' +
+        '(Afficher (Tete "y" ))\n' +
+        '(Afficher (Queue "y" ))\n' +
+        '');
+    </script>
+
     <h2 id="faire-tant-que"><a href="#faire-tant-que">: </a>Faire… tant que…</h2>
     <div id="script-accu-nombres-tq"></div>
     <script>inject_microalg_editor_in('script-accu-nombres-tq', {localStorage: false},
@@ -661,15 +741,52 @@
         );
     </script>
 
+    <h2 id="definir"><a href="#definir">: </a>Définir ses commandes</h2>
+    <p>En plus des <a href="doc.html#listedessymbolesprdfinis">symboles prédéfinis</a>
+    dans MicroAlg, vous pouvez créer vos propres commandes, grâce à la commande
+    <code>Definir</code>.</p>
+    <div id="script-definir"></div>
+    <script>inject_microalg_editor_in('script-definir', {localStorage: false},
+        '(Definir (Double x)\n' +
+        '    "Retourne le double du nombre (paramètre `x`)."\n' +
+        '    "anonyme"\n' +
+        '    (Retourner (* 2 x))\n' +
+        ')\n' +
+        '\n' +
+        '(!!! "Voici différentes façons d’utiliser la commande ainsi définie :")\n' +
+        '\n' +
+        '(Afficher "**(Afficher Double)** donne :")\n' +
+        '(Afficher Double)\n' +
+        '(Afficher "**(Afficher (Aide Double))** donne :")\n' +
+        '(Afficher (Aide Double))\n' +
+        '(Afficher "**(Afficher (Double 7))** donne :")\n' +
+        '(Afficher (Double 7))\n' +
+        '');
+    </script>
+    <p><strong>Attention !</strong> La commande <code>Retourner</code> doit
+    être la dernière de la commande créée car <code>Retourner</code> n’en
+    interrompt pas l’exécution, comme on peut le voir ici :</p>
+    <div id="script-bug-retourner"></div>
+    <script>inject_microalg_editor_in('script-bug-retourner', {localStorage: false},
+        '(Definir (Bug_Retourner)\n' +
+        '    "Un vrai `Retourner` aurait retourné `Premier retour`."\n' +
+        '    "ProfGra"\n' +
+        '    (Retourner "Premier retour.")\n' +
+        '    (Retourner "Bug.")\n' +
+        ')\n' +
+        '(Afficher (Bug_Retourner))\n' +
+        '');
+    </script>
+
     <h2 id="fin">Fin</h2>
-    <p>Voilà, c’est fini. Si ça vous a plu et que vous avez une envie de créer
-    votre propre tutoriel, il faut installer MicroAlg localement. Pour cela,
-    chercher « utilisation possible sans connexion » sur
+    <p>Voilà, c’est fini. Si désormais vous cherchez une information, allez
+    voir directement la <a href="doc.html">documentation</a>.</p>
+    <p>Si ça vous a plu et que vous avez une envie de créer votre propre
+    tutoriel, il faut installer MicroAlg localement. Pour cela, chercher
+    « utilisation possible sans connexion » sur
     <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.
-    <p>Si ça vous a plu et que vous avez une envie de contribuer, suivre les
+    <p>Si vous avez une remarque à faire, ou envie de contribuer, suivre les
     instructions de <a href="#contact">cette section</a>.</p>
-    <p>Si désormais vous cherchez une information, allez voir directement la
-    <a href="doc.html">documentation</a>.</p>
     <p>Bonne continuation !</p>
     <br>
     <br>
