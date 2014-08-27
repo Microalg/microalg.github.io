@@ -328,7 +328,7 @@ function getString(str, editMode) {
 
 function newErrMsg(msg, badValue) {
 	getSymbol("*Msg").setVal(newTransSymbol(msg));
-	return (badValue === undefined) ? msg : lispToStr(badValue) + " -- " + msg;
+	return (badValue === undefined) ? msg + "" : lispToStr(badValue) + " -- " + msg;
 }
 
 function aTrue(val) { if (val !== NIL) { A1.setVal(val); return true; } else return false; }
@@ -379,7 +379,7 @@ function getAlg(c) {
 			} else {
 				s = NIL;
 			}
-		} else throw new Error(newErrMsg(SYM_EXP));
+		} else throw new Error(newErrMsg(SYM_EXP, s));
 		c = c.cdr;
 	}
 	return s;
@@ -630,6 +630,9 @@ CompExpr.prototype.evalTrue = function(a, b) {
 function lispFnOrder(a, b) { return cst.compExprArr[0].evalTrue(a, b) ? -1 : 1; }
 
 var coreFunctions = {
+	"and": function(c) { var v = NIL; while (c instanceof Cell) { v = evalLisp(c.car);
+			if (!aTrue(v)) return NIL; c = c.cdr; } return v;
+	},
 	"apply": function(c) { return applyFn(c.car, evalLisp(c.cdr.car), c.cdr.cdr); },
 	"arg": function(c) { var n = 0, f = cst.evFrames.car;
 		if (c !== NIL) {
@@ -948,7 +951,11 @@ var coreFunctions = {
 		throw new Error(newErrMsg(VAR_EXP, s));
 	},
 	"quote": function(c) { return c; },
-	"quit": function(c) { throw new Error(newErrMsg(evalLisp(c.car), evalLisp(c.cdr.car))); },
+	"quit": function(c) {
+		var value = evalLisp(c.cdr.car);
+		if (value == NIL) throw new Error(newErrMsg(evalLisp(c.car)));
+		else throw new Error(newErrMsg(evalLisp(c.car), value));
+	},
 	"rand": function(c) { var r = Math.random();
 		if (c === NIL) return new Number(r);	// range 0.0 .. 1.0
 		var n = evalLisp(c.car);
@@ -968,7 +975,7 @@ var coreFunctions = {
 			readlinesync.setPrompt("");
 			_stdPrompt = readlinesync.prompt;
 		} else {
-			if (typeof(stdPrompt) != "undefined") {
+			if (typeof stdPrompt != "undefined") {
 				var _stdPrompt = stdPrompt;
 			} else {
 				var _stdPrompt = window.prompt;
@@ -981,6 +988,13 @@ var coreFunctions = {
 		if (!(lst instanceof Cell)) return NIL;
 		do { r = new Cell(lst.car, r); lst = lst.cdr; } while (lst instanceof Cell);
 		return r;
+	},
+	"round": function(c) {
+		var len = evalLisp(c.cdr.car);
+		if (len == NIL) len = 3;
+		var power_of_ten = Math.pow(10, len);
+		var num = evalLisp(c.car);
+		return newTransSymbol((Math.round(num * power_of_ten) / power_of_ten).toString());
 	},
 	"run": function(c) { 	// TODO: binding env. offset cnt
 		c = evalLisp(c.car);

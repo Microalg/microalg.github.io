@@ -12,17 +12,21 @@ Voir <http://microalg.info>.")
 "+" "-" "*" "/"
 "!!!" "=" "=/" "<" "<=" ">" ">="
 "Affecter_a" "Afficher" "Aide" "Alors"
-"Bloc" "Booleen?"
+"Booleen?"
 "Concatener"
-"Demander"
+"Definir" "Demander"
+"Et"
 "Faire"
 "Faux" "Faux?"
 "Initialiser"
-"Nombre" "Nombre?"
-"Rien"
+"Longueur"
+"Nieme" "Nombre" "Nombre?" "Non"
+"Ou"
+"Queue"
+"Retourner" "Rien"
 "Si" "Sinon"
-"Tant_que" "Texte" "Texte?" "Type"
-"Vrai" "Vrai?"
+"Tant_que" "Tete" "Texte" "Texte?" "Type"
+"Vide?" "Vrai" "Vrai?"
 ))
 
 # picolisp.l shimz
@@ -41,7 +45,7 @@ Voir <http://microalg.info>.")
   )
 )
 (ifn member
-  (de member (lst elt)
+  (de member (elt lst)
     (let (result lst)
          (while (not (or (not (<> elt (car result)))
                          (not (n0 (length result)))))
@@ -57,7 +61,7 @@ Voir <http://microalg.info>.")
           tmp    NIL
           elt    NIL)
          (while (setq elt (pop 'lst))
-                (ifn (member seps elt)
+                (ifn (member elt seps)
                      (push 'tmp elt)
                      (push 'result (reverse tmp))
                      (setq tmp NIL)
@@ -68,6 +72,11 @@ Voir <http://microalg.info>.")
     )
   )
 )
+
+# Vérif et conversions de booléens MicroAlg <-> PicoLisp:
+(de !boolM2P (x) (if (<> Faux x) T NIL))
+(de !boolP2M (x) (if x Vrai Faux))
+(de !boolCheck (x) (if (member x '(Vrai Faux)) T))
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -92,7 +101,7 @@ Voir <http://microalg.info>.")
                    (cond
                     ((== truc NIL) (get 'Aide 'text))
                     ((== truc 'symboles) (glue " " symboles))
-                    (doc (pack "Aide pour `" truc "`:  ^J" doc))
+                    (doc (pack "Aide pour `" truc "` :  ^J" doc))
                     ((eval truc) (pack "Pas d’aide pour " truc "."))
                     (T (pack "`" truc "’ n’existe pas."))
                    )))
@@ -114,20 +123,25 @@ Si vous ne l’avez pas déjà fait, commencez par le
 Attention, certains symboles particuliers comme `aide` ou `version` ont des
 comportements différents suivant qu’on les évalue, qu’on les affiche ou qu’on
 les appelle.")
+(put 'Afficher 'text "Commande `Afficher`.")
 (setq *LastStdOut "?")
 (de Afficher args (let (first (car args)
                         text (if (num? first) first (get first 'text))
                         a_afficher (if text text (eval first)))
                        (setq *LastStdOut (if a_afficher a_afficher "?"))
-                       (println a_afficher)
-                       NIL  # Pas de valeur de retour
+                       (println (ifn a_afficher
+                                     (if (<> *EMUENV "browser")
+                                         " "
+                                         "&nbsp;")
+                                     a_afficher))
+                       Rien  # Pas de valeur de retour
                   )
 )
-(put 'Afficher 'text "Commande 'Afficher'.")
 
 # Concatener
 (put 'Concatener 'doc
 "Commande qui concatène les textes passés en paramètre.")
+(put 'Concatener 'text "Commande `Concatener`.")
 (de Concatener @ (let (
                        result (pack (rest))
                       )
@@ -139,23 +153,54 @@ les appelle.")
 # Gestion des variables
 (put 'Initialiser 'doc
 "Commande qui permet d’initialiser une variable avec une valeur.")
-(de Initialiser arg_lst (let (var (car arg_lst)
+(put 'Initialiser 'text "Commande `Initialiser`.")
+(de Initialiser arg_lst (let (nbr_args (length arg_lst))
+                             (if (<> 2 nbr_args)
+                                 (quit (pack "Initialiser prend 2 paramètres. "
+                                             "Vous en donnez " nbr_args ".") )
+                             )  # Du coup un deuxième arg NIL ne peut être que "".
+                        )
+                        (let (var (car arg_lst)
                               val (eval (cadr arg_lst)))
-                             (if (== NIL (eval var))
-                                 (set var val)
-                                 (quit "Variable déjà initialisée" var)
-                             )))
+                             (if (get var 'type)
+                                 (quit "Variable déjà initialisée."
+                                       (pack (str var) ", " (get var 'type)))
+                             )
+                             (set var val)
+                             (put var 'type (ifn val "texte" (Type val)))
+                             Rien  # Pas de valeur de retour
+                        ))
 (put 'Affecter_a 'doc
 "Commande qui permet d’affecter une valeur à une variable.")
-(de Affecter_a arg_lst (let (var (car arg_lst)
-                             val (eval (cadr arg_lst)))
-                            (if (== NIL (eval var))
-                                (quit "Variable non initialisée" var)
-                                (if (<> Faux (= (Type (eval var)) (Type val)))
-                                    (set var val)
-                                    (quit "Le type ne correspond pas" (list var 'est 'un (Type (eval var)) ', val 'un (Type val)))
-                                )
-                            )))
+(put 'Affecter_a 'text "Commande `Affecter_a`.")
+(de Affecter_a arg_lst
+    (let (preums (car arg_lst)
+          deuz   (eval (cadr arg_lst))
+          troiz  (eval (caddr arg_lst))
+          var    preums
+          val    (ifn troiz deuz troiz)
+          idx    troiz)
+         (ifn idx
+              (prog
+                 # Affectation au symbole dans `var`.
+                 (ifn (get var 'type)
+                      (quit "Variable non initialisée." var)
+                 )
+                 (if (or (not val)  # Pour accepter "" qui est NIL.
+                         (<> Faux (= (get var 'type) (Type val))))
+                     (set var val)
+                     (quit "Le type ne correspond pas."
+                           (list var 'est 'un (get var 'type) '; val 'un (Type val))
+                     )
+                 )
+              )
+              (prog
+                 # Affectation à l’élément `idx` du symbole dans `var`.
+              )
+         )
+         Rien  # Pas de valeur de retour
+    )
+)
 
 # Demander.
 # Avec EmuLisp, les entrées utilisateur se font au travers de la fonction
@@ -171,17 +216,78 @@ les appelle.")
 # >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
 # ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
 
+# Manipulations de texte
+(put 'Longueur 'doc
+"Commande qui retourne la longueur d’une liste.")
+(put 'Longueur 'text "Commande `Longueur`.")
+(de Longueur (obj)
+    (length obj))
+(put 'Nieme 'doc
+"Permet d’accéder en lecture à un des éléments d’une liste (se lit « énième »).
+
+La numérotation commence à 1.")
+(put 'Nieme 'text "Commande `Nieme`.")
+(de Nieme (obj idx)
+    # Quelques vérifications
+    (let (len (length obj))
+      (cond
+        ((not idx) (quit "Il manque le deuxième paramètre : l’indice."))
+        ((<> idx (format (round idx 0))) (quit "Indice non entier." idx))
+        ((le0 idx) (quit "Indice négatif ou nul." idx))
+        ((le0 (- (length obj) idx)) (quit "Indice trop grand." (list idx '> len)))
+      )
+    )
+    # Le calcul
+    (cond
+      ((str? obj) (car (nth (chop obj) idx)))
+      #((lst? obj) (nth obj idx))
+      (T Rien)
+    ))
+(put 'Tete 'doc
+"Commande qui retourne le premier élément d’une liste.")
+(put 'Tete 'text "Commande `Tete`.")
+(de Tete (obj)
+    # Quelques vérifications
+    (if (!boolM2P (Vide? obj))
+        (quit "Un objet vide n’a pas de tête.")
+    )
+    # Le calcul
+    (cond
+      ((str? obj) (car (chop obj)))
+      #((lst? obj) (car obj))
+      (T Rien)
+    ))
+(put 'Queue 'doc
+"Commande qui retourne une copie de la liste en paramètre, mais sans son premier élément.")
+(put 'Queue 'text "Commande `Queue`.")
+(de Queue (obj)
+    # Quelques vérifications
+    (if (!boolM2P (Vide? obj))
+        (quit "Un objet vide n’a pas de queue.")
+    )
+    # Le calcul
+    (cond
+      ((str? obj) (pack (cdr (chop obj))))
+      #((lst? obj) (cdr obj))
+      (T Rien)
+    ))
+
 # Types et conversions
 (put 'Type 'doc
 "Commande qui retourne le type de son paramètre (sous forme de texte et
 en minuscule).")
-(de Type (x) (cond
-                ((<> Faux (Texte? x)) "texte")
-                ((<> Faux (Nombre? x)) "nombre")
-                ((<> Faux (Booleen? x)) "booleen")
-                ((<> Faux (== Rien x)) "rien")
-                (T NIL)
-              ))
+(put 'Type 'text "Commande `Type`.")
+(de Type arg_lst
+  (let (!x (car arg_lst)
+        !evaled_x (eval !x))
+       (cond
+         ((<> Faux (Texte?   !evaled_x)) "texte")
+         ((<> Faux (Booleen? !evaled_x)) "booleen")
+         ((<> Faux (Nombre?  !evaled_x)) "nombre")
+         ((<> Faux (== Rien  !evaled_x)) "rien")
+         ((sym? x) (get !x 'type))
+         (T Rien)
+       ) ) )
 (put 'Texte 'doc
 "Commande qui retourne le texte correspondant à son paramètre.")
 (de Texte (x) (cond
@@ -196,11 +302,6 @@ en minuscule).")
                 ((str? x) (or (format x) Rien))
                 (T NIL)
               ))
-
-# Blocs
-(put 'Bloc 'doc
-"Commande qui permet de regrouper plusieurs instructions en une seule.")
-(de Bloc arg_lst (run arg_lst))
 
 # Structure conditionnelle
 (put 'Vrai 'doc "Booléen valant Vrai.")
@@ -219,38 +320,133 @@ en minuscule).")
                      splitted  (split (cddr arg_lst) 'Sinon)
                      bloc_vrai (car splitted)
                      bloc_faux (cadr splitted))
-                    (if (<> Alors kw_alors) (quit "Mot-clef `Alors` manquant !" arg_lst))
+                    (if (<> Alors kw_alors) (quit "Mot-clef `Alors` manquant." arg_lst))
                     (if (<> Faux (eval condition))  # = retourne Vrai ou Faux
                         (run bloc_vrai)
                         (if (== NIL bloc_faux)
                             Rien
                             (run bloc_faux)))))
 
+# Opérations logiques
+(put 'Non 'doc
+"Non logique.
+
+Voir <http://fr.wikipedia.org/wiki/Fonction_NON>.")
+(put 'Non 'text "Commande `Non`.")
+(de Non (P)
+    (ifn (!boolCheck P) (quit "`Non` prend un paramètre booléen."))
+    (!boolP2M (not (!boolM2P P))) )
+(put 'Et 'doc
+"Et logique.
+
+Voir <http://fr.wikipedia.org/wiki/Fonction_ET>.")
+(put 'Et 'text "Commande `Et`.")
+(de Et (P Q)
+    (ifn (!boolCheck P) (quit "Le premier paramètre de `Et` doit être un booléen."))
+    (ifn (!boolCheck Q) (quit "Le second paramètre de `Et` doit être un booléen."))
+    (!boolP2M (and (!boolM2P P) (!boolM2P Q))) )
+(put 'Ou 'doc
+"Ou logique.
+
+Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
+(put 'Ou 'text "Commande `Ou`.")
+(de Ou (P Q)
+    (ifn (!boolCheck P) (quit "Le premier paramètre de `Ou` doit être un booléen."))
+    (ifn (!boolCheck Q) (quit "Le second paramètre de `Ou` doit être un booléen."))
+    (!boolP2M (or (!boolM2P P) (!boolM2P Q))) )
+
 # Structures itératives
 (put 'Tant_que 'doc
 "Structure itérative de type « tant que ... faire ... ».")
 (de Tant_que arg_lst (let (Bool (car arg_lst)
                            Mot-Clef (cadr arg_lst)
-                           Bloc (cddr arg_lst))
+                           Corps (cddr arg_lst))
                           # Ce if permet de retourner Rien plutôt que NIL
                           # dans le cas où Bool est tout de suite Faux,
                           # mais du coup Bool peut être évalué plusieurs fois.
                           (if (<> Vrai (eval Bool))
                               Rien
                               (while (<> Faux (eval Bool))
-                                     (run Bloc)))))
+                                     (run Corps)))))
 (put 'Faire 'doc
 "Structure itérative de type « faire ... tant que ... ».")
 (de Faire arg_lst (let (Splitted (split arg_lst 'Tant_que)
-                        Bloc (car Splitted)
+                        Corps (car Splitted)
                         Bool (caadr Splitted))
                        # Ce let permet de retourner le résultat du premier
                        # tour dans le cas où Bool est tout de suite Faux.
-                       (let (resultat-premier-tour (run Bloc))
+                       (let (resultat-premier-tour (run Corps))
                             (if (<> Vrai (eval Bool))
                                 resultat-premier-tour
                                 (while (<> Faux (eval Bool))
-                                       (run Bloc))))))
+                                       (run Corps))))))
+
+# Procédures utilisateur
+(put 'Definir 'doc
+"Permet de définir une nouvelle commande (fonction mathématique ou procédure).
+
+La syntaxe de cette commande est :
+
+    (Definir (Nom_de_la_nouvelle_commande arg1 arg2 ...)
+        \"Une phrase expliquant le rôle de cette commande.\"
+        \"L’auteur de cette commande.\"
+        (...    ici les     ...)
+        (...  instructions  ...)
+        (... de la commande ...)
+        (Retourner la_valeur_de_retour)
+    )
+
+Il peut être intéressant de signer ses créations avec le pseudo utilisé sur
+[les questions/réponses](http://qr.microalg.info).
+
+Exemple 1 :
+
+    (Definir (Double x)
+        \"Retourne le double du nombre (paramètre `x`).\"
+        \"anonyme\"
+        (Retourner (* 2 x))
+    )
+
+Exemple 2 :
+
+    (Definir (Crier texte)
+        \"Affiche le texte (paramètre `texte`) avec un point d’exclamation.\"
+        \"ProfGra\"
+        (Afficher (Concatener texte \" !\"))
+        (Retourner Rien)
+    )
+")
+(put 'Definir 'text "Commande `Definir`.")
+(de Definir arg_lst
+  (let (signature (car arg_lst)
+        nom       (car signature)
+        params    (cdr signature)
+        corps     (cdr arg_lst)
+        doc       (car corps)
+        auteur    (cadr corps))
+       (ifn (str? doc)
+            (put nom 'doc Rien)
+            (put nom 'doc (pack "`(" (str signature) ")` : " doc)))
+       (ifn (str? auteur) (setq auteur "un auteur anonyme"))
+       (put nom 'text (pack "Commande `"
+                            (str nom)
+                            "`, définie par *"
+                            auteur
+                            "*."))
+       (set nom (list params (list 'run (cons 'quote corps))))
+       Rien  # Pas de valeur de retour
+  )
+)
+(put 'Retourner 'doc
+"Dernière instruction du corps d’une commande définie avec `Definir`.
+Indique la valeur que cette commande va retourner.
+
+Utiliser `(Retourner Rien)` pour ne rien retourner.
+
+**Attention !** Cette instruction doit être la dernière de la commande créée car
+`Retourner` n’en interrompt pas l’exécution.")
+(put 'Retourner 'text "Commande `Retourner`.")
+(de Retourner (val) val)
 
 # Prédicats
 (put 'Vrai? 'doc
@@ -299,6 +495,14 @@ dans l’ordre décroissant (strictement), et `Faux` sinon.")
 "Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
 dans l’ordre décroissant.")
 (de >= (x y) (if (ge0 (- x y)) Vrai Faux))
+(put 'Vide? 'doc
+"Prédicat retournant `Vrai` si l’argument est considéré comme vide.
+
+* **Textes** : le seul texte vide est `\"\"`.
+")
+(put 'Vide? 'text "Prédicat `Vide?`.")
+(de Vide? (obj)
+    (if (<> 0 (length obj)) Faux Vrai))
 
 # Rien
 (put 'Rien 'doc
