@@ -1,5 +1,5 @@
-(put 'version 'text "MicroAlg version 0.1.0")
-(setq version "0.1.0")
+(setq version "0.1.1")
+(put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
 l’abscence d’un langage vraiment axé sur la pédagogie.  
@@ -9,13 +9,14 @@ Voir <http://microalg.info>.")
 (put 'apropos 'doc "Symbole contenant des informations sur MicroAlg.")
 
 (setq symboles '(
-"+" "-" "*" "/"
+"+" "-" "*" "/" "%" "**"
 "!!!" "=" "=/" "<" "<=" ">" ">="
 "Affecter_a" "Afficher" "Aide" "Alors"
 "Booleen?"
 "Concatener"
+"Decimal@"
 "Definir" "Demander"
-"Et"
+"Entier@" "Et"
 "Faire"
 "Faux" "Faux?"
 "Initialiser"
@@ -53,30 +54,14 @@ Voir <http://microalg.info>.")
     result)
   )
 )
-(ifn split
-  (de split @
-    (let (lst   (next)
-          seps  (rest)
-          result NIL
-          tmp    NIL
-          elt    NIL)
-         (while (setq elt (pop 'lst))
-                (ifn (member elt seps)
-                     (push 'tmp elt)
-                     (push 'result (reverse tmp))
-                     (setq tmp NIL)
-                )
-         )
-         (push 'result (reverse tmp))
-         (reverse result)
-    )
-  )
-)
 
 # Vérif et conversions de booléens MicroAlg <-> PicoLisp:
 (de !boolM2P (x) (if (<> Faux x) T NIL))
 (de !boolP2M (x) (if x Vrai Faux))
 (de !boolCheck (x) (if (member x '(Vrai Faux)) T))
+(de !boolCheckM2P (x msg)
+    (ifn (!boolCheck x) (quit msg x))
+    (!boolM2P x) )
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -87,6 +72,10 @@ Voir <http://microalg.info>.")
 "Commande multiplie tous ses paramètres.")
 (put '/ 'doc
 "Commande qui divise son premier paramètre par son second paramètre.")
+(put '% 'doc
+"Commande qui donne le reste de la division euclidienne de son premier paramètre par son second paramètre.")
+(put '** 'doc
+"Commande qui donne son premier paramètre à la puissance du second paramètre.")
 
 # Commentaires
 (put '!!! 'doc
@@ -129,11 +118,12 @@ les appelle.")
                         text (if (num? first) first (get first 'text))
                         a_afficher (if text text (eval first)))
                        (setq *LastStdOut (if a_afficher a_afficher "?"))
-                       (println (ifn a_afficher
-                                     (if (<> *EMUENV "browser")
-                                         " "
-                                         "&nbsp;")
-                                     a_afficher))
+                       (ifn !testing
+                            (println (ifn a_afficher
+                                          (if (<> *EMUENV "browser")
+                                              " "
+                                              "&nbsp;")
+                                          a_afficher)))
                        Rien  # Pas de valeur de retour
                   )
 )
@@ -161,13 +151,15 @@ les appelle.")
                              )  # Du coup un deuxième arg NIL ne peut être que "".
                         )
                         (let (var (car arg_lst)
-                              val (eval (cadr arg_lst)))
-                             (if (get var 'type)
-                                 (quit "Variable déjà initialisée."
-                                       (pack (str var) ", " (get var 'type)))
+                              val (eval (cadr arg_lst))
+                              type_var (get var 'type)
+                              type_val (Type val))
+                             (if (and type_var (<> type_val type_var))
+                                 (quit (pack "Valeur de type " type_val ", ne peut initialiser "
+                                             var " qui est de type " type_var "."))
                              )
                              (set var val)
-                             (put var 'type (ifn val "texte" (Type val)))
+                             (put var 'type (ifn val "texte" type_val))
                              Rien  # Pas de valeur de retour
                         ))
 (put 'Affecter_a 'doc
@@ -202,6 +194,32 @@ les appelle.")
     )
 )
 
+# Tirages pseudo-aléatoires.
+(put 'Decimal@ 'doc
+"Retourne un nombre décimal pseudo-aléatoire dans [0;1[.
+
+Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
+(put 'Decimal@ 'text "Commande `Decimal@`.")
+(de Decimal@ () (/ (+ 2147483648 (rand)) 4294967296))
+(put 'Entier@ 'doc
+"Retourne un nombre entier pseudo-aléatoire dans [`min`;`max`].
+
+Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
+(put 'Entier@ 'text "Commande `Entier@`.")
+(de Entier@ arg_lst (let (nbr_args (length arg_lst))
+                         (if (<> 2 nbr_args)
+                             (quit (pack "`Entier@` prend 2 paramètres. "
+                                         "Vous en donnez " nbr_args ".") )
+                         )
+                    )
+                    (let (min (eval (car arg_lst))
+                          max (eval (cadr arg_lst)))
+                         (ifn (num? min) (quit "Le premier paramètre de `Entier@` doit être un nombre."))
+                         (ifn (num? max) (quit "Le second paramètre de `Entier@` doit être un nombre."))
+                         (rand min max)
+                    )
+)
+
 # Demander.
 # Avec EmuLisp, les entrées utilisateur se font au travers de la fonction
 # _stdPrompt, surchargée dans ide_injection.js. Dans un navigateur, la dernière
@@ -215,7 +233,7 @@ les appelle.")
 # https://fr.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange#Table_des_128_caract.C3.A8res_ASCII
 # https://en.wikipedia.org/wiki/ASCII#ASCII_printable_character_code_chart
 # >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
-# ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+# ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'                                       "
 
 # Manipulations de texte
 (put 'Longueur 'doc
@@ -325,7 +343,7 @@ en minuscule).")
                      bloc_vrai (car splitted)
                      bloc_faux (cadr splitted))
                     (if (<> Alors kw_alors) (quit "Mot-clef `Alors` manquant." arg_lst))
-                    (if (<> Faux (eval condition))  # = retourne Vrai ou Faux
+                    (if (!boolCheckM2P (eval condition) "La condition n’est pas un booléen.")
                         (run bloc_vrai)
                         (if (== NIL bloc_faux)
                             Rien
@@ -366,26 +384,25 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 (de Tant_que arg_lst (let (Bool (car arg_lst)
                            Mot-Clef (cadr arg_lst)
                            Corps (cddr arg_lst))
-                          # Ce if permet de retourner Rien plutôt que NIL
-                          # dans le cas où Bool est tout de suite Faux,
-                          # mais du coup Bool peut être évalué plusieurs fois.
-                          (if (<> Vrai (eval Bool))
-                              Rien
-                              (while (<> Faux (eval Bool))
-                                     (run Corps)))))
+                          (if (<> 'Faire Mot-Clef) (quit "Commande Tant_que sans mot-clé Faire."))
+                          (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
+                                 (run Corps))
+                          Rien
+                     )
+)
 (put 'Faire 'doc
 "Structure itérative de type « faire ... tant que ... ».")
 (put 'Faire 'text "Commande `Faire`.")
 (de Faire arg_lst (let (Splitted (split arg_lst 'Tant_que)
                         Corps (car Splitted)
                         Bool (caadr Splitted))
-                       # Ce let permet de retourner le résultat du premier
-                       # tour dans le cas où Bool est tout de suite Faux.
-                       (let (resultat-premier-tour (run Corps))
-                            (if (<> Vrai (eval Bool))
-                                resultat-premier-tour
-                                (while (<> Faux (eval Bool))
-                                       (run Corps))))))
+                       (run Corps)
+                       (if (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
+                           (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
+                                  (run Corps)))
+                       Rien
+                  )
+)
 
 # Procédures utilisateur
 (put 'Definir 'doc
@@ -481,6 +498,12 @@ et `Faux` sinon.")
 (put 'Booleen? 'text "Prédicat `Booleen?`.")
 (de Booleen? (x) (if (or (== Vrai x) (== Faux x)) Vrai Faux))
 # Sans le suffixe '?'
+# Éviter le message « redefined »
+(setq = NIL)
+(setq < NIL)
+(setq <= NIL)
+(setq > NIL)
+(setq >= NIL)
 (put '= 'doc
 "Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont égales,
 et `Faux` sinon.")
@@ -524,3 +547,16 @@ dans l’ordre décroissant.")
 (put 'Rien 'doc
 "Valeur de contenant aucune information, représentant l’absence de valeur.")
 (setq Rien 'Rien)
+
+# Ignorer les balises de la galerie (http://galerie.microalg.info) si utilisées
+# par inadvertance, ou une fois de trop dans la galerie.
+(de MicroAlg arg_lst
+    (Afficher
+        (pack "L’instruction `(MicroAlg ...)` est une instruction fantôme.  ^J"
+              "Merci de la supprimer, elle ne sert que pour la galerie  ^J"
+              "(<http://galerie.microalg.info>).") ) )
+(de /MicroAlg arg_lst
+    (Afficher
+        (pack "L’instruction `(/MicroAlg)` est une instruction fantôme.  ^J"
+              "Merci de la supprimer, elle ne sert que pour la galerie  ^J"
+              "(<http://galerie.microalg.info>).") ) )
