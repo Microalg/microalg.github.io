@@ -1,4 +1,4 @@
-(setq version "0.1.1")
+(setq version "0.1.2")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -384,7 +384,7 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 (de Tant_que arg_lst (let (Bool (car arg_lst)
                            Mot-Clef (cadr arg_lst)
                            Corps (cddr arg_lst))
-                          (if (<> 'Faire Mot-Clef) (quit "Commande Tant_que sans mot-clé Faire."))
+                          (if (<> 'Faire Mot-Clef) (quit "Commande `Tant_que` sans mot-clé `Faire`."))
                           (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
                                  (run Corps))
                           Rien
@@ -396,6 +396,7 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 (de Faire arg_lst (let (Splitted (split arg_lst 'Tant_que)
                         Corps (car Splitted)
                         Bool (caadr Splitted))
+                       (ifn (<> arg_lst Corps) (quit "Commande `Faire` sans mot-clé `Tant_que`."))
                        (run Corps)
                        (if (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
                            (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
