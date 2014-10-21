@@ -244,9 +244,6 @@ Blockly.MicroAlg['afficher'] = function(block) {
 // Bloc Aide
 // Gen Aide
 
-// Bloc Bloc
-// Gen Bloc
-
 // Bloc Concatener
 Blockly.Blocks['concatener'] = {
   init: function() {
@@ -484,18 +481,6 @@ Blockly.MicroAlg['type'] = function(block) {
   }
 };
 
-// Bloc <
-// Gen <
-// Bloc <=
-// Gen <=
-// Bloc =
-// Gen =
-// Bloc =/
-// Gen =/
-// Bloc >
-// Gen >
-// Bloc >=
-// Gen >=
 // Bloc Booleen?
 // Gen Booleen?
 // Bloc Faux?
@@ -624,10 +609,10 @@ Blockly.Blocks['operations'] = {
     this.setTooltip(function() {
       var mode = thisBlock.getFieldValue('OP');
       var TOOLTIPS = {
-        'ADD'     : "Renvoie la somme des deux nombres.",
-        'MINUS'   : "Renvoie le quotient des deux nombres.",
-        'MULTIPLY': "Renvoie la différence des deux nombres.",
-        'DIVIDE'  : "Renvoie le produit des deux nombres.",
+        'ADD'     : "Retourne la somme des deux nombres.",
+        'MINUS'   : "Retourne le quotient des deux nombres.",
+        'MULTIPLY': "Retourne la différence des deux nombres.",
+        'DIVIDE'  : "Retourne le produit des deux nombres.",
       };
       return TOOLTIPS[mode];
     });
@@ -651,9 +636,93 @@ Blockly.MicroAlg['operations'] = function(block) {
   return code;
 };
 
+// Bloc comparaisons
+Blockly.Blocks['comparaisons'] = {
+  init: function() {
+    var OPERATORS =
+        [['=', 'EQ'],
+         ['≠', 'NEQ'],
+         ['<', 'INF'],
+         ['>', 'SUP'],
+         ['≤', 'INFEQ'],
+         ['≥', 'SUPEQ']];
+    this.setHelpUrl(malg_url + '#comparaisonsavecblockly');
+    this.setColour(200);
+    this.setOutput(true, 'Boolean');
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(OPERATORS), 'COMP');
+    this.appendValueInput('A');
+    this.appendValueInput('B');
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+    var thisBlock = this;
+    this.setTooltip(function() {
+      var mode = thisBlock.getFieldValue('COMP');
+      var TOOLTIPS = {
+        '=': "Retourne Vrai si les arguments sont égaux.",
+        '≠': "Retourne Vrai si les arguments sont différents.",
+        '<': "Retourne Vrai si le premier argument est strictement inférieur au second.",
+        '>': "Retourne Vrai si le premier argument est strictement supérieur au second.",
+        '≤': "Retourne Vrai si le premier argument est inférieur ou égal au second.",
+        '≥': "Retourne Vrai si le premier argument est supérieur ou égal au second."
+      };
+      return TOOLTIPS[mode];
+    });
+  }
+};
+
+// Gen comparaisons
+Blockly.MicroAlg['comparaisons'] = function(block) {
+  var OPERATORS = {
+    'EQ':    '=',
+    'NEQ':   '=/',
+    'INF':   '<',
+    'SUP':   '>',
+    'INFEQ': '<=',
+    'SUPEQ': '>='
+  };
+  var operator = OPERATORS[block.getFieldValue('COMP')];
+  var inputA = Blockly.MicroAlg.statementToCode(block, 'A');
+  var inputB = Blockly.MicroAlg.statementToCode(block, 'B');
+  var argument0 = inputA.substring(Blockly.MicroAlg.INDENT.length) || '';
+  var argument1 = inputB.substring(Blockly.MicroAlg.INDENT.length) || '';
+  var code = '(' + operator + ' ' + argument0 + ' ' + argument1 + ')';
+  return code;
+};
+
 // Bloc Faux
+Blockly.Blocks['faux'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#cmd-faux');
+    this.setColour(0);
+    this.appendDummyInput()
+        .appendField('Faux');
+    this.setOutput(true);
+    this.setTooltip('Booléen valant Faux.');
+  }
+};
+
 // Gen Faux
+Blockly.MicroAlg['faux'] = function(block) {
+  return 'Faux';
+};
+
 // Bloc Rien
 // Gen Rien
+
 // Bloc Vrai
+Blockly.Blocks['vrai'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#cmd-vrai');
+    this.setColour(0);
+    this.appendDummyInput()
+        .appendField('Vrai');
+    this.setOutput(true);
+    this.setTooltip('Booléen valant Vrai.');
+  }
+};
+
 // Gen Vrai
+Blockly.MicroAlg['vrai'] = function(block) {
+  return 'Vrai';
+};

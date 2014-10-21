@@ -10,7 +10,7 @@
   ))
 (de insertion_next (src) (car (insertion_next_aux (reverse src))))
 (de insertion_next_aux (src)
-  (if (<= (length src) 1) src
+  (ifn (and (<> (length src) 0) (<> (length src) 1)) src  # (if (<= len 1)
                           # Déplacement de la tête, enfermée dans un (Next ),
                           # À la fin du deuxième élément.
                           # La queue restant inchangée.
@@ -52,6 +52,36 @@
          "</block>"))
 (de / (A B)
    (pack "<block type=\"operations\"><field name=\"OP\">DIVIDE</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de = (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">EQ</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de =/ (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">NEQ</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de < (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">INF</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de > (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">SUP</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de <= (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">INFEQ</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de >= (A B)
+   (pack "<block type=\"comparaisons\"><field name=\"COMP\">SUPEQ</field>"
          "<value name=\"A\">" A "</value>"
          "<value name=\"B\">" B "</value>"
          "</block>"))
@@ -99,3 +129,7 @@
         content
         "</value>"
         "</block>"))
+(de Vrai ()
+  "<block type=\"vrai\"></block>")
+(de Faux ()
+  "<block type=\"faux\"></block>")
