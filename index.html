@@ -71,12 +71,12 @@
         <strong>dans un navigateur</strong> :</p>
         <div class="microalg">
         <div id="script-si-majeur-mineur"></div>
-        <script>inject_microalg_editor_in('script-si-majeur-mineur', {localStorage: false},
+        <script>inject_microalg_editor_in('script-si-majeur-mineur', {src:
             '(Afficher "Quel âge as-tu ?")\n' +
             '(Si (< (Nombre (Demander)) 18)\n' +
             ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
             ' Sinon (Afficher "Tu prétends être majeur.")\n' +
-            ')');
+            ')'});
         </script>
         </div>
         <p>Le mieux pour se faire un avis sur le langage est d’explorer
@@ -91,7 +91,8 @@
                 <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md#avec-java">instructions correspondantes</a>) ;</li>
             <li><a href="doc.html#blockly">Blockly</a>,
                 pour pouvoir programmer avec des blocs, comme un puzzle
-                (voir <a href="tuto_blocs.html">le tutoriel interactif</a>) ;</li>
+                (voir <a href="#script-un-de-plus">plus bas sur cette page</a>
+                ou <a href="tuto_blocs.html">le tutoriel interactif</a>) ;</li>
             <li>n’importe quel site web, via Javascript, ce qui permet de
                 produire facilement des documents incluant des échantillons
                 interactifs, comme <a href="tuto.html">le tutoriel</a> ou la
@@ -116,6 +117,20 @@
         <p>Si après toutes ces lectures vous avez encore des questions, vous
         pouvez les poser dans
         <a href="http://qr.microalg.info">la foire aux questions</a>.</p>
+        <div class="microalg">
+        <div id="script-un-de-plus"></div>
+        <script>inject_microalg_editor_in('script-un-de-plus', {
+         blockly: true,
+         src:
+            '(!!! "Bouger les blocs pour voir le code se mettre à jour.")\n' +
+            '(Afficher\n' +
+            '    (Concatener\n' +
+            '        "Un de plus: "\n' +
+            '        (Texte (+ 1 (Nombre (Demander))))\n' +
+            '    )\n' +
+            ')'});
+        </script>
+        </div>
         </article>
       </div>
     </div>
