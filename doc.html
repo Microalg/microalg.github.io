@@ -138,6 +138,9 @@ qu’elle ne soit considérée comme complète :
   `(Commande2 (Commande1 arg1 arg2 ...) arg3 ...)`  
   Dans ce cas, c’est la commande qui est à l’intérieur qui est exécutée en
   premier.
+* Les symboles (noms de variables ou commandes) ne peuvent pas contenir les
+  caractères suivants : `"` `'` `(` `)` `,` `[` `]` `` ` `~` `{` `}`.  
+  Le point peut être utilisé dans un symbole, mais pas tout seul.
 
 ### Symboles
 
@@ -228,9 +231,11 @@ valeur qui est parfois fournie :
 
 * Commande `Faire` sans mot-clé `Tant_que`.
     * `Tant_que` est peut-être mal orthographié, il manque peut-être le « _ ».
-    * Le `Faire` correspondant a pu être fermé prématurément.
+    * Le `Faire` correspondant a pu être fermé prématurément.  
+      `(Faire (=/ n 1)) <- une parenthèse fermante en trop`
 * Commande `Tant_que` sans mot-clé `Faire`.
-    * Le `Tant_que` correspondant a pu être fermé prématurément.
+    * Le `Tant_que` correspondant a pu être fermé prématurément.  
+      `(Tant_que (=/ n 1)) <- une parenthèse fermante en trop`
 * `Entier@` prend 2 paramètres. Vous en donnez X.
 * Il manque le deuxième paramètre : l’indice.
 * Indice négatif ou nul.
@@ -251,6 +256,10 @@ valeur qui est parfois fournie :
     * Le `Si` correspondant a pu être fermé prématurément.
 * `Non` prend un paramètre booléen.
     * Voir la sous-section [booléens](#boolens).
+* X -- Number expected
+    * Vous avez sans doute tenté un calcul (`+`, `-`, …) faisant intervenir
+      une valeur qui n’est pas du type nombre.  
+      Pensez à utiliser la commande `Nombre` pour convertir cette valeur.
 * Un objet vide n’a pas de queue.
 * Un objet vide n’a pas de tête.
 * X -- undefined
@@ -459,6 +468,7 @@ et [`>=`](#cmd->=).
 * Samuel B.
 * Jéjé
 * David F.
+* Luc V. et Piotr Allarski
 
 <a name="modeles"/>Modèles et contre-modèles :
 
