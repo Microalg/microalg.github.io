@@ -1,4 +1,4 @@
-(setq version "0.2.1")
+(setq version "0.2.2")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -10,22 +10,22 @@ Voir <http://microalg.info>.")
 
 (setq symboles '(
 "+" "-" "*" "/" "%" "**"
-"!!!" "=" "=/" "<" "<=" ">" ">="
-"Affecter_a" "Afficher" "Aide" "Alors"
+"!!!" "=" "=/" "<" "<=" ">" ">=" "?"
+"Affecter_a" "Afficher" "Aide" "Ajouter_a" "Alors"
 "Booleen?"
 "Concatener"
 "Definir" "Demander"
-"Et"
+"En_position" "Et" "Exemples_de"
 "Faire"
 "Faux" "Faux?"
 "Initialiser"
-"Longueur"
+"Liste" "Longueur"
 "Nieme" "Nombre" "Nombre?" "Non"
 "Ou"
 "Queue"
-"Retourner" "Rien"
+"Retirer_de" "Retourner" "Rien"
 "Si" "Sinon"
-"Tant_que" "Tete" "Texte" "Texte?" "Type"
+"Tant_que" "Tester" "Tete" "Texte" "Texte?" "Type"
 "Vide?" "Vrai" "Vrai?"
 ))
 
@@ -44,6 +44,23 @@ Voir <http://microalg.info>.")
     )
   )
 )
+(ifn head
+  (de head (n l acc)
+    (cond
+      ((or (=0 n) (=0 (length l))) (reverse acc))
+      (T (prog (push 'acc (pop 'l)) (head (- n 1) l acc)))
+    )
+  )
+)
+(ifn tail
+  (de tail (n l) (tail_helper n (reverse l)))
+  (de tail_helper (n l acc)
+    (cond
+      ((or (=0 n) (=0 (length l))) acc)
+      (T (prog (push 'acc (pop 'l)) (tail_helper (- n 1) l acc)))
+    )
+  )
+)
 (ifn member
   (de member (elt lst)
     (let (result lst)
@@ -53,6 +70,17 @@ Voir <http://microalg.info>.")
     result)
   )
 )
+(ifn class
+  (prog
+    (de class () NIL)
+    (de new () NIL)
+    (de dm () NIL)
+    (de : () NIL)
+    (de try (x) NIL)  # the x due to a bug in EmuLisp
+  )
+)
+(ifn conc
+  (de conc () NIL) )
 
 # Vérif et conversions de booléens MicroAlg <-> PicoLisp:
 (de !boolM2P (x) (if (<> Faux x) T NIL))
@@ -61,6 +89,16 @@ Voir <http://microalg.info>.")
 (de !boolCheckM2P (x msg)
     (ifn (!boolCheck x) (quit msg x))
     (!boolM2P x) )
+
+# Helpers
+(de compose (F G)  # http://rosettacode.org/wiki/First-class_functions#PicoLisp
+   (curry (F G) (X)
+         (F (G X)) ) )
+(de !add_quotes (x) (pack "\"" x "\""))
+(de !quote_txt (x) (if (and (str? x)
+                            (not (try 'text> x)))  # car (str? (Liste)) -> not NIL
+                       (!add_quotes x)
+                       x))
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -107,27 +145,47 @@ Si vous ne l’avez pas déjà fait, commencez par le
 # surchargée par stdPrint dans piljs ou ide_injection.js
 # On garde une trace du dernier affichage dans la variable globale *LastStdOut.
 (put 'Afficher 'doc
-"Commande qui évalue son premier argument et l’affiche.  
-Attention, certains symboles particuliers comme `aide` ou `version` ont des
-comportements différents suivant qu’on les évalue, qu’on les affiche ou qu’on
-les appelle.")
+"Commande qui affiche son unique argument, si besoin après l’avoir évalué.")
 (put 'Afficher 'text "Commande `Afficher`.")
 (setq *LastStdOut "?")
+(de !text (truc)
+    (let (
+          first truc
+          efirst (eval first)
+         )
+         (cond
+          ((and (not (atom efirst)) (!boolM2P (= '? (car efirst))))
+           (pack "(" (str efirst) ")"))           # liste commençant par ?
+          ((num? first) first)                    # nombre litéral
+          ((get first 'text) (get first 'text))   # p.ex. commandes, après num
+          ((try 'text> first) (text> first))      # liste évaluée (avec $), avant txt
+          ((str? first) first)                    # texte litéral
+          ((try 'text> efirst) (text> efirst))    # liste
+          ((num? efirst) efirst)                  # expr -> des nbres
+          ((str? efirst) efirst)                  # expr -> texte
+          ((get efirst 'text) (get efirst 'text)) # expr -> cmd (un jour)
+          ((sym? efirst) efirst)                  # expr -> sym (Rien, bool…)
+          (T (quit "Pas de représentation textuelle." first))
+         )
+     )
+)
+
 (de Afficher args
-  (let (first (car args)
-         second (cadr args)
-         text (if (num? first) first (get first 'text))
-         a_afficher (if text text (eval first)))
-        (if second (quit (pack "`Afficher` n’accepte qu’un paramètre, faites "
-                               "plusieurs affichages ou utilisez `Concaténer`." )))
-        (setq *LastStdOut (if a_afficher a_afficher "?"))
-        (ifn !testing
-             (println (ifn a_afficher
-                           (if (<> *EMUENV "browser")
-                               " "
-                               "&nbsp;")
-                           a_afficher)))
-        Rien  # Pas de valeur de retour
+  (let (
+   first (car args)
+   second (cadr args)
+   a_afficher (!text first)
+  )
+  (if second (quit (pack "`Afficher` n’a qu’un paramètre, faîtes plusieurs "
+                         "affichages ou utilisez `Concaténer`." )))
+  (setq *LastStdOut (if a_afficher a_afficher "?"))
+  (ifn !testing
+       (println (ifn a_afficher
+                     (if (<> *EMUENV "browser")
+                         " "
+                         "&nbsp;")
+                     a_afficher)))
+  Rien  # Pas de valeur de retour
   )
 )
 
@@ -157,7 +215,7 @@ les appelle.")
                               val (eval (cadr arg_lst))
                               type_var (get var 'type)
                               type_val (Type val))
-                             (if (and type_var (<> type_val type_var))
+                             (if (and (<> "rien" type_val) type_var (<> type_val type_var))
                                  (quit (pack "Valeur de type " type_val ", ne peut initialiser "
                                              var " qui est de type " type_var "."))
                              )
@@ -166,16 +224,23 @@ les appelle.")
                              Rien  # Pas de valeur de retour
                         ))
 (put 'Affecter_a 'doc
-"Commande qui permet d’affecter une valeur à une variable.")
+"Commande qui permet d’affecter une valeur à une variable.
+
+Si la variable contient un texte ou une liste et qu’une position est fournie,
+comme par exemple dans :  
+`(Affecter_a var val En_position idx)`  
+alors l’élément à la `idx` ième position dans `var` est affecté de la valeur
+ `val`.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
 (put 'Affecter_a 'text "Commande `Affecter_a`.")
 (de Affecter_a arg_lst
-    (let (preums (car arg_lst)
-          deuz   (eval (cadr arg_lst))
-          troiz  (eval (caddr arg_lst))
-          var    preums
-          val    (ifn troiz deuz troiz)
-          idx    troiz)
-         (ifn idx
+    (let (var (car arg_lst)
+          val (eval (cadr arg_lst))
+          kw  (caddr arg_lst)
+          idx (eval (cadddr arg_lst))
+          evaled_var (eval var))
+         (ifn kw
               (prog
                  # Affectation au symbole dans `var`.
                  (ifn (get var 'type)
@@ -191,11 +256,22 @@ les appelle.")
               )
               (prog
                  # Affectation à l’élément `idx` du symbole dans `var`.
+                 (cond
+                   ((!boolM2P (Liste? evaled_var)) (put> evaled_var val idx))
+                   ((str? evaled_var)
+                    (let (chopped (chop evaled_var))
+                         (set var (pack (head (- idx 1) chopped)
+                                        val
+                                        (tail (- idx) chopped) )) ))
+                   (T (quit "Affectation positionnelle impossible." (Type evar)))
+                 )
               )
          )
          Rien  # Pas de valeur de retour
     )
 )
+(put 'En_position 'doc "Mot-clef intermédiaire pour la commande `Affecter_a`.")
+(setq En_position 'En_position)
 
 # Tirages pseudo-aléatoires.
 (put 'Decimal@ 'doc
@@ -238,35 +314,93 @@ Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
 # >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
 # ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'                                       "
 
-# Manipulations de texte
+# Listes
+# Implémentation interne des listes (POO)
+(class +Liste)
+# elts
+(dm T (ELTS)
+      (=: elts ELTS)
+)
+(dm length> ()
+    (length (: elts))
+)
+(dm text> ()
+    (pack "(Liste"
+          (if (: elts) " ")
+          (glue " " (mapcar (compose '!text '!quote_txt) (: elts)))
+          ")"
+    )
+)
+(dm nth> (idx)
+    (car (nth (: elts) idx))
+)
+(dm elts> ()
+    (: elts)
+)
+(dm push> (elt)
+    (=: elts (conc (: elts) (list elt)))
+)
+(dm pop> ()
+    (let (!return_val (last (: elts)))
+         (=: elts (head (- (length (: elts)) 1) (: elts)))
+         !return_val
+    )
+)
+(dm put> (elt idx)
+    (=: elts (append (head (- idx 1) (: elts))
+                     (list elt)
+                     (tail (- idx) (: elts))
+             )
+    )
+)
+# Interface MicroAlg des listes
+(put 'Liste 'doc
+"**Non disponible dans la version web !**  
+Commande qui construit une liste.")
+(put 'Liste 'text "Commande `Liste`.")
+(de Liste @
+    (new '(+Liste) (rest)) )
+
+# Manipulations de texte et de liste
 (put 'Longueur 'doc
-"Commande qui retourne la longueur d’une liste.")
+"Commande qui retourne la longueur d’un texte ou d’une liste.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
 (put 'Longueur 'text "Commande `Longueur`.")
 (de Longueur (obj)
-    (length obj))
+    (if (!boolM2P (Liste? obj))
+        (length> obj)
+        (length obj)
+    )
+)
 (put 'Nieme 'doc
-"Permet d’accéder en lecture à un des éléments d’une liste (se lit « énième »).
+"Permet d’accéder en lecture à un des éléments d’un texte ou d’une liste
+(se lit « énième »).
 
-La numérotation commence à 1.")
+La numérotation commence à 1.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
 (put 'Nieme 'text "Commande `Nieme`.")
 (de Nieme (obj idx)
     # Quelques vérifications
-    (let (len (length obj))
+    (let (len (Longueur obj))
       (cond
         ((not idx) (quit "Il manque le deuxième paramètre : l’indice."))
         ((<> idx (format (round idx 0))) (quit "Indice non entier." idx))
         ((le0 idx) (quit "Indice négatif ou nul." idx))
-        ((le0 (- (length obj) idx)) (quit "Indice trop grand." (list idx '> len)))
+        ((lt0 (- len idx)) (quit "Indice trop grand." (list idx '> len)))
       )
     )
     # Le calcul
     (cond
+      ((!boolM2P (Liste? obj)) (nth> obj idx))
       ((str? obj) (car (nth (chop obj) idx)))
-      #((lst? obj) (nth obj idx))
       (T Rien)
     ))
 (put 'Tete 'doc
-"Commande qui retourne le premier élément d’une liste.")
+"Commande qui retourne le premier élément d’un texte ou d’une liste.
+
+**Les listes ne sont pas disponibles dans la version web !**")
 (put 'Tete 'text "Commande `Tete`.")
 (de Tete (obj)
     # Quelques vérifications
@@ -275,12 +409,15 @@ La numérotation commence à 1.")
     )
     # Le calcul
     (cond
+      ((!boolM2P (Liste? obj)) (nth> obj 1))
       ((str? obj) (car (chop obj)))
-      #((lst? obj) (car obj))
       (T Rien)
     ))
 (put 'Queue 'doc
-"Commande qui retourne une copie du texte ou de la liste en paramètre `obj`, mais sans son premier élément.")
+"Commande qui retourne une copie du texte ou de la liste en paramètre `obj`,
+mais sans son premier élément.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
 (put 'Queue 'text "Commande `Queue`.")
 (de Queue (obj)
     # Quelques vérifications
@@ -289,10 +426,53 @@ La numérotation commence à 1.")
     )
     # Le calcul
     (cond
+      ((!boolM2P (Liste? obj)) (apply Liste (cdr (elts> obj))))
       ((str? obj) (pack (cdr (chop obj))))
-      #((lst? obj) (cdr obj))
-      (T Rien)
+      (T (quit "Vous cherchez la queue d’une valeur qui n’est ni un texte ni une liste."
+               (list obj (Type obj))))
     ))
+(put 'Ajouter_a 'doc
+"Commande qui, si `sym` contient un texte ou une liste, affecte un nouvel
+élément à la fin de ce texte ou de cette liste (après le dernier élément).
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
+(put 'Ajouter_a 'text "Commande `Ajouter_a`.")
+(de Ajouter_a arg_lst
+  (let (!sym (car arg_lst)
+        !evaled_sym (eval !sym)
+        !elt (eval (cadr arg_lst)))
+       # Quelques vérifications
+       # Le calcul
+       (cond
+         ((!boolM2P (Liste? !evaled_sym)) (prog (push> !evaled_sym !elt) Rien))
+         ((or (not !evaled_sym) (str? !evaled_sym)) (prog (set !sym (pack !evaled_sym !elt)) Rien))
+         (T Rien)
+       )
+  )
+)
+(put 'Retirer_de 'doc
+"Commande qui, si `sym` contient un texte ou une liste, retire le dernier
+élément à la fin de ce texte ou de cette liste et le retourne.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
+(put 'Retirer_de 'text "Commande `Retirer_de`.")
+(de Retirer_de arg_lst
+  (let (!sym (car arg_lst)
+        !evaled_sym (eval !sym))
+       # Quelques vérifications
+       # Le calcul
+       (cond
+         ((!boolM2P (Liste? !evaled_sym)) (pop> !evaled_sym))
+         ((or (not !evaled_sym) (str? !evaled_sym))
+             (let (!chopped (chop !evaled_sym)
+                   !return_val (last !chopped))
+                  (set !sym (pack (head (- (length !evaled_sym) 1) !chopped)))
+                  !return_val
+             ))
+         (T Rien)
+       )
+  )
+)
 
 # Types et conversions
 (put 'Type 'doc
@@ -303,9 +483,11 @@ en minuscule).")
   (let (!x (car arg_lst)
         !evaled_x (eval !x))
        (cond
-         ((<> Faux (Texte?   !evaled_x)) "texte")
-         ((<> Faux (Booleen? !evaled_x)) "booleen")
          ((<> Faux (Nombre?  !evaled_x)) "nombre")
+         ((<> Faux (Liste?   !x))        "liste")
+         ((<> Faux (Texte?   !evaled_x)) "texte")
+         ((<> Faux (Liste?   !evaled_x)) "liste")
+         ((<> Faux (Booleen? !evaled_x)) "booleen")
          ((<> Faux (== Rien  !evaled_x)) "rien")
          ((sym? x) (get !x 'type))
          (T Rien)
@@ -473,7 +655,85 @@ Utiliser `(Retourner Rien)` pour ne rien retourner.
 **Attention !** Cette instruction doit être la dernière de la commande créée car
 `Retourner` n’en interrompt pas l’exécution.")
 (put 'Retourner 'text "Commande `Retourner`.")
-(de Retourner (val) val)
+(de Retourner (val)
+  val
+)
+(put 'Exemples_de 'doc
+"**Non disponible dans la version web !**  
+Permet de lire ou écrire les exemples-tests d’une commande.
+
+Exemples :
+
+    (!!! \"Pour écrire les exemples de Double\")
+    (Exemples_de Double
+        (Liste
+            (? 1) 2
+            (? 2) 4
+            (? 3) 6
+        )
+    )
+    -> Rien
+
+    (!!! \"Pour lire les exemples de Double\")
+    (Exemples_de Double)
+    -> (Liste (? 1) 2 (? 2) 4 (? 3) 6)
+
+    (!!! \"Pour recopier les exemples de Cmd_1 dans Cmd_2.\")
+    (Exemples de Cmd_2 (Exemples de Cmd_1))
+")
+(put 'Exemples_de 'text "Commande `Exemples_de`.")
+(de Exemples_de arg_lst
+  (let (commande (car arg_lst)
+        exemples (eval (cadr arg_lst)))
+       (ifn exemples (get commande 'exemples)
+                     (prog
+                       (ifn (!boolM2P (Liste? exemples))
+                            (quit "Les exemples fournis ne forment pas une liste."))
+                       (put commande 'exemples exemples)
+                     )
+       )
+  )
+)
+(put 'Tester 'doc
+"**Non disponible dans la version web !**  
+Vérifie que les exemples de la commande passée en paramètre sont conformes.
+
+Voir la commande `Exemples_de`.")
+(put '? 'text "Symbole remplaçant la commande à tester dans `Exemples_de`.")
+# Éviter le message « redefined »
+(setq ? NIL)
+(de ? @ (apply list (conc (list '?) (rest))))
+(put 'Tester 'text "Commande `Tester`.")
+(de !paires (!list !acc)
+    (cond
+      ((!boolM2P (= 0 (length !list))) (reverse !acc))
+      (T (push '!acc (cut 2 '!list))
+         (!paires !list !acc))
+    )
+)
+(de Tester arg_lst
+  (let (!commande (car arg_lst)
+        !exemples (get !commande 'exemples))
+       (cond
+         ((not (eval !commande))
+            (Afficher (pack "Il faut définir la commande " !commande " avant de la tester.")))
+         ((not !exemples)
+            (Afficher (pack "La commande " !commande " n’a pas d’exemples.")))
+         ((!boolM2P (Non (Liste? !exemples)))
+            (Afficher (pack "La commande " !commande " n’a pas d’exemples valables.")))
+         (T (mapcar '((!paire) (let (!args (cdr (car !paire))
+                                     !got (apply (eval !commande) !args)
+                                     !expected (cadr !paire))
+                                    (if (<> !got !expected)
+                                        (Afficher (pack "Erreur: (" !commande " "
+                                                        (glue " " (mapcar '!text !args)) ")"
+                                                        " donne " !got
+                                                        " au lieu de " !expected ".")))
+                               )
+                     ) (!paires (elts> !exemples))))
+       )
+  )
+)
 
 # Prédicats
 (put 'Vrai? 'doc
@@ -501,6 +761,12 @@ et `Faux` sinon.")
 et `Faux` sinon.")
 (put 'Booleen? 'text "Prédicat `Booleen?`.")
 (de Booleen? (x) (if (or (== Vrai x) (== Faux x)) Vrai Faux))
+(put 'Liste? 'doc
+"**Non disponible dans la version web !**  
+Prédicat retournant `Vrai` si la valeur de son argument est une liste,
+et `Faux` sinon.")
+(put 'Liste? 'text "Prédicat `Liste?`.")
+(de Liste? (x) (if (or (try 'text> x) (try 'text> (eval x))) Vrai Faux))
 # Sans le suffixe '?'
 # Éviter le message « redefined »
 (setq = NIL)
@@ -542,10 +808,12 @@ dans l’ordre décroissant.")
 "Prédicat retournant `Vrai` si l’argument est considéré comme vide.
 
 * **Textes** : le seul texte vide est `\"\"`.
-")
+* **Listes** : la seule liste vide est `(Liste)`.
+
+**Attention, les listes ne sont pas disponibles dans la version web !**")
 (put 'Vide? 'text "Prédicat `Vide?`.")
 (de Vide? (obj)
-    (if (<> 0 (length obj)) Faux Vrai))
+    (if (<> 0 (Longueur obj)) Faux Vrai))
 
 # Rien
 (put 'Rien 'doc
