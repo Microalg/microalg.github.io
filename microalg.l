@@ -19,7 +19,7 @@ Voir <http://microalg.info>.")
 "Faire"
 "Faux" "Faux?"
 "Initialiser"
-"Liste" "Longueur"
+"Liste" "Liste?" "Longueur"
 "Nieme" "Nombre" "Nombre?" "Non"
 "Ou"
 "Queue"
