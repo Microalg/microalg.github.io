@@ -149,6 +149,10 @@ en sorte que `(Demander)` attende l’utilisateur.
 * Une *instruction* est constituée de parenthèses, contenant une *commande* et
   ses *arguments* :  
   `(Commande arg1 arg2 ...)`
+* Les séparateurs possibles sont :
+    * l’espace,
+    * le retour à la ligne,
+    * la tabulation (déconseillée).
 * C’est absolument universel dans MicroAlg. Même les commentaires sont de cette
   forme :  
   `(!!! "Ceci est un commentaire")`
@@ -253,6 +257,11 @@ En cours de rédaction.
 Les messages sont classés par ordre alphabétique, sans tenir compte de la
 valeur qui est parfois fournie :
 
+* `Afficher` n’a qu’un paramètre, faîtes plusieurs affichages ou utilisez
+  `Concatener`.
+    * Vous utilisez peut-être `Concatener`, mais il manque une parenthèse
+      fermante. Le reste du programme est vu comme le reste des arguments à
+      `Afficher`.
 * Commande `Faire` sans mot-clé `Tant_que`.
     * `Tant_que` est peut-être mal orthographié, ou il manque peut-être le « _ »
       ou la majuscule.
@@ -270,6 +279,10 @@ valeur qui est parfois fournie :
 * Indice non entier.
 * Indice trop grand.
 * `Initialiser` prend 2 paramètres. Vous en donnez X.
+* `java.lang.NullPointerException`
+    * Il y a peut-être dans votre code une commande de la forme `(x)` ou `x`
+      est une variable contenant un nombre. Dans ce cas, vous voulez peut-être
+      juste écrire la valeur de `x`, car `x` n’est pas une commande.
 * X -- La condition n’est pas un booléen.
     * Voir la sous-section [booléens](#boolens).
 * Le premier paramètre de `Entier@` doit être un nombre.
@@ -286,7 +299,8 @@ valeur qui est parfois fournie :
     * Voir la sous-section [booléens](#boolens).
 * X -- Number expected
     * Vous avez sans doute tenté un calcul (`+`, `-`, …) faisant intervenir
-      une valeur qui n’est pas du type nombre.  
+      une valeur qui n’est pas du type nombre. C’est souvent le cas si vous
+      utilisez la commande `Demander`.  
       Pensez à utiliser la commande `Nombre` pour convertir cette valeur.
 * Un objet vide n’a pas de queue.
 * Un objet vide n’a pas de tête.
@@ -469,8 +483,8 @@ s’est pas terminé correctement. Dans ce cas, plusieurs solutions :
 * taper `(bye)` dans le panneau de droite, après le `?` ou le `:` ;
 * cliquer sur `Tools` puis `Stop Executing` ;
 
-puis réessayer. Attention, dans certains cas, un processus `java.exe` peut
-continuer de tourner.
+puis réessayer. Attention, si vous utilisez la seconde méthode, un processus
+`java.exe` peut continuer de tourner.
 
 #### Unable to access jarfile
 

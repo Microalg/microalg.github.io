@@ -177,7 +177,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
    a_afficher (!text first)
   )
   (if second (quit (pack "`Afficher` n’a qu’un paramètre, faîtes plusieurs "
-                         "affichages ou utilisez `Concaténer`." )))
+                         "affichages ou utilisez `Concatener`." )))
   (setq *LastStdOut (if a_afficher a_afficher "?"))
   (ifn !testing
        (println (ifn a_afficher
@@ -589,7 +589,10 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 (de Faire arg_lst (let (Splitted (split arg_lst 'Tant_que)
                         Corps (car Splitted)
                         Bool (caadr Splitted))
-                       (ifn (<> arg_lst Corps) (quit "Commande `Faire` sans mot-clé `Tant_que`."))
+                       (ifn (<> arg_lst Corps)
+                            (quit "Commande `Faire` sans mot-clé `Tant_que`."))
+                       (if  (!boolM2P (> (length (cadr Splitted)) 1))
+                            (quit "Il ne faut qu’un seul élément après le mot-clé `Tant_que`."))
                        (run Corps)
                        (if (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
                            (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
@@ -663,7 +666,10 @@ Utiliser `(Retourner Rien)` pour ne rien retourner.
 **Attention !** Cette instruction doit être la dernière de la commande créée car
 `Retourner` n’en interrompt pas l’exécution.")
 (put 'Retourner 'text "Commande `Retourner`.")
-(de Retourner (val)
+(de Retourner (val deuze)
+  (if deuze (quit (pack "`Retourner` n’a qu’un paramètre. Si vous voulez "
+                        "vraiment retourner plusieurs valeurs, vous pouvez "
+                        "essayer de retourner une liste." )))
   val
 )
 (put 'Exemples_de 'doc
