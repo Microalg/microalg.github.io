@@ -196,7 +196,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
    second (cadr args)
    a_afficher (!text first)
   )
-  (if second (quit (pack "`Afficher` n’a qu’un paramètre, faîtes plusieurs "
+  (if second (quit (pack "`Afficher` n’a qu’un paramètre, faites plusieurs "
                          "affichages ou utilisez `Concatener`." )))
   (setq *LastStdOut (if a_afficher a_afficher "?"))
   (ifn !testing
@@ -704,7 +704,9 @@ Exemples :
 (put 'Exemples_de 'text "Commande `Exemples_de`.")
 (de Exemples_de arg_lst
   (let (commande (car arg_lst)
-        exemples (eval (cadr arg_lst)))
+        exemples (eval (cadr arg_lst))
+        troize (caddr arg_lst))
+       (if troize (quit (pack "`Exemples_de` n’a pas de troisième paramètre.")))
        (ifn exemples (get commande 'exemples)
                      (prog
                        (ifn (!boolM2P (Liste? exemples))
@@ -732,7 +734,9 @@ Voir la commande `Exemples_de`.")
 )
 (de Tester arg_lst
   (let (!commande (car arg_lst)
+        deuze (cadr arg_lst)
         !exemples (get !commande 'exemples))
+       (if deuze (quit (pack "`Tester` n’a qu’un paramètre.")))
        (cond
          ((not (eval !commande))
             (Afficher (pack "Il faut définir la commande " !commande " avant de la tester.")))
