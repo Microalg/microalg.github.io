@@ -89,6 +89,18 @@ body.microalg {
 .link-snippet a {
     text-decoration: none;
 }
+a.wp:after {
+    color: black;
+    vertical-align: super;
+    font-size: 50%;
+    content:"(wp)";
+}
+a.offi:after {
+    color: black;
+    vertical-align: super;
+    font-size: 50%;
+    content:"(officiel)";
+}
 #bla {
     width: 60%;
     margin: 0px auto;
