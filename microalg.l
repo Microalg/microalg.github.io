@@ -501,10 +501,13 @@ en minuscule).")
 "Commande qui retourne le texte correspondant à son paramètre.")
 (put 'Texte 'text "Commande `Texte`.")
 (de Texte (x) (cond
+                ((not (<> x 'Vrai)) "Vrai")
+                ((not (<> x 'Faux)) "Faux")
+                ((not (<> x 'Rien)) "Rien")
                 ((!boolM2P (Liste? x)) (!text x))  # mettre avant str?
                 ((str? x) x)
                 ((num? x) (format x))
-                (T NIL)
+                (T "???")
               ))
 (put 'Nombre 'doc
 "Commande qui retourne le nombre correspondant à son paramètre textuel.")
@@ -570,6 +573,7 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 
 # Structures itératives
 (setq credit_iterations 1000)
+(put 'credit_iterations 'type "nombre")
 (setq credit_iterations_message
       (pack "Crédit d’itérations épuisé (1 000 par défaut). Vous pouvez "
             "recharger votre crédit en affectant une valeur à la variable "
@@ -622,6 +626,10 @@ La syntaxe de cette commande est :
         (... de la commande ...)
         (Retourner la_valeur_de_retour)
     )
+
+**Attention** : La commande `Retourner` n’interrompt pas l’exécution des
+commandes que vous définissez. Il faut donc pour l’instant la mettre en
+dernière position.
 
 Il peut être intéressant de signer ses créations avec le pseudo utilisé sur
 [les questions/réponses](http://qr.microalg.info).
