@@ -45,6 +45,7 @@ Aller directement à :
 * [Intégrations](#intgrations)
     * [SciTE](#scite)
     * [NotePad++](#notepad)
+    * [Vim](#vim)
     * [Blockly](#blockly)
 * [Remerciements](#remerciements)
 
@@ -445,6 +446,33 @@ avec le programme. Les valeurs demandées par le programme doivent y être tapé
 **Bug connu** (si vous utilisez autre chose que Windows) : pas moyen de faire
 en sorte que `(Demander)` attende l’utilisateur.
 
+### Abbréviations
+
+Après avoir tapé les préfixes ci-dessous, un appui sur `Ctrl`+`B` vous
+donnera la suite.
+
+    (Af  ->  (Affecter_a |)
+    (Afe ->  (Affecter_a | En_position )
+    (A   ->  (Afficher |)
+    (Aj  ->  (Ajouter_a |)
+    (Co  ->  (Concatener |)
+    (D   ->  (Definir |...
+    (Dm  ->  (Demander)
+    (E   ->  (Exemples_de |...
+    # Pour Faire, deux lignes vides pour aider à penser au compteur.
+    (F   ->  (Faire (|)...
+    (I   ->  (Initialiser |)
+    (Li  ->  (Liste |)
+    (Lo  ->  (Longueur |)
+    (Ni  ->  (Nieme |)
+    (No  ->  (Nombre |)
+    (Rd  ->  (Retirer_de |)
+    (R   ->  (Retourner |)
+    (S   ->  (Si (|) Alors...
+    (Ss  ->  (Si (|) Alors () Sinon...
+    # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
+    (Tq  ->  (Tant_que (|) Faire...
+
 ### Problèmes connus
 
 #### Pas de réaction
@@ -469,6 +497,26 @@ colorées, pas d’indication de signature de commande…).
 
 `Ctrl`+`F5` pour lancer le programme (suivant le raccourci choisi). La sortie
 apparaît dans une fenêtre identique à celle de `cmd.exe`.
+
+## Vim
+
+Voici ce que vous pouvez mettre dans votre `.vimrc` si vous avez un fond
+sombre. Si vous avez un fond clair, dîtes-moi ce qui fonctionne en envoyant
+une copie d’écran.
+
+    let g:lisp_rainbow = 1
+    " Les opérateurs +-*/><= doivent rester blancs.
+    hi def lispFunc   ctermfg=grey
+    " Les textes en vert discret.
+    hi def lispString ctermfg=darkgreen
+    " Les parenthèses.
+    hi def hlLevel0   ctermfg=darkred
+    hi def hlLevel1   ctermfg=brown
+    hi def hlLevel2   ctermfg=yellow
+    hi def hlLevel3   ctermfg=green
+    hi def hlLevel4   ctermfg=cyan
+    hi def hlLevel5   ctermfg=blue
+    hi def hlLevel6   ctermfg=darkmagenta
 
 ## Blockly
 
