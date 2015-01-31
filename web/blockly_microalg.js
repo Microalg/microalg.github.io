@@ -31,10 +31,13 @@ Blockly.Msg.RENAME_VARIABLE_TITLE = "Renommer toutes les variables '%1' en :";
 Blockly.MicroAlg = new Blockly.Generator('MicroAlg');
 Blockly.MicroAlg.INDENT = '  ';
 Blockly.MicroAlg.addReservedWords(
-    '=, =/, <, <=, >, >=, ' +
-    'Affecter_a, Afficher, Aide, Bloc, Booleen?, Concatener, ' +
-    'Demander, Faire, Faux, Faux?, Initialiser, Nombre, Nombre?, ' +
-    'Rien, Si, Tant_que, Texte, Texte?, Type, Vrai, Vrai?');
+    'Affecter_a, Afficher, Aide, Ajouter_a, Alors, Booleen?, Concatener, ' +
+    'Definir, Demander, En_position, Entier@, Et, Exemples_de, ' +
+    'Faire, Faux, Faux?, Initialiser, Initialiser@, ' +
+    'Liste, Liste?, Longueur, Nieme, Nieme@, Nombre, Nombre?, Non, Ou, ' +
+    'Queue, Retirer_de, Retourner, Rien, Si, Sinon, ' +
+    'Tant_que, Tester, Tete, Texte, Texte?, Type, ' +
+    'Vide?, Vrai, Vrai?');
 
 // La suite, jusqu’au commentaire de fin, n’a pas été modifiée.
 
@@ -394,6 +397,37 @@ Blockly.Blocks['demander'] = {
 // Gen Demander
 Blockly.MicroAlg['demander'] = function(block) {
   return '(Demander)';
+};
+
+// Bloc Entier@
+Blockly.Blocks['entier_pseudo_aleatoire'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#cmd-Entier@');
+    this.setColour(250);
+    this.appendValueInput('MIN')
+        .setCheck('Number')
+        .appendField('Entier@');
+    this.appendValueInput('MAX')
+        .setCheck('Number');
+    this.setInputsInline(true);
+    this.setOutput(true, 'Number');
+    this.setTooltip('Nombre pseudo-aléatoire entre les valeurs fournies.');
+  }
+};
+
+// Gen Entier@
+Blockly.MicroAlg['entier_pseudo_aleatoire'] = function(block) {
+  var min = Blockly.MicroAlg.statementToCode(block, 'MIN') || '';
+  var max = Blockly.MicroAlg.statementToCode(block, 'MAX') || '';
+  if (min + max === '') return '(Entier@)';
+  var num_lines = (min + max).split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Entier@ ' + min.substring(Blockly.MicroAlg.INDENT.length) +
+                   ' ' + max.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Entier@\n' + min + '\n' + max + '\n)';
+  }
 };
 
 // Bloc Faire
