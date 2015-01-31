@@ -1,4 +1,4 @@
-(setq version "0.2.4")
+(setq version "0.2.5")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -15,12 +15,12 @@ Voir <http://microalg.info>.")
 "Booleen?"
 "Concatener"
 "Definir" "Demander"
-"En_position" "Et" "Exemples_de"
+"En_position" "Entier@" "Et" "Exemples_de"
 "Faire"
 "Faux" "Faux?"
-"Initialiser"
+"Initialiser" "Initialiser@"
 "Liste" "Liste?" "Longueur"
-"Nieme" "Nombre" "Nombre?" "Non"
+"Nieme" "Nieme@" "Nombre" "Nombre?" "Non"
 "Ou"
 "Queue"
 "Retirer_de" "Retourner" "Rien"
@@ -106,6 +106,9 @@ Voir <http://microalg.info>.")
 (de var: X
    (apply meta X This) )
 
+# En cas d’erreur, pas de prompt ? par défaut.
+(setq *Err '((bye)))
+
 # Vérif et conversions de booléens MicroAlg <-> PicoLisp:
 (de !boolM2P (x) (if (<> Faux x) T NIL))
 (de !boolP2M (x) (if x Vrai Faux))
@@ -115,10 +118,13 @@ Voir <http://microalg.info>.")
     (!boolM2P x) )
 
 (de !add_quotes (x) (pack "\"" x "\""))
-(de !quote_txt (x) (if (and (str? x)
-                            (not (try 'text> x)))  # car (str? (Liste)) -> not NIL
+(de !quote_txt (x) (if (or (not x) (!boolM2P (Texte? x)))
                        (!add_quotes x)
                        x))
+
+# Vérif qu’une variable est bien initialisée :
+(de !inited (!sym)
+    (or (eval !sym) (get !sym 'type)) )
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -229,6 +235,9 @@ Si vous ne l’avez pas déjà fait, commencez par le
           efirst (eval first)
          )
          (cond
+          ((!boolM2P (= Vrai efirst)) "Vrai")
+          ((!boolM2P (= Faux efirst)) "Faux")
+          ((!boolM2P (= Rien efirst)) "Rien")
           ((and (not (atom efirst)) (!boolM2P (= '? (car efirst))))
            (pack "(" (str efirst) ")"))           # liste commençant par ?
           ((num? first) first)                    # nombre litéral
@@ -251,8 +260,11 @@ Si vous ne l’avez pas déjà fait, commencez par le
    second (cadr args)
    a_afficher (!text first)
   )
+  # Quelques vérifications
+  (ifn (!inited first) (quit "`Afficher` : la variable n’est pas initialisée." first))
   (if second (quit (pack "`Afficher` n’a qu’un paramètre, faites plusieurs "
                          "affichages ou utilisez `Concatener`." )))
+  # Le boulot
   (setq *LastStdOut (if a_afficher a_afficher "?"))
   (ifn !testing
        (println (ifn a_afficher
@@ -345,6 +357,7 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
          )
          (ifn kw
               (prog
+                 (if (!boolM2P (Liste? var)) (quit (pack !onppauv "à une liste, utiliser `Affecter_a … … En_position …`.") var))
                  # Affectation au symbole dans `var`.
                  (ifn (get var 'type)
                       (quit "Variable non initialisée." var)
@@ -384,29 +397,95 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
 (setq En_position 'En_position)
 
 # Tirages pseudo-aléatoires.
-(put 'Decimal@ 'doc
-"Retourne un nombre décimal pseudo-aléatoire dans [0;1[.
+(put 'Initialiser@ 'doc
+"Permet d’obtenir une séquence de nombres pseudo-aléatoires différente.
 
-Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
-(put 'Decimal@ 'text "Commande `Decimal@`.")
-(de Decimal@ () (/ (+ 2147483648 (rand)) 4294967296))
+Cette commande est à appeler une seule fois au début de votre programme et est
+inutile si vous utilisez la version Javascript de MicroAlg (en particulier dans
+le navigateur). Elle résout le problème suivant :
+
+Dans une session :
+
+    : (Entier@ 0 1000)
+    -> 0
+    : (Entier@ 0 1000)
+    -> 648
+
+Puis dans une autre, plus tard :
+
+    : (Entier@ 0 1000)
+    -> 0
+    : (Entier@ 0 1000)
+    -> 648
+
+Alors que :
+
+    : (Initialiser@)
+    -> Rien
+    : (Entier@ 0 1000)
+    -> 422  # Cette valeur sera différente à chaque seconde de la journée.
+")
+(put 'Initialiser@ 'text "Commande `Initialiser@`.")
+(de Initialiser@ ()
+    (seed (time))
+    Rien)
 (put 'Entier@ 'doc
-"Retourne un nombre entier pseudo-aléatoire dans [`min`;`max`].
+"Retourne un nombre entier pseudo-aléatoire dans [`min`;`max`] (les deux
+paramètres entiers).
+
+    : (Entier@ 1 6)
+    -> 2
+    : (Entier@ 1 6)
+    -> 6
 
 Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
 (put 'Entier@ 'text "Commande `Entier@`.")
-(de Entier@ arg_lst (let (nbr_args (length arg_lst))
-                         (if (<> 2 nbr_args)
-                             (quit (pack "`Entier@` prend 2 paramètres. "
-                                         "Vous en donnez " nbr_args ".") )
-                         )
-                    )
-                    (let (min (eval (car arg_lst))
-                          max (eval (cadr arg_lst)))
-                         (ifn (num? min) (quit "Le premier paramètre de `Entier@` doit être un nombre."))
-                         (ifn (num? max) (quit "Le second paramètre de `Entier@` doit être un nombre."))
-                         (rand min max)
-                    )
+(de Entier@ (!min !max !rien_ici)
+    # Quelques vérifications
+    (ifn (and !min !max) (quit "`Entier@` prend deux paramètres (entiers)."))
+    (if !rien_ici (quit "`Entier@` ne prend que deux paramètres (entiers)."))
+    (cond
+        ((<> !min (format (round !min 0) 0 "." ","))
+         (quit "Le minimum de `Entier@` n’est pas entier." !min))
+        ((<> !max (format (round !max 0) 0 "." ","))
+         (quit "Le maximum de `Entier@` n’est pas entier." !max))
+        ((!boolM2P (> !min !max))
+         (quit "Le minimum et le maximum de `Entier@` ne sont pas dans l’ordre."))
+    )
+    # Le calcul
+    (rand !min !max)
+)
+(put 'Nieme@ 'doc
+"Retourne un élément choisi pseudo-aléatoirement dans la liste ou le texte
+ fourni en paramètre.
+
+    : (Nieme@ (Liste 13 666 2015))
+    -> 2015
+    : (Nieme@ (Liste 13 666 2015))
+    -> 666
+    : (Nieme@ \"bonjour\")
+    -> n
+    : (Nieme@ \"bonjour\")
+    -> o
+
+Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
+(put 'Nieme@ 'text "Commande `Nieme@`.")
+(de Nieme@ (obj !rien_ici)
+    # Quelques vérifications
+    (setq !onppeuv "`Nieme@` ne peut pas extraire un élément pseudo-aléatoire ")
+    (cond
+        ((num? obj) (quit (pack !onppeuv "d’un nombre.") obj))
+        ((== obj 'Vrai) (quit (pack !onppeuv "du booléen Vrai.")))
+        ((== obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
+        ((== obj 'Rien) (quit (pack !onppeuv "de Rien.")))
+    )
+    (if !rien_ici (quit "`Nieme@` ne prend qu’un paramètre (liste ou texte)."))
+    # Le calcul
+    (cond
+        ((!boolM2P (Liste? obj)) (nth> obj (rand 1 (length> obj))))
+        ((str? obj) (car (nth (chop obj) (rand 1 (length obj)))))
+        (T Rien)
+    )
 )
 
 # Demander.
@@ -491,11 +570,31 @@ Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
     -> 4
 ")
 (put 'Longueur 'text "Commande `Longueur`.")
-(de Longueur (obj)
-    (if (!boolM2P (Liste? obj))
-        (length> obj)
-        (length obj)
+(de !longueur (!obj)
+    (if (!boolM2P (Liste? !obj))
+        (length> !obj)
+        (length  !obj)
     )
+)
+(de Longueur arg_lst
+  (let (!obj (car arg_lst)
+        !evaled_obj (eval !obj)
+        !deuze (cadr arg_lst))
+    # Quelques vérifications
+    (if !deuze (quit "`Longueur` n’a qu’un paramètre."))
+    (ifn !obj 0  # pour gérer texte vide
+      (ifn (!inited !obj) (quit "`Longueur` : la variable n’est pas initialisée." !obj))
+    )
+    (setq !npdl " n’a pas de `Longueur`.")
+    (cond
+        ((num? !evaled_obj) (quit (pack "Un nombre" !npdl) !evaled_obj))
+        ((==   !evaled_obj 'Vrai) (quit (pack "Vrai" !npdl)))
+        ((==   !evaled_obj 'Faux) (quit (pack "Faux" !npdl)))
+        ((==   !evaled_obj 'Rien) (quit (pack "Rien" !npdl)))
+    )
+    # Le calcul
+    (!longueur !evaled_obj)
+  )
 )
 (put 'Nieme 'doc
 "Permet d’accéder en lecture à un des éléments d’un texte ou d’une liste
@@ -509,29 +608,37 @@ La numérotation commence à 1.
     -> 3
 ")
 (put 'Nieme 'text "Commande `Nieme`.")
-(de Nieme (obj idx)
+(de Nieme arg_lst
+  (let (!obj (car arg_lst)
+        !evaled_obj (eval !obj)
+        !idx (eval (cadr arg_lst))
+        !troize (caddr arg_lst))
     # Quelques vérifications
+    (if !troize (quit "`Nieme` n’a que deux paramètres."))
+    (ifn (!inited !obj) (quit "`Nieme` : la variable n’est pas initialisée." !obj))
     (setq !onppeuv "`Nieme` ne peut pas extraire une valeur ")
     (cond
-        ((num? obj) (quit (pack !onppeuv "d’un nombre.") obj))
-        ((== obj 'Vrai) (quit (pack !onppeuv "du booléen Vrai.")))
-        ((== obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
-        ((== obj 'Rien) (quit (pack !onppeuv "de Rien.")))
+        ((num? !evaled_obj) (quit (pack !onppeuv "d’un nombre.") !evaled_obj))
+        ((==   !evaled_obj 'Vrai) (quit (pack !onppeuv "du booléen Vrai.")))
+        ((==   !evaled_obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
+        ((==   !evaled_obj 'Rien) (quit (pack !onppeuv "de Rien.")))
     )
-    (let (len (Longueur obj))
+    (let (len (Longueur !evaled_obj))
       (cond
-        ((not idx) (quit "Il manque le deuxième paramètre : l’indice."))
-        ((<> idx (format (round idx 0) 0 "." ",")) (quit "Indice non entier." idx))
-        ((le0 idx) (quit "Indice négatif ou nul." idx))
-        ((lt0 (- len idx)) (quit "Indice trop grand." (list idx '> len)))
+        ((not !idx) (quit "Il manque le deuxième paramètre : l’indice."))
+        ((<> !idx (format (round !idx 0) 0 "." ",")) (quit "Indice non entier." !idx))
+        ((le0 !idx) (quit "Indice négatif ou nul." !idx))
+        ((lt0 (- len !idx)) (quit "Indice trop grand." (list !idx '> len)))
       )
     )
     # Le calcul
     (cond
-      ((!boolM2P (Liste? obj)) (nth> obj idx))
-      ((str? obj) (car (nth (chop obj) idx)))
+      ((!boolM2P (Liste? !evaled_obj)) (nth> !evaled_obj !idx))
+      ((!boolM2P (Texte? !evaled_obj)) (car (nth (chop !evaled_obj) !idx)))
       (T Rien)
-    ))
+    )
+  )
+)
 (put 'Tete 'doc
 "Commande qui retourne le premier élément d’un texte ou d’une liste.
 
@@ -543,14 +650,17 @@ La numérotation commence à 1.
 (put 'Tete 'text "Commande `Tete`.")
 (de Tete (obj)
     # Quelques vérifications
-    (if (!boolM2P (Vide? obj))
-        (quit "Un objet vide n’a pas de tête.")
+    (cond ((num? obj)
+           (quit "Un nombre n’a pas de tête, il faut un texte ou une liste." obj))
+          ((!boolM2P (Vide? obj))
+           (quit "Un objet vide n’a pas de tête." obj))
     )
     # Le calcul
     (cond
       ((!boolM2P (Liste? obj)) (nth> obj 1))
       ((str? obj) (car (chop obj)))
-      (T Rien)
+      (T (quit "Vous cherchez la tete d’une valeur qui n’est ni un texte ni une liste."
+               (list obj (Type obj))))
     ))
 (put 'Queue 'doc
 "Commande qui retourne une copie du texte ou de la liste en paramètre,
@@ -564,8 +674,10 @@ La numérotation commence à 1.
 (put 'Queue 'text "Commande `Queue`.")
 (de Queue (obj)
     # Quelques vérifications
-    (if (!boolM2P (Vide? obj))
-        (quit "Un objet vide n’a pas de queue.")
+    (cond ((num? obj)
+           (quit "Un nombre n’a pas de queue, il faut un texte ou une liste." obj))
+          ((!boolM2P (Vide? obj))
+           (quit "Un objet vide n’a pas de queue." obj))
     )
     # Le calcul
     (cond
@@ -606,10 +718,15 @@ Avec une liste :
         !troize (caddr arg_lst))
        # Quelques vérifications
        (if !troize (quit "`Ajouter_a` n’a que deux paramètres."))
+       (ifn (!inited !sym) (quit "`Ajouter_a` : la variable n’est pas initialisée." !sym))
+       (if (!boolM2P (!texte? !sym))
+           (if (or (not (!boolM2P (Texte? !elt)))
+                   (!boolM2P (> (Longueur !elt) 1)) )
+               (quit "On peut `Ajouter_a` un texte qu’un caractère." !elt) ))
        # Le calcul
        (cond
          ((!boolM2P (Liste? !evaled_sym)) (prog (push> !evaled_sym !elt) Rien))
-         ((or (not !evaled_sym) (str? !evaled_sym)) (prog (set !sym (pack !evaled_sym !elt)) Rien))
+         ((!boolM2P (!texte? !sym)) (prog (set !sym (pack !evaled_sym !elt)) Rien))
          (T (quit "Le premier argument de `Ajouter_a` doit être du texte ou une liste." !sym))
        )
   )
@@ -645,10 +762,11 @@ Avec une liste :
         !deuze (cadr arg_lst))
        # Quelques vérifications
        (if !deuze (quit "`Retirer_de` n’a qu’un paramètre."))
+       (ifn (!inited !sym) (quit "`Retirer_de` : la variable n’est pas initialisée." !sym))
        # Le calcul
        (cond
          ((!boolM2P (Liste? !evaled_sym)) (pop> !evaled_sym))
-         ((or (not !evaled_sym) (str? !evaled_sym))
+         ((!boolM2P (Texte? !evaled_sym))
              (let (!chopped (chop !evaled_sym)
                    !return_val (last !chopped))
                   (set !sym (pack (head (- (length !evaled_sym) 1) !chopped)))
@@ -678,12 +796,14 @@ en minuscule).
   (let (!x (car arg_lst)
         !evaled_x (eval !x))
        (cond
-         ((<> Faux (Nombre?  !evaled_x)) "nombre")
-         ((<> Faux (Liste?   !x))        "liste")
-         ((<> Faux (Texte?   !evaled_x)) "texte")
-         ((<> Faux (Liste?   !evaled_x)) "liste")
-         ((<> Faux (Booleen? !evaled_x)) "booleen")
-         ((<> Faux (== Rien  !evaled_x)) "rien")
+         ((not !x) "texte")  # Possiblement "" en direct.
+         ((!boolM2P (Nombre?  !evaled_x)) "nombre")
+         ((!boolM2P (Liste?   !x))        "liste")
+         ((!boolM2P (!texte?  !x))        "texte")  # pour les sym textuels ?
+         ((!boolM2P (Texte?   !evaled_x)) "texte")
+         ((!boolM2P (Liste?   !evaled_x)) "liste")
+         ((!boolM2P (Booleen? !evaled_x)) "booleen")
+         ((!boolM2P (== Rien  !evaled_x)) "rien")
          ((sym? x) (get !x 'type))
          (T Rien)
        ) ) )
@@ -943,11 +1063,11 @@ Utiliser `(Retourner Rien)` pour ne rien retourner.
 **Attention !** Cette instruction doit être la dernière de la commande créée car
 `Retourner` n’en interrompt pas l’exécution.")
 (put 'Retourner 'text "Commande `Retourner`.")
-(de Retourner (val deuze)
-  (if deuze (quit (pack "`Retourner` n’a qu’un paramètre. Si vous voulez "
-                        "vraiment retourner plusieurs valeurs, vous pouvez "
-                        "essayer de retourner une liste." )))
-  val
+(de Retourner (!val !deuze)
+  (if !deuze (quit (pack "`Retourner` n’a qu’un paramètre. Si vous voulez "
+                         "vraiment retourner plusieurs valeurs, vous pouvez "
+                         "essayer de retourner une liste." )))
+  !val
 )
 (put 'Exemples_de 'doc
 "Permet de lire ou écrire les exemples-tests d’une commande.
@@ -1007,9 +1127,9 @@ Voir la commande `Exemples_de`.")
 )
 (de Tester arg_lst
   (let (!commande (car arg_lst)
-        deuze (cadr arg_lst)
+        !deuze (cadr arg_lst)
         !exemples (get !commande 'exemples))
-       (if deuze (quit "`Tester` n’a qu’un paramètre."))
+       (if !deuze (quit "`Tester` n’a qu’un paramètre."))
        (cond
          ((not (eval !commande))
             (Afficher (pack "Il faut définir la commande " !commande " avant de la tester.")))
@@ -1064,7 +1184,27 @@ et `Faux` sinon.
     -> Vrai
 ")
 (put 'Texte? 'text "Prédicat `Texte?`.")
-(de Texte? (x) (if (str? x) Vrai Faux))
+(de !texte? (!obj)  # helper évaluant son arg
+       (cond
+        ((not !obj) Vrai)                       # Possiblement "" en direct.
+        ((num? !obj) Faux)                      # Un nombre en direct.
+        ((num? !evaled_obj) Faux)               # Un sym numérique.
+        ((!boolM2P (Liste? !evaled_obj)) Faux)  # Liste.
+        ((if (sym? !obj) (== (get !obj 'type) "texte")) Vrai)  # Un sym textuel.
+        ((== (get !obj 'type) "texte") Vrai)    # Un sym textuel.
+        ((str? !evaled_obj) Vrai)               # Texte.
+        (T Faux)                                # Le reste.
+       )
+  )
+(de Texte? arg_lst
+  (let (!obj (car arg_lst)
+        !evaled_obj (eval !obj)
+        !deuze (cadr arg_lst))
+       # Quelques vérifications:
+       (if !deuze (quit "`Retirer_de` n’a qu’un paramètre."))
+       (!texte? !obj)
+  )
+)
 (put 'Nombre? 'doc
 "Prédicat retournant `Vrai` si la valeur de son argument est un nombre,
 et `Faux` sinon.
@@ -1115,7 +1255,14 @@ et `Faux` sinon.
     -> Vrai
 ")
 (put '= 'text "Prédicat `=`.")
-(de = (x y) (ifn (<> x y) Vrai Faux))
+(de = (x y) (ifn (<> x y)
+                 (if (or (== x Vrai) (== x Faux) (== x Rien)
+                         (== y Vrai) (== y Faux) (== y Rien))
+                     (if (== x y) Vrai Faux)  # test == pour les vals ci-dessus
+                     Vrai                     # pour les autres, c’est not <>
+                 )
+                 Faux)  # ici, ils sont <>
+)
 (put '=/ 'doc
 "Prédicat retournant `Vrai` si les valeurs de ses deux arguments sont
 différentes, et `Faux` sinon.
@@ -1196,8 +1343,27 @@ Exemples :
     -> Vrai
 ")
 (put 'Vide? 'text "Prédicat `Vide?`.")
-(de Vide? (obj)
-    (if (<> 0 (Longueur obj)) Faux Vrai))
+(de Vide? arg_lst
+  (let (!obj (car arg_lst)
+        !evaled_obj (eval !obj)
+        !deuze (cadr arg_lst))
+    # Quelques vérifications
+    (ifn arg_lst (quit "`Vide?` prend un paramètre."))
+    (if !deuze (quit "`Vide?` n’a qu’un paramètre."))
+    (ifn !obj Vrai
+      (ifn (!inited !obj) (quit "`Vide?` : la variable n’est pas initialisée." !obj))
+    )
+    (setq !ctnaass "`Vide?` : ce test n’a aucun sens sur ")
+    (cond
+        ((num? !evaled_obj) (quit (pack !ctnaass "un nombre.") !evaled_obj))
+        ((==   !evaled_obj 'Vrai) (quit (pack !ctnaass "Vrai.")))
+        ((==   !evaled_obj 'Faux) (quit (pack !ctnaass "Faux.")))
+        ((==   !evaled_obj 'Rien) (quit (pack !ctnaass "Rien.")))
+    )
+    # Le calcul
+    (if (<> 0 (!longueur !evaled_obj)) Faux Vrai)
+  )
+)
 
 # Rien
 (put 'Rien 'doc
