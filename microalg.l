@@ -261,7 +261,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
    a_afficher (!text first)
   )
   # Quelques vérifications
-  (ifn (!inited first) (quit "`Afficher` : la variable n’est pas initialisée." first))
+  #(ifn (!inited first) (quit "`Afficher` : la variable n’est pas initialisée." first))
   (if second (quit (pack "`Afficher` n’a qu’un paramètre, faites plusieurs "
                          "affichages ou utilisez `Concatener`." )))
   # Le boulot
