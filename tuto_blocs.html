@@ -41,6 +41,7 @@
     <a href="#calculs-nombres">Calculs avec des nombres</a>,
     <a href="#calculs-nombres-demandes">Calculs avec des nombres demandés à l’utilisateur</a>,
     <a href="#booleens">Booléens</a>,
+    <a href="#si">Si</a>,
     <a href="#taper-du-code">Taper du code</a>,
     <a href="#contact">Contact</a>.
     </p>
@@ -337,7 +338,7 @@
      src:
         '(Afficher (+ 1 (Demander)))'
     });</script>
-    </p>C'est la première fois que dans ce tutoriel nous évoquons la
+    <p>C'est la première fois que dans ce tutoriel nous évoquons la
     distinction entre <code>1</code> et <code>"1"</code>. C’est la notion de
     <em>type</em>. On dira que :</p>
     <ul>
@@ -506,6 +507,186 @@
         '(Afficher (< 0 1))\n' +
         ''
     });</script>
+
+    <h2 id="si"><a href="#si">: </a>Si</h2>
+    <p>Les booléens servent surtout à décider quelle instruction exécuter
+    plutôt qu’une autre.</p>
+    Par exemple, lorsque l’on discute avec quelqu’un, on peut commencer par :
+    « Salut, ça va ? ».<br>
+    <strong>Si</strong> la personne répond « oui » (qui correspondrait à
+    <code>Vrai</code>), <strong>alors</strong> on lui répond « Tant mieux ! ».<br>
+    <strong>Sinon</strong> (ce qui correspondrait à <code>Faux</code>), on lui
+    répond « Ah, qu’y a-t-il ? ».</p>
+    <p>Avec MicroAlg, pour programmer ce genre de situation, on utilisera la
+    commande <code>Si</code>.</p>
+    <p>Attention, dans l’exemple suivant, seul le mot « oui » en minuscule est
+    reconnu comme une réponse positive.</p>
+    <div id="script-si"></div>
+    <script>inject_microalg_editor_in('script-si', {
+     blockly_only: true,
+     src:
+        '(Afficher "Salut, ça va ?")\n' +
+        '(Si (= (Demander) "oui")\n' +
+        ' Alors (Afficher "Tant mieux !")\n' +
+        ' Sinon (Afficher "Ah, qu’y a-t-il ?")\n' +
+        ')'
+    });</script>
+    <p>Le programme ci-dessus peut se lire :</p>
+    <ul>
+        <li>Afficher la question.</li>
+        <li><strong>Si</strong> ce que l’utilisateur tape et « oui » sont égaux
+            (l’utilisateur répond « oui »),</li>
+        <li><strong>Alors</strong> afficher « Tant mieux ! »,</li>
+        <li><strong>Sinon</strong> afficher « Ah, qu’y a-t-il ? ».</li>
+    </ul>
+    <p>On peut donc résumer la commande <code>Si</code> ainsi :<br>
+    <pre><code>Si booléen
+Alors bloc-si-vrai
+Sinon bloc-si-faux</code></pre></p>
+    <p>Si on veut détailler, le bloc <code>Si</code> possède ici trois
+    entrées :</p>
+    <ul>
+        <li>en face de <code>Si</code>, un booléen,</li>
+        <li>en face de <code>Alors</code>, le bloc à exécuter si le booléen est <code>Vrai</code>,</li>
+        <li>en face de <code>Sinon</code>, le bloc à exécuter si le booléen est <code>Faux</code>,</li>
+    </ul>
+    <p>Le bloc <code>Si</code> agit comme un aiguillage pour les rails des
+    trains. En actionnant l’aiguillage, on décide sur quelle voie va rouler le
+    train.</p>
+    <p>L’analogie de l’arbre est aussi possible : le déroulement du programme
+    peut suivre une des deux branches, la branche du « alors » ou la branche du
+    « sinon ».</p>
+    <p>Voici d’autres exemples :</p>
+    <div id="script-si-mdp"></div>
+    <script>inject_microalg_editor_in('script-si-mdp', {
+     blockly_only: true,
+     src:
+        '(Afficher "Quel est le mot de passe ?")\n' +
+        '(Si (= (Demander) "funambule")\n' +
+        ' Alors (Afficher "Accès autorisé.")\n' +
+        ' Sinon (Afficher "Accès refusé.")\n' +
+        ')'
+    });</script>
+    <div id="script-si-calcul"></div>
+    <script>inject_microalg_editor_in('script-si-calcul', {
+     blockly_only: true,
+     src:
+        '(Afficher "Combien font deux et deux ?")\n' +
+        '(Si (= (Demander) "quatre")\n' +
+        ' Alors (Afficher "Bravo !")\n' +
+        ' Sinon (Afficher "Perdu, c’était « quatre ».")\n' +
+        ')'
+    });</script>
+    <div id="script-si-majeur-mineur"></div>
+    <script>inject_microalg_editor_in('script-si-majeur-mineur', {
+     blockly_only: true,
+     src:
+        '(Afficher "Quel âge as-tu ?")\n' +
+        '(Si (< (Nombre (Demander)) 18)\n' +
+        ' Alors (Afficher "Tu es mineur.")\n' +
+        ' Sinon (Afficher "Tu es majeur.")\n' +
+        ')'
+    });</script>
+    <p>Après avoir vu les bases du bloc <code>Si</code>, voyons quelques
+    variantes :</p>
+    <ul>
+        <li><a href="#si-sans-sinon">Si sans « sinon »</a>,</li>
+        <li><a href="#si-blocs">Si avec plusieurs commandes</a>,</li>
+        <li><a href="#si-emboites">Si(s) emboîtés</a>,</li>
+        <li><a href="#si-valeurs">Si avec des valeurs uniquement</a>,</li>
+    </ul>
+    <h3 id="si-sans-sinon"><a href="#si-sans-sinon">: </a>Si sans « sinon »</h3>
+    <p>Il est possible de ne rien mettre en face de <code>Sinon</code> si on
+    n’a rien à y faire. Dans ce cas, on peut même cacher cette partie du bloc
+    <code>Si</code>, comme ci-dessous. Pour faire apparaître ou disparaître
+    le <code>Sinon</code>, il suffit de cliquer sur l’étoile devant le
+    <code>Si</code>, puis d’ajouter ou de supprimer le bloc <code>Sinon</code>
+    en le faisant glisser dans l’encadré.</p>
+    <div id="script-si-sans-sinon"></div>
+    <script>inject_microalg_editor_in('script-si-sans-sinon', {
+     blockly_only: true,
+     src:
+        '(Si Vrai\n' +
+        ' Alors (Afficher "Bonjour !")\n' +
+        ')\n' +
+        '(Si Faux\n' +
+        ' Alors (Afficher "Au revoir !")\n' +
+        ')\n' +
+        '(Afficher "Voilà.")\n' +
+        ''
+    });</script>
+    <h3 id="si-blocs"><a href="#si-blocs">: </a>Si avec plusieurs commandes</h3>
+    <p>On a parfois besoin d’exécuter plusieurs instructions dans une même
+    branche. Il suffit simplement d’empiler les blocs au bon endroit.</p>
+    <div id="script-si-blocs"></div>
+    <script>inject_microalg_editor_in('script-si-blocs', {
+     blockly_only: true,
+     src:
+        '(Si Vrai\n' +
+        ' Alors (Afficher "Bonjour !")\n' +
+        '       (Afficher "Et rebonjour !")\n' +
+        ' Sinon (Afficher "Au revoir !")\n' +
+        '       (Afficher "Et au revoir encore !")\n' +
+        ')\n' +
+        '(!!! "Le même code, mais avec l’autre booléen :")\n' +
+        '(Si Faux\n' +
+        ' Alors (Afficher "Bonjour !")\n' +
+        '       (Afficher "Et rebonjour !")\n' +
+        ' Sinon (Afficher "Au revoir !")\n' +
+        '       (Afficher "Et au revoir encore !")\n' +
+        ')\n' +
+        ''
+    });</script>
+    <p>Avec plusieurs commandes dans les branches, la commande <code>Si</code>
+    est finalement de la forme :<br>
+    <pre><code>Si booléen
+Alors commande-1-si-vrai
+      commande-2-si-vrai
+       ...
+Sinon commande-1-si-faux
+      commande-2-si-faux
+       ...</code></pre></p>
+    <h3 id="si-emboites"><a href="#si-emboites">: </a>Si(s) emboîtés</h3>
+    <p>Un arbre a parfois plus de deux branches !</p>
+    <p>Qu’affiche le programme suivant ? Comment lui faire afficher
+    les autres textes du programme en ne changeant que la valeur des
+    booléens ?</p>
+    <div id="script-si-emboites"></div>
+    <script>inject_microalg_editor_in('script-si-emboites', {
+     blockly_only: true,
+     src:
+        '(Si Vrai\n' +
+        ' Alors (Si Vrai\n' +
+        '           Alors (Afficher "premier")\n' +
+        '           Sinon (Afficher "deuxième")\n' +
+        '       )\n' +
+        ' Sinon (Si Vrai\n' +
+        '           Alors (Afficher "troisième")\n' +
+        '           Sinon (Afficher "quatrième")\n' +
+        '       )\n' +
+        ')'
+    });</script>
+    <!--
+    <p>Voici une application concrète d’une structure avec des <code>Si</code>
+    emboîtés :</p>
+    <div id="script-si-emboites-appli"></div>
+    <script>inject_microalg_editor_in('script-si-emboites-appli', {
+     blockly_only: true,
+     src:
+        '(Afficher "Veuillez taper un nombre.")\n' +
+        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Si (>= nbre 0)\n' +
+        ' Alors (Si (>= nbre 1000)\n' +
+        '        Alors (Afficher "Ce nombre est positif et assez grand.")\n' +
+        '        Sinon (Afficher "Ce nombre est positif ou nul et pas trop grand.")\n' +
+        '       )\n' +
+        ' Sinon (Si (<= nbre -1000)\n' +
+        '        Alors (Afficher "Ce nombre est négatif et assez grand.")\n' +
+        '        Sinon (Afficher "Ce nombre est négatif et pas trop grand.")\n' +
+        '       )\n' +
+        ')'
+    });</script>
+    -->
 
     <h2 id="taper-du-code"><a href="#taper-du-code">: </a>Taper du code</h2>
     <p>Bouger des blocs à la souris, c’est bien. Mais taper son code soi-même,

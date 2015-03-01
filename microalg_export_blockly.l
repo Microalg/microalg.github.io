@@ -10,7 +10,7 @@
   ))
 (de insertion_next (src) (car (insertion_next_aux (reverse src))))
 (de insertion_next_aux (src)
-  (ifn (and (<> (length src) 0) (<> (length src) 1)) src  # (if (<= len 1)
+  (ifn (and (<> (length src) 0) (<> (length src) 1)) src  # if (<= len 1)
                           # Déplacement de la tête, enfermée dans un (Next ),
                           # À la fin du deuxième élément.
                           # La queue restant inchangée.
@@ -122,6 +122,29 @@
         content
         "</value>"
         "</block>"))
+(de Si inputs
+  (let (condition (car inputs)
+        kw_alors  (cadr inputs)
+        splitted  (split (cddr inputs) 'Sinon)
+        bloc_vrai (car splitted)
+        bloc_faux (cadr splitted)
+        # !next est le dernier de la liste inputs, si son car vaut Next.
+        !next (let !last (last inputs) (if (= (car !last) 'Next) !last)))
+       (pack "<block type=\"si\">"
+             (if (n0 (length bloc_faux)) "<mutation else=\"1\"></mutation>")
+             "<value name=\"COND\">"
+             (eval condition)
+             "</value>"
+             "<statement name=\"ALORS\">"
+             (eval (insertion_next bloc_vrai))
+             "</statement>"
+             (if bloc_faux (pack
+                 "<statement name=\"SINON\">"
+                 (eval (insertion_next bloc_faux))
+                 "</statement>"))
+             (eval !next)
+             "</block>")
+))
 (de Texte (content)
   (pack "<block type=\"texte\">"
         "<value name=\"VALUE\">"

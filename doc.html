@@ -221,9 +221,9 @@ En cours de rédaction.
 # Erreurs fréquentes
 
 Les messages sont classés par ordre alphabétique, sans tenir compte de la
-valeur qui est parfois fournie :
+valeur ou de la commande qui est parfois fournie :
 
-* `Afficher` n’a qu’un paramètre, faîtes plusieurs affichages ou utilisez
+* `Afficher` n’a qu’un paramètre, faites plusieurs affichages ou utilisez
   `Concatener`.
     * Vous utilisez peut-être `Concatener`, mais il manque une parenthèse
       fermante. Le reste du programme est vu comme le reste des arguments à
@@ -262,8 +262,13 @@ valeur qui est parfois fournie :
     * Il y a peut-être dans votre code une commande de la forme `(x)` ou `x`
       est une variable contenant un nombre. Dans ce cas, vous voulez peut-être
       juste écrire la valeur de `x`, car `x` n’est pas une commande.
+* `java.lang.StackOverflowError`
+    * Voir la sous-section [récursion](#rcursion).
 * X -- La condition n’est pas un booléen.
     * Voir la sous-section [booléens](#boolens).
+* La variable n’est pas initialisée.
+    * Vous utilisez une variable inconnue de MicroAlg. Vérifier l’orthographe
+      de la variable.
 * Le premier paramètre de `Entier@` doit être un nombre.
 * Le premier paramètre de X doit être un booléen.
     * Voir la sous-section [booléens](#boolens).
@@ -271,6 +276,8 @@ valeur qui est parfois fournie :
 * Le second paramètre de X doit être un booléen.
     * Voir la sous-section [booléens](#boolens).
 * (V est un W ; X un Y) -- Le type ne correspond pas.
+* Maximum call stack size exceeded.
+    * Voir la sous-section [récursion](#rcursion).
 * Mot-clef `Alors` manquant.
     * La condition du `Si` correspondant a pu être laissée ouverte.
     * Le `Si` correspondant a pu être fermé prématurément.
@@ -281,9 +288,14 @@ valeur qui est parfois fournie :
       une valeur qui n’est pas du type nombre. C’est souvent le cas si vous
       utilisez la commande `Demander`.  
       Pensez à utiliser la commande `Nombre` pour convertir cette valeur.
+* too much recursion
+    * Voir la sous-section [récursion](#rcursion).
 * Un objet vide n’a pas de queue.
 * Un objet vide n’a pas de tête.
 * X -- undefined
+    * Vous tentez d’utiliser la commande `X` mais qui n’existe pas. La
+      commande est sans doute mal orthographiée, ou vous utilisez une vieille
+      version de MicroAlg.
     * « `Affecter` -- undefined » indique qu’il vous manque un « _ ».
     * « `Tant` -- undefined » indique qu’il vous manque un « _ ».
 * Valeur de type X, ne peut initialiser Y qui est de type Z.
@@ -304,13 +316,20 @@ le signaler en :
    en premier car c’est une commande comme les autres. Par exemple `(n > 1)`
    ne fonctionnera pas, il faut écrire `(> n 1)`.
 
+## Récursion
+
+* Il est possible que vos appels récursifs (appel d’une commande depuis sa
+  définition) ne trouvent pas de point d’appui. Votre test est-il bon ?  
+  Avant que l’ordinateur ne *plante* franchement, un des langages utilisés par
+  MicroAlg arrête ce qui lui semble être un travail infini. La limite est
+  variable et ne peut que très rarement être modifiée.
+
 # Feuille de route
 
 Voici les directions que le projet va prendre :
 
 * Finir d’implémenter le jeu d’instructions de base.
-    * Il manque par exemple la génération de nombres pseudo-aléatoires.
-    * Il manque aussi la lecture/écriture depuis/dans un fichier.
+    * Il manque la lecture/écriture depuis/dans un fichier.
 * Implémenter [une tortue](http://profgra.org/lycee/memento_des_tortues.html)
     * en restant dans l’esprit du jeu d’instructions minimal :
         * BC, LC
