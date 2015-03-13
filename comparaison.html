@@ -1,0 +1,194 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+
+  <title>Microalg</title>
+  <meta name="description" content="Langage et environnements dédiés à l’algorithmique.">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, langage, environnement" />
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
+    <link rel="stylesheet" type="text/css" href="web/style.css" />
+    <script type="text/javascript" src="web/ide_injections.js"></script>
+    <script type="text/javascript" src="web/parenedit.js"></script>
+    <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
+    <script type="text/javascript" src="web/showdown.js"></script>
+    <link rel="icon" href="visuels/logo_microalg.ico" />
+</head>
+
+<body>
+  <div class="wrapper">
+    <div id="logo"><img src="images/logo_microalg.svg" alt="Logo MicroAlg"></div>
+    <header>
+      <h1 class="title">Micro&nbsp;Alg</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">
+        Langage et environnements dédiés à l’algorithmique.</p>
+      <div id="main" role="main">
+        <div class="link-bar">
+        <div class="inner">
+          <a href="tuto.html" title="Pour apprendre ou essayer MicroAlg en ligne">Tuto interactif</a> &mdash;
+          <a href="http://galerie.microalg.info" title="Pour explorer ou publier">Galerie</a> &mdash;
+          <a href="doc.html" title="La référence">Doc</a> &mdash;
+          <a href="http://qr.microalg.info" title="La foire aux questions">Questions/Réponses</a> &mdash;
+          <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md" title="Sur sa machine ou sur son site">Installer</a> &mdash;
+          <a href="https://github.com/Microalg/Microalg" title="QG du développement de MicroAlg">GitHub</a> &mdash;
+          <a href="https://twitter.com/search?f=realtime&q=%23MicroAlg%20from%3Amicroalg&src=typd" title="via Twitter">News</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+        <a name="comparaisons"></a>
+        <table class="comparaisons">
+
+          <tr>
+            <th>&nbsp;</th>
+<!-- nav --><th><abbr title="fonctionne dans un navigateur">web</abbr></th>
+<!-- txt --><th><abbr title="programmation textuelle, avec des lignes de code">texte</abbr></th>
+<!-- blk --><th><abbr title="programmation visuelle, comme avec des pièces de puzzle">blocs</abbr></th>
+<!-- pas --><th><abbr title="exécution du programme instruction par instruction avec indicateurs visuels">pas à pas</abbr></th>
+<!-- def --><th><abbr title="définir ses fonctions ou procédures">defs</abbr></th>
+<!--  io --><th><abbr title="lire un fichier et écrire dans un fichier">I/O fichiers</abbr></th>
+<!-- tor --><th><abbr title="la célèbre tortue du Logo">tortue</abbr></th>
+<!-- img --><th><abbr title="génération ou transformation pixel par pixel">image</abbr></th>
+<!-- zik --><th><abbr title="génération de musique ou bruitages">son</abbr></th>
+<!-- anm --><th><abbr title="possibilité de déplacer des images">anims</abbr></th>
+<!-- gam --><th><abbr title="animations visuelles et interactions">jeux vid</abbr></th>
+          </tr>
+
+          <tr>
+            <td class="col-title">MicroAlg</td>
+<!-- nav --><td class="comp-v">✓</td>
+<!-- txt --><td class="comp-v">✓</td>
+<!-- blk --><td class="comp-v"><abbr title="voir en bas de cette page">✓</abbr></td>
+<!-- pas --><td class="comp-">…</td>
+<!-- def --><td class="comp-v">✓</td>
+<!--  io --><td class="comp-">…</td>
+<!-- tor --><td class="comp-">…</td>
+<!-- img --><td class="comp--"><abbr title="via le web seulement, et rame « un peu »">~</abbr></td>
+<!-- zik --><td class="comp-">…</td>
+<!-- anm --><td class="comp-">…</td>
+<!-- gam --><td class="comp-">…</td>
+          </tr>
+
+          <tr>
+            <td class="col-title">Algobox</td>
+<!-- nav --><td class="comp--"><abbr title="seulement export non modifiable">~</abbr></td>
+<!-- txt --><td class="comp-v">✓</td>
+<!-- blk --><td class="comp--"><abbr title="pas de blocs, mais possibilité de cliquer plutôt que taper">~</abbr></td>
+<!-- pas --><td class="comp-v">✓</td>
+<!-- def --><td class="comp--"><abbr title="deux fonctions mathématiques seulement">~</abbr></td>
+<!--  io --><td class="comp-x">✗</td>
+<!-- tor --><td class="comp-x">✗</td>
+<!-- img --><td class="comp-x">✗</td>
+<!-- zik --><td class="comp-x">✗</td>
+<!-- anm --><td class="comp-x">✗</td>
+<!-- gam --><td class="comp-x">✗</td>
+          </tr>
+
+          <tr>
+            <td class="col-title">Scratch</td>
+<!-- nav --><td class="comp-v">✓</td>
+<!-- txt --><td class="comp-x">✗</td>
+<!-- blk --><td class="comp-v">✓</td>
+<!-- pas --><td class="comp-">?</td>
+<!-- def --><td class="comp--"><abbr title="les blocs définis n’ont pas de valeur de retour (ou faut m’expliquer)">~</abbr></td>
+<!--  io --><td class="comp-">?</td>
+<!-- tor --><td class="comp-v"><abbr title="par défaut, c’est un chat">✓</abbr></td>
+<!-- img --><td class="comp-">?</td>
+<!-- zik --><td class="comp-v">✓</td>
+<!-- anm --><td class="comp-v">✓</td>
+<!-- gam --><td class="comp-v">✓</td>
+          </tr>
+
+          <tr>
+            <td class="col-title">Javascool</td>
+<!-- nav --><td class="comp-x">✗</td>
+<!-- txt --><td class="comp-v">✓</td>
+<!-- blk --><td class="comp-x">✗</td>
+<!-- pas --><td class="comp-">?</td>
+<!-- def --><td class="comp-v">✓</td>
+<!--  io --><td class="comp-v">✓</td>
+<!-- tor --><td class="comp-">?</td>
+<!-- img --><td class="comp-">?</td>
+<!-- zik --><td class="comp-">?</td>
+<!-- anm --><td class="comp-">?</td>
+<!-- gam --><td class="comp-">?</td>
+          </tr>
+
+          <tr>
+            <td class="col-title">Python</td>
+<!-- nav --><td class="comp-v"><abbr title="via Brython">✓</abbr></td>
+<!-- txt --><td class="comp-v">✓</td>
+<!-- blk --><td class="comp-v"><abbr title="via Blockly">✓</abbr></td>
+<!-- pas --><td class="comp-v"><abbr title="via Online Python Tutor">✓</abbr></td>
+<!-- def --><td class="comp-v">✓</td>
+<!--  io --><td class="comp-v">✓</td>
+<!-- tor --><td class="comp--"><abbr title="via 'import turtle', pas dispo pour tous les Python">~</abbr></td>
+<!-- img --><td class="comp-v">✓</td>
+<!-- zik --><td class="comp-v">✓</td>
+<!-- anm --><td class="comp-v">✓</td>
+<!-- gam --><td class="comp-v">✓</td>
+          </tr>
+
+          <tr>
+            <td class="col-title">Javascript</td>
+<!-- nav --><td class="comp-v">✓</td>
+<!-- txt --><td class="comp-v">✓</td>
+<!-- blk --><td class="comp-v"><abbr title="via Blockly">✓</abbr></td>
+<!-- pas --><td class="comp-v"><abbr title="via Online Python Tutor">✓</abbr></td>
+<!-- def --><td class="comp-v">✓</td>
+<!--  io --><td class="comp-v">✓</td>
+<!-- tor --><td class="comp--"><abbr title="il faut installer une bibliothèque">~</abbr></td>
+<!-- img --><td class="comp-v">✓</td>
+<!-- zik --><td class="comp-v">✓</td>
+<!-- anm --><td class="comp-v">✓</td>
+<!-- gam --><td class="comp-v">✓</td>
+          </tr>
+
+        </table>
+        <table class="legende">
+            <tr><td><strong>en gras</strong></td><td>fonctionnalités (survoler pour plus de détails)</td><tr>
+            <tr><td class="comp-v">✓</td><td>oui</td><tr>
+            <tr><td class="comp--">~</td><td>presque (survoler le ~ pour plus de détails)</td><tr>
+            <tr><td class="comp-x">✗</td><td>non</td><tr>
+            <tr><td class="comp-">…</td><td>pas encore</td><tr>
+            <tr><td class="comp-">?</td><td>statut inconnu</td><tr>
+        </table>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+
+      <p>
+      Microalg a un compte Twitter&nbsp;: <a target="_blank" href="https://twitter.com/microalg">@microalg</a>.<br />
+      Son créateur aussi&nbsp;: <a target="_blank" href="https://twitter.com/profgraorg">@profgraorg</a>.<br />
+      Il a même une adresse email&nbsp;: <a href="mailto:profgra.org@gmail.com">profgra.org@gmail.com</a>.<br />
+      Pour une liste des changements de ce site, consulter <a href="https://github.com/Microalg/microalg.github.io/commits/master">cette page</a>.
+      <!-- https://api.github.com/repos/Microalg/microalg.github.io/commits?sha=master -->
+      </p>
+
+      </div>
+      <div class="creds">
+          <small>Thème basé sur le travail de <a href="https://twitter.com/jonrohan/">Jon Rohan</a><br/>
+          pour un thème de <a href="http://pages.github.com/">GitHub Pages</a><br/></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/Microalg/microalg.github.io/tarball/master" class="tar">tar</a><a href="https://github.com/Microalg/microalg.github.io/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+</body>
+</html>
