@@ -44,7 +44,6 @@ Aller directement à :
 * [Architecture](#architecture)
 * [Intégrations](#intgrations)
     * [SciTE](#scite)
-    * [NotePad++](#notepad)
     * [Vim](#vim)
     * [Blockly](#blockly)
 * [Remerciements](#remerciements)
@@ -76,20 +75,6 @@ du projet, est créé fin mars 2014. Suivront :
 MicroAlg est encore jeune et il manque encore des choses importantes avant
 qu’elle ne soit considérée comme complète :
 
-### Nombres
-
-Dans sa version Javascript, c’est-à-dire principalement dans le navigateur,
-MicroAlg peut pour l’instant travailler avec des
-<a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres
-flottants</a>. C’est plutôt appréciable, sauf que dans les autres versions,
-ça ne sera pas possible (voir la documentation officielle de PicoLisp sur les
-nombres :
-[ici](http://www.software-lab.de/doc/ref.html#number) et
-[là](http://www.software-lab.de/doc/ref.html#num-io)).  
-L’idée est de trouver un moyen de présenter à l’utilisateur les nombres en
-<a href="http://fr.wikipedia.org/wiki/Virgule_fixe" class="wp">virgule fixe</a>
-de PicoLisp.
-
 ### Erreurs non traduites
 
 Les messages d’erreurs ne sont pas encore tous très clairs, voire même pas
@@ -100,6 +85,31 @@ soient implémentées dans EmuLisp.
 
 La commande `Retourner` n’interrompt pas la commande en cours. Voir
 [ici](tuto.html#script-bug-retourner) une illustration du problème.
+
+Il est tout de même possible de contourner le problème en se débrouillant pour
+placer la commande `Retourner` à la toute fin de la commande à définir.
+
+### Nombres
+
+*EN BREF*  
+Les nombres sont gérés différemments selon la façon dont vous utilisez
+MicroAlg. Par défaut cependant, que ce soit dans le navigateur ou après
+installation, MicroAlg travaille avec des
+<a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres
+flottants</a>.
+
+*EN DÉTAILS*  
+Dans les versions reposant sur Javascript, c’est-à-dire dans le navigateur mais
+aussi hors web grâce à
+<a href="https://developer.mozilla.org/fr/docs/Rhino" class="offi">Rhino</a> ou
+<a href="http://fr.wikipedia.org/wiki/Node.js" class="wp">NodeJS</a>,
+MicroAlg travaille avec des
+<a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres
+flottants</a>. C’est plutôt appréciable, sauf que dans les autres versions
+(celles reposant sur PicoLisp ou Ersatz), ça ne sera pas possible directement
+(voir la documentation officielle de PicoLisp sur les nombres :
+[ici](http://www.software-lab.de/doc/ref.html#number) et
+[là](http://www.software-lab.de/doc/ref.html#num-io)).
 
 ### Saisie utilisateur avec SciTE
 
@@ -408,22 +418,23 @@ Javascript.
   [dépôt semi-officiel](https://github.com/grahack/emulisp).
 
 Chaque implémentation posséde un programme principal, nommés respectivement
-`pil`, `pilj` et `piljs`. Ces programmes ont deux missions :
+`pil`, `pil-j`, `pil-rjs` et `pil-njs`. Ces programmes ont deux missions :
 
 * lancés sans argument, ils offrent un interpréteur interactif,
 * lancés avec un nom de fichier en argument, ils interprètent ce fichier et
   passent en mode interactif, sauf si on les arrête avant.
 
-Attention, `pilj` n’est pas le nom officiel de l’exécutable d’Ersatz (c’est
+Attention, `pil-j` n’est pas le nom officiel de l’exécutable d’Ersatz (c’est
 `pil`). De plus, les versions officielles et semi-officielles d’EmuLisp n’ont
-pas de `piljs`. `piljs` n’existe (pour l’instant) que dans MicroAlg.
+pas de `pil-Xjs`. `pil-rjs` et `pil-njs` n’existent (pour l’instant) que dans
+MicroAlg.
 
-MicroAlg offre donc naturellement les programmes `malg`, `malgj` et `malgjs`.
-Ils ont les mêmes missions que leurs homologues, la seule différence est qu’ils
-chargent `microalg.l`, le cœur du projet MicroAlg, où les commandes du langage
-sont définies.
+MicroAlg offre donc naturellement les programmes `malg`, `malg-j`, `malg-rjs`
+et `malg-njs`. Ils ont les mêmes missions que leurs homologues, la seule
+différence est qu’ils chargent `microalg.l`, le cœur du projet MicroAlg, où les
+commandes du langage sont définies.
 
-![Diagramme d’architecture](visuels/archi.svg)
+<img id="diagramme" alt="Diagramme d’architecture" src="visuels/archi.svg" />
 
 **Légende**
 
@@ -431,6 +442,9 @@ sont définies.
 * JVM : pour <a href="http://fr.wikipedia.org/wiki/Machine_virtuelle_Java"
   class="wp">Java Virtual Machine</a>,
   exécute du byte-code Java
+* Rhino : plateforme en Java pur permettant d’interpréter du code Javascript
+  (voir <a href="http://fr.wikipedia.org/wiki/Rhino_%28moteur_JavaScript%29"
+  class="wp">l’article Wikipedia</a>)
 * NodeJS : plateforme permettant d’interpréter du code Javascript
   (voir <a href="http://fr.wikipedia.org/wiki/Nodejs"
   class="wp">l’article Wikipedia</a>)
@@ -438,9 +452,10 @@ sont définies.
 * PicoLisp : la version officielle du langage hôte, PicoLisp
 * Ersatz : implémentation en Java de PicoLisp
 * EmuLisp : implémentation en Javascript de PicoLisp
-* `pil`, `pilj` et `piljs` : les interpréteurs des implémentations de PicoLisp
+* `pil`, `pil-j`, `pil-rjs` et `pil-njs` : les interpréteurs des
+  implémentations de PicoLisp
 * `microalg.l` : le fichier définissant le langage MicroAlg
-* `malg`, `malgj` et `malgjs` : les interpréteurs de MicroAlg,
+* `malg`, `malg-j`, `malg-rjs` et `malg-njs` : les interpréteurs de MicroAlg,
   correspondants aux implémentations de PicoLisp
 * « depuis éditeur » concerne par exemple [SciTE](doc.html#scite)
 * web IDE : interface permettant de manipuler MicroAlg depuis un navigateur
@@ -517,14 +532,6 @@ puis réessayer. Attention, si vous utilisez la seconde méthode, un processus
 #### Unable to access jarfile
 
 Merci d’éviter les espaces dans les différents chemins.
-
-## NotePad++
-
-L’intégration est bien moins poussée qu’avec SciTE (pas de parenthèses
-colorées, pas d’indication de signature de commande…).
-
-`Ctrl`+`F5` pour lancer le programme (suivant le raccourci choisi). La sortie
-apparaît dans une fenêtre identique à celle de `cmd.exe`.
 
 ## Vim
 

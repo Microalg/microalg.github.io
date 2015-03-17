@@ -18,7 +18,7 @@ var VERSION = [2, 0, 3, 0],
 
 function getFileSync(fileUrl) {
 	var req = new XMLHttpRequest();
-	var OK = fileUrl.match(/^file:/) ? 0 : 200;
+	var OK = fileUrl.match(/^file:/) ? 200 : 200;
 	req.open("GET", fileUrl, false);		// synchronous
 	if (req.overrideMimeType) req.overrideMimeType("text/plain; charset=utf-8");
 	req.send(null);
@@ -233,6 +233,7 @@ Symbol.prototype.setVal = function(val) {
 // by escaping them with a backslash '\'.
 Symbol.prototype.escName = function() {
 	if (this.name instanceof Number) return this.name;
+	this.name = this.name + "";  // Cast to String for Rhino.
 	var eName = this.name.replace(/\\/g, "\\\\");
 	eName = eName.replace(/\"/g, "\\\"");
 	eName = eName.replace(/\^/g, "\\^");
@@ -507,9 +508,10 @@ var gEmptyObj = {}, TheCls, TheKey;
 var cst, QUOTE;
 
 function emuEnv() {
-	if (typeof window != "undefined") return "browser";
-	if (typeof process != "undefined") return "nodejs";
-	return NIL;
+		if (typeof window != 'undefined') return "browser";
+		if (typeof process != 'undefined') return "nodejs";
+		if (typeof print != 'undefined') return "rhino";
+		return NIL;
 }
 
 function prepareNewState(optionalState) {
@@ -861,26 +863,31 @@ CompExpr.prototype.evalTrue = function(a, b) {
 function lispFnOrder(a, b) { return cst.compExprArr[0].evalTrue(a, b) ? -1 : 1; }
 
 function emuprompt(c) { // No support (yet) for the two parameters (non-split chars and comment char).
-    if (emuEnv() == 'nodejs') {
-        var readlinesync = require('readline-sync');
-        readlinesync.setPrompt("");
-        _stdPrompt = readlinesync.prompt;
-    } else {
-        if (typeof stdPrompt != "undefined") {
-            var _stdPrompt = stdPrompt;
-        } else {
-            var _stdPrompt = window.prompt;
-        }
-    }
-    var user_input = _stdPrompt();
-    if (emuEnv() == 'nodejs') {
-        readlinesync.setPrompt(": ");
-    }
-    if (user_input === "") {
-        return NIL;
-    } else {
-        return newTransSymbol(user_input);
-    }
+	if (emuEnv() == 'nodejs') {
+		var readlinesync = require('readline-sync');
+		readlinesync.setPrompt("");
+		_stdPrompt = readlinesync.prompt;
+	} else if (emuEnv() == 'rhino') {
+		importPackage(java.io);
+		importPackage(java.lang);
+		var stdin = new BufferedReader(new InputStreamReader(System['in']));
+		_stdPrompt = function () { return stdin.readLine(); }
+	} else {
+		if (typeof stdPrompt != "undefined") {
+			var _stdPrompt = stdPrompt;
+		} else {
+			var _stdPrompt = window.prompt;
+		}
+	}
+	var user_input = _stdPrompt();
+	if (emuEnv() == 'nodejs') {
+		readlinesync.setPrompt(": ");
+	}
+	if (user_input === "") {
+		return NIL;
+	} else {
+		return newTransSymbol(user_input);
+	}
 }
 
 var coreFunctions = {
@@ -925,7 +932,11 @@ var coreFunctions = {
 	"box": function(c) { return box(evalLisp(c.car)); },
 	"bye": function(c) { prog(getSymbol("*Bye").getVal());
 		if (emuEnv() == "nodejs") { var prv = evalLisp(c.car);
-			process.exit((prv instanceof Number) ? prv : 0); } else {
+			process.exit((prv instanceof Number) ? prv : 0);
+		} else if (emuEnv() == "rhino") { var prv = evalLisp(c.car);
+			importPackage(java.lang);
+			System.exit((prv instanceof Number) ? prv : 0);
+		} else {
 			throw new Error(newErrMsg("Function 'bye' not supported"));
 		}
 	},

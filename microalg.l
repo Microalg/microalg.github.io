@@ -1,4 +1,4 @@
-(setq version "0.2.6")
+(setq version "0.3.14")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -503,12 +503,7 @@ Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
     -> Rien
 ")
 (put 'Demander 'text "Commande `Demander`.")
-(de Demander () (in NIL (line " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~")))
-# Références:
-# https://fr.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange#Table_des_128_caract.C3.A8res_ASCII
-# https://en.wikipedia.org/wiki/ASCII#ASCII_printable_character_code_chart
-# >>> ''.join([chr(i) for i in range(32, 127) if not chr(i).isalnum()])
-# ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'                                       "
+(de Demander () (in NIL (line T)))
 
 # Listes
 # Implémentation interne des listes (POO)
@@ -626,10 +621,10 @@ La numérotation commence à 1.
     )
     (let (len (Longueur !evaled_obj))
       (cond
-        ((not !idx) (quit "Il manque le deuxième paramètre : l’indice."))
+        ((not !idx) (quit "`Nieme` : Il manque le deuxième paramètre : l’indice."))
         ((<> !idx (format (round !idx 0) 0 "." ",")) (quit "Indice non entier." !idx))
-        ((le0 !idx) (quit "Indice négatif ou nul." !idx))
-        ((lt0 (- len !idx)) (quit "Indice trop grand." (list !idx '> len)))
+        ((le0 !idx) (quit "`Nieme` : Indice négatif ou nul." !idx))
+        ((lt0 (- len !idx)) (quit "`Nieme` : Indice trop grand." (list !idx '> len)))
       )
     )
     # Le calcul
@@ -653,8 +648,8 @@ La numérotation commence à 1.
     # Quelques vérifications
     (cond ((num? obj)
            (quit "Un nombre n’a pas de tête, il faut un texte ou une liste." obj))
-          ((!boolM2P (Vide? obj))
-           (quit "Un objet vide n’a pas de tête." obj))
+          ((not (<> 0 (!longueur obj)))
+           (quit "Un objet vide n’a pas de tête."))
     )
     # Le calcul
     (cond
@@ -677,8 +672,8 @@ La numérotation commence à 1.
     # Quelques vérifications
     (cond ((num? obj)
            (quit "Un nombre n’a pas de queue, il faut un texte ou une liste." obj))
-          ((!boolM2P (Vide? obj))
-           (quit "Un objet vide n’a pas de queue." obj))
+          ((not (<> 0 (!longueur obj)))
+           (quit "Un objet vide n’a pas de queue."))
     )
     # Le calcul
     (cond
