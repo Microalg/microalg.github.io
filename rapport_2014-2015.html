@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<!-- from http://bost.ocks.org/mike/sankey/ -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Rapport 2014-2015 -- MicroAlg</title>
+  <meta name="description" content="Langage et environnements dédiés à l’algorithmique.">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, langage, environnement" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
+  <link rel="stylesheet" type="text/css" href="web/style.css" />
+  <script type="text/javascript" src="web/ide_injections.js"></script>
+  <script type="text/javascript" src="web/parenedit.js"></script>
+  <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
+  <script type="text/javascript" src="web/showdown.js"></script>
+  <script type="text/javascript" src="web/showup.js"></script>
+  <link type="text/css" href="web/showup.css" rel="stylesheet" />
+  <script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
+  <script src="http://bost.ocks.org/mike/sankey/sankey.js"></script>
+
+  <link rel="icon" href="visuels/logo_microalg.ico" />
+<style> // for the Sankey diagram
+
+#chart {
+  height: 500px;
+}
+
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+
+.link:hover {
+  stroke-opacity: .5;
+}
+
+</style>
+</head>
+<body class="microalg">
+<div class="navbar">
+    <a href="./">Accueil</a> :
+    <a href="#top">Haut de page</a>
+</div>
+<div id="my-body"></div>
+<script type="text/markdown">
+# Rapport MicroAlg 2014-2015
+
+## Introduction
+
+2014-2015 est la première année scolaire où MicroAlg a été utilisée. Une
+promotion de 36 élèves préparant le BTS SIO (Brevet de Technicien Supérieur,
+Services Informatiques aux Organisations) a travaillé U22 (algorithmique) en
+utilisant ce langage et les environnements qui lui sont associés.
+
+Je remercie très sincèrement cette promotion qui a su donner des retours très
+intéressants au fur et à mesure de l’année, et qui a su être patiente lorsque
+des problèmes (rares) sont survenus.
+
+[Cette page](http://galerie.microalg.info/profgra:peda:progression_2014_2015)
+donne un aperçu de la progression pédagogique mise en place lors de cette
+année scolaire.
+
+Le reste de ce document est constitué :
+
+* de l’[avis du concepteur](#lavisduconcepteur) ;
+* de l’[avis des cobayes](#lavisdestudiants) (exploitation du questionnaire
+  passé aux étudiants) ;
+* d’une [conclusion](#conclusion).
+
+## L’avis du concepteur
+
+### Complétude
+
+Le langage va encore évoluer, s’enrichir (mais pas trop), mais aujourd’hui le
+minimum vital est là. D’une part le langage est complet
+<a href="http://fr.wikipedia.org/wiki/Turing-complet" class="wp">au sens de Turing</a>
+puisqu’un <a href="http://fr.wikipedia.org/wiki/Brainfuck" class="wp">interpréteur BF</a>
+a été écrit en MicroAlg. D’autre part je le considère comme complet
+pour enseigner les bases de l’algorithmique (variables, conditions, boucles,
+listes).
+
+Il manque cependant une sortie graphique (géométrie, tortue, jeux), qui
+devrait être réalisée dans les prochains mois via
+<a href="http://processing.org/" class="offi">Processing</a> (Java et JS).
+
+Je remercie encore ici Alex Burger et Jon Kleiser, les principaux géants dont
+les épaules portent MicroAlg.
+
+### Concepteur ?
+
+Concepteur est un bien grand mot. Les grands principes avaient été réfléchis
+bien avant l’implémentation (langage en français et simple, facilité pour se
+mettre au travail…), mais certains points importants n’avaient pas été
+prémédités. Je veux parler des points suivants :
+
+* Positif ou négatif, je ne sais pas encore
+    * [MicroAlg est un Lisp](#microalgestunlisp)
+* Positifs
+    * [Ses parenthèses sont colorées](#sesparenthsessontcolores)
+    * [Même les non-débutants ont des travaux](#mmelesnondbutantsontdutravail)
+    * [Le pseudo-aléatoire est reproductible](#lepseudoalatoireestreproductible)
+* Négatifs
+    * [Les messages d’erreur](#lesmessagesderreur)
+    * [La gestion des nombres non entiers](#lagestiondesnombresnonentiers)
+
+#### MicroAlg est un Lisp
+
+Au départ prévu pour être embarqué dans le langage
+[Tcl](http://fr.wikipedia.org/wiki/Tool_Command_Language), il a finalement été
+embarqué dans [PicoLisp](http://picolisp.com/). En effet, suite à
+[une expérience](http://profgra.org/lycee/calcul.html) concluante dans le
+navigateur et parce que j’avais une furieuse envie de me servir de PicoLisp,
+je me suis dit que la syntaxe simplissime de Lisp serait un point fort.
+
+On a donc la syntaxe universelle décrite [ici](http://microalg.info/doc.html#syntaxe).
+
+Le revers de la médaille est l’écriture d’expressions mathématiques. En effet,
+pour encoder `2x+1`, il faut taper `(+ (* 2 x) 1)`. Quelque part, c’est
+casse-pieds, mais le revers du revers de la médaille est que ça force
+l’apprenant à bien comprendre l’architecture de l’expression.
+
+#### Ses parenthèses sont colorées
+
+Le but de l’incorporation des parenthèses colorées était bien sûr d’aider à
+la compréhension du programme, mais je n’avais pas anticipé la puissance de ce
+qu’on pouvait appeler un « détail » visuel.
+
+Voir les détails [ici](http://microalg.info/doc.html#trucs-syntaxe).
+
+#### Même les non-débutants ont du travail
+
+Si un apprenant a déjà beaucoup programmé sur son temps libre, comme il y a peu
+de chances qu’il ou elle ait déjà goûté à un Lisp (c’est tout de même arrivé
+une année en SIO), les activités ne sont pas terminées trop vite. Une grosse
+hétérogénéité ne sera jamais gommée entièrement, mais elle me semble être
+atténuée.
+
+De plus, cela permet de détecter ceux qui savent programmer mais qui ne
+comprennent pas en profondeur ce qu’ils font. Le travail qu’il leur reste à
+faire avec MicroAlg me semble être très bénéfique pour compléter leur aisance
+avec le code.
+
+#### Le pseudo-aléatoire est reproductible
+
+Dans [le premier exercice](http://galerie.microalg.info/profgra:peda:listes:listes_1#tirage_de_des)
+utilisant les nombres pseudo-aléatoires, les élèves avaient tous un résultat
+qui m’était familier. En effet, avec PicoLisp, il faut initialiser explicitement
+la graine du [générateur](http://fr.wikipedia.org/wiki/G%C3%A9n%C3%A9rateur_de_nombres_pseudo-al%C3%A9atoires)
+de nombres pseudo-aléatoires (avec [`seed`](http://www.software-lab.de/doc/refS.html#seed)).
+Du coup, ils avaient vraiment tous le même résultat.
+
+La prise de conscience de cette « limitation » a été un enchantement. En effet :
+
+* c’est un moyen de vérifier que les exercices sont bien faits (par le prof ou
+  entre apprenants) ;
+* c’est une entrée pour parler du concept de tirages pseudo-aléatoires.
+
+Du coup, des travaux ont été engagés fin avril :
+
+* Tenter de rapprocher les versions C et Java de PicoLisp dans leurs résultats
+  des commandes [`rand`](http://www.software-lab.de/doc/refR.html#rand) et
+  [`seed`](http://www.software-lab.de/doc/refS.html#seed) (voir les discussions
+  [ici](http://comments.gmane.org/gmane.lisp.picolisp.general/5184) et
+  [là](http://comments.gmane.org/gmane.lisp.picolisp.general/5199)).  
+  Finalement, cela semble plutôt vain puisqu’il y a plusieurs versions C de
+  PicoLisp, ces différentes versions ne gérant pas les entiers de la même
+  façon, il serait difficile de les réconcilier sur `rand` et `seed`.
+* Tenter d’imiter les versions C et Java avec EmuLisp (la version JavaScript de
+  PicoLisp) concernant ces deux commandes. En effet, la primitive utilisée pour
+  les tirages au sort (`rand`) utilisait directement
+  [`Math.random()`](https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Math/random).  
+  Finalement vain puisque les versions C et Java ne se réconcilieront pas.
+
+Une meilleure stratégie serait d’implémenter un petit générateur simple, comme
+<a href="http://en.wikipedia.org/wiki/Lehmer_random_number_generator#Parameters_in_common_use"
+   class="wp">MINSTD</a>.
+
+Un autre chantier aura été d’implémenter un moyen de donner la liste des
+valeurs que les appels à `Entier@` ou `Nieme@` vont retourner.
+
+Ces modifications arriveront avec la version 0.3.15 de MicroAlg.
+
+#### Les messages d’erreur
+
+Un gros point négatif, détaillé [ici](http://microalg.info/doc.html#messagesderreur).
+
+Reste une amélioration possible en utilisant les exceptions (quand elles seront
+implémentées dans EmuLisp, la version JavaScript de PicoLisp).
+
+#### La gestion des nombres non entiers
+
+Un autre point négatif, mais moins gros. Seules les implémentations utilisant
+JavaScript gèrent les nombres non entiers (avec les
+<a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres flottants</a>).
+
+## L’avis des étudiants
+
+Vers la fin de l’année scolaire, un questionnaire éléctronique a été passé
+aux étudiants (via [Google Forms](https://www.google.com/intl/fr_fr/forms/about/)).
+Sur 36 étudiants, pour l’instant 20 ont répondu. Les données brutes seront
+publiées une fois que le questionnaire sera fermé.
+
+Voici quelques [statistiques](#quelquesstatistiques)
+et quelques [phrases intéressantes](#quelquesphrases).
+
+### Quelques statistiques
+
+#### Répartitions et moyennes
+
+Voir [le résumé fourni par Google Form](rapport_2014-2015.pdf) (au format .pdf).
+
+#### Diagramme de flux
+
+En gardant quelques questions parmi les trente sept, on peut construire ce
+diagramme de Sankey.
+
+Les données n’étant pas encore prêtes, voici à quoi ça va ressembler :
+
+<div id="chart"></div>
+
+Voir [l’article Wikipedia](http://fr.wikipedia.org/wiki/Diagramme_de_Sankey)
+expliquant ce type de diagrammes, et
+[la page qui m’a servi de modèle](http://bost.ocks.org/mike/sankey/).
+
+### Quelques phrases
+
+Quels sont, selon vous, les points positifs de MicroAlg ?
+
+* Simple pour débuter car c'est français
+* Bon outil pour appréhender les bases de l'algorithmique voir même en tant qu'introduction à la programmation. Les instructions sont claires, la documentation sait aider les âmes en peine.
+* Pouvoir faire de l'algorithme avec un language français. Accessible à tous. Gratuit.
+* Commandes en français , facile d'accès ( compréhension )
+* Je ne connais pas les autres langage, je ne peux donc juger sur cette seule expérience.
+* La facilité / logique d'utilisation, le fait qu'il soit en français (plus simple pour le début).
+* En français
+* Les commandes en français et de façon claires
+* Le français, plus facile de comprendre les commandes. Son accessibilité à tous.
+* C'est un language de programmation en francais ce qui facilite la comprehension, surtout lorsqu'on a du mal dans les langues, elle permet donc d'etudier la logique de l'algorithmique et non pas d'abord passer par la comprehension des termes anglais.
+* Laisse une ouverture plus créative que les logiciels Algobox
+* Pour tout novice ne connaissant pas l’algorithmique, MicroAlg est intéressant puisqu'il permet de faire découvrir et développer les compétences de chacun en Algorithmique.
+* Le premier gros point est le langage en français.Les tutoriels si on ne se souvient plus d'une commande.La coloration des parenthèses pour savoir s'il nous en manque.
+* Facile à prendre en main, pas besoin de maîtriser l'anglais.Les noms de commandes sont faciles à identifier et à retenir.
+* facile pour comprendre l'algorithmie
+* Son gros avantage, c'est en français. Pour certains allergique du codage en anglais (j'ai un peu de mal en anglais) cela permet de comprendre la fonction sans décrypter son utilisation via des traduction des fois bizarres je pense. Le second, les parenthèses, malgrés un système de couleurs basique, cela est très utile et corriges souvent des programmes entiers.
+* MicroAlg est en français, ce qui permet de mieux comprendre pour des personnes qui ont un faible niveau bilingue
+* Très proche de l'algo papier et donc assez intuitif.
+* Il faut s'habituer à la syntaxe pour les opérations au début (calculs).
+* Le français pour les néophytes en programmation permet de retenir facilement les mots clefs.
+
+Quels sont, selon vous, les points négatifs de MicroAlg ?
+
+* Parenthèses, inversion de la syntaxe lors de calculs
+* Sur le plan professionnel, il aurait été plus valorisant de faire du python, pour trouver des stages etc..
+* Differents des autres logiciels d algorithmie.
+* Pas encore assez connu ( utile à la vie de tout les jours )
+* Certaines formulations de commandes ( commande arg1 arg 2). Le fait que le langage ne soit pas encore connu.
+* Les parenthèses autour des phrases...
+* Trop chargé, pas assez clair dans la syntaxe.
+* Je n'en ai pas en tête, le seul regret et de n'avoir pas utilis« d'autre logiciel pour l'algorithme
+* Le français ne permet pas de rendre le langage mondial
+* Un language que pas grand monde connait, qu'on ne peut pas mettre dans un CV (Dans un CV nous pouvons normalement mettre Python)
+* Lien avec la programmation. Difficile de s'approprier le langage au départ.
+* MicroAlg n'est pas utilisable en tant que langage pour les Entreprises. Sinon rien à signaler.
+* La difficulté à comprendre le langage au tout début. La syntaxe de certaine commandes.
+* Très bien pour de l'algorithme niveau lycée mais pour notre BTS en informatique il serait important d'utiliser un langage universel dont l'on puisse se servir dans toutes les entreprises
+* Je ne programme pas trop je peut pas trop parler de point négatif. Mais si je devrais expliquer certains détails cela serait les erreurs incompréhensibles , malgré leur maigres nombres. De plus, lorsque l'on travaille sur Scite, j'utilise la technique dite du "décalage de la parenthèse". Le problèmes est qu'un exercice sur scite ce décompose en plusieurs parties, et que entre chacune de ces parties on est obligés de traffiquer du code (ce qui n'est pas énormément génant) pour afficher que ce que l'on veut.
+* Parfois de la confusion, lorsque l'algorithme est trop long, avec les parenthèse même si toutefois elles définissent bien les éléments.
+* Il faut s'habituer à la syntaxe pour les opérations au début (calculs).
+* L'écriture des codes assez fastidieuse lorsque l'on fait beaucoup de langage autre (verbosité).
+
+Et bien d’autres vers la fin du [résumé](rapport_2014-2015.pdf) (au format .pdf).
+
+## Conclusion
+
+En conclusion, l’aventure a assez bien commencé et va continuer.
+
+**Mais MicroAlg a besoin de vous !**
+
+MicroAlg attend vos contributions, 
+[qui que vous soyez](http://microalg.info/doc.html#contribuer) !
+
+À bientôt.
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+</script>
+
+<script>
+var scripts = document.getElementsByTagName('script');
+var target_elt = document.getElementById('my-body');
+for (var i = 0; i < scripts.length; i++){
+    var script = scripts[i];
+    if (script.type != 'text/markdown') continue;
+    var md = script.innerHTML.replace(/^\s<!--*/, '')
+        .replace(/-->\s*$/, '');
+    var markup = new Showdown.converter().makeHtml(md);
+    target_elt.innerHTML = markup;
+}
+</script>
+
+<script type="text/javascript">
+var margin = {top: 1, right: 1, bottom: 6, left: 1},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.0f"),
+    format = function(d) { return formatNumber(d) + " TWh"; },
+    color = d3.scale.category20();
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var sankey = d3.sankey()
+    .nodeWidth(15)
+    .nodePadding(10)
+    .size([width, height]);
+
+var path = sankey.link();
+
+d3.json("rapport_2014-2015.json", function(energy) {
+
+  sankey
+      .nodes(energy.nodes)
+      .links(energy.links)
+      .layout(32);
+
+  var link = svg.append("g").selectAll(".link")
+      .data(energy.links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
+
+  link.append("title")
+      .text(function(d) { return d.source.name + " → " + d.target.name + "\n" + format(d.value); });
+
+  var node = svg.append("g").selectAll(".node")
+      .data(energy.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .call(d3.behavior.drag()
+      .origin(function(d) { return d; })
+      .on("dragstart", function() { this.parentNode.appendChild(this); })
+      .on("drag", dragmove));
+
+  node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) { return d.name + "\n" + format(d.value); });
+
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+  function dragmove(d) {
+    d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+    sankey.relayout();
+    link.attr("d", path);
+  }
+});
+
+</script>
+<script>
+    $().showUp('.navbar', {
+        upClass: 'navbar-show',
+        downClass: 'navbar-hide'
+    });
+</script>
+</body>
+</html>
