@@ -1,4 +1,4 @@
-(setq version "0.3.14")
+(setq version "0.3.15")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -13,17 +13,19 @@ Voir <http://microalg.info>.")
 "!!!" "=" "=/" "<" "<=" ">" ">=" "?"
 "Affecter_a" "Afficher" "Aide" "Ajouter_a" "Alors"
 "Booleen?"
-"Concatener"
+"Concatener" "credit_iterations"
 "Definir" "Demander"
 "En_position" "Entier@" "Et" "Exemples_de"
 "Faire"
 "Faux" "Faux?"
 "Initialiser" "Initialiser@"
 "Liste" "Liste?" "Longueur"
+"Millisecondes"
 "Nieme" "Nieme@" "Nombre" "Nombre?" "Non"
 "Ou"
 "Queue"
 "Retirer_de" "Retourner" "Rien"
+"sequence_tirages@"
 "Si" "Sinon"
 "Tant_que" "Tester" "Tete" "Texte" "Texte?" "Type"
 "Vide?" "Vrai" "Vrai?"
@@ -124,7 +126,9 @@ Voir <http://microalg.info>.")
 
 # Vérif qu’une variable est bien initialisée :
 (de !inited (!sym !evaled_sym)
-    (or !evaled_sym (get !sym 'type)) )
+    (or (not !sym)
+        !evaled_sym
+        (get !sym 'type) ) )
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -158,16 +162,22 @@ Voir <http://microalg.info>.")
     : (/ 8 2)
     -> 4
 
-Attention, suivant la version que vous utilisez, les divisions non entières
-donnent des résultats différents. En version web (avec Javascript) :
+**Attention** : le comportement de cette commande diffère suivant les
+implémentations.  
+
+* Avec `malg` et `malg-j`, la division donnera toujours un entier.
+* Avec `malg-njs`, `malg-rjs` (configuration par défaut de SciTE) et dans le
+  navigateur, un nombre à virgule flottante sera retourné.
+
+Dans le premier cas :
 
     : (/ 9 2)
-    -> 4.5
+    -> 4
 
 Sinon :
 
     : (/ 9 2)
-    -> 4
+    -> 4.5
 ")
 (put '/ 'text "Commande quotient.")
 (put '% 'doc
@@ -191,6 +201,9 @@ Sinon :
 
     : (!!! \"Ceci est un commentaire.\")
     -> Rien
+
+Notez bien que l’argument passé à `!!!` doit être un texte et doit donc être
+entre guillemets.
 ")
 (put '!!! 'text "Commande commentaire.")
 (de !!! () Rien)
@@ -228,7 +241,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
     -> Rien
 ")
 (put 'Afficher 'text "Commande `Afficher`.")
-(setq *LastStdOut "?")
+(setq *LastStdOut "")
 (de !text (truc)
     (let (
           first truc
@@ -265,7 +278,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
   (if second (quit (pack "`Afficher` n’a qu’un paramètre, faites plusieurs "
                          "affichages ou utilisez `Concatener`." )))
   # Le boulot
-  (setq *LastStdOut (if a_afficher a_afficher "?"))
+  (setq *LastStdOut (if a_afficher a_afficher ""))
   (ifn !testing
        (println (ifn a_afficher
                      (if (<> *EMUENV "browser")
@@ -346,6 +359,7 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
           val (eval (cadr arg_lst))
           kw  (caddr arg_lst)
           idx (eval (cadddr arg_lst))
+          cinquieme (cadddr (cdr arg_lst))
           evaled_var (eval var))
          (setq !onppauv "On ne peut pas affecter une valeur ")
          (cond
@@ -373,13 +387,19 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
               )
               (prog
                  # Affectation à l’élément `idx` du symbole dans `var`.
-                 (let (len (Longueur evaled_var))
+                 # Tout d’abord quelques vérifications:
+                 (if (<> 'En_position kw)
+                     (quit "Le mot-clef intermédiaire avant l’indice doit être `En_position`.")
+                 )
+                 (if cinquieme (quit "Après `En_position`, il n’y a qu’un paramètre."))
+                 (let (len (!longueur evaled_var))
                    (cond
                      ((<> idx (format (round idx 0) 0 "." ",")) (quit "Indice non entier." idx))
                      ((le0 idx) (quit "Indice négatif ou nul." idx))
                      ((lt0 (- len idx)) (quit "Indice trop grand." (list idx '> len)))
                    )
                  )
+                 # Puis le travail:
                  (cond
                    ((!boolM2P (Liste? evaled_var)) (put> evaled_var val idx))
                    ((str? evaled_var)
@@ -397,98 +417,6 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
 (put 'En_position 'doc "Mot-clef intermédiaire pour la commande `Affecter_a`.")
 (setq En_position 'En_position)
 
-# Tirages pseudo-aléatoires.
-(put 'Initialiser@ 'doc
-"Permet d’obtenir une séquence de nombres pseudo-aléatoires différente.
-
-Cette commande est à appeler une seule fois au début de votre programme et est
-inutile si vous utilisez la version Javascript de MicroAlg (en particulier dans
-le navigateur). Elle résout le problème suivant :
-
-Dans une session :
-
-    : (Entier@ 0 1000)
-    -> 0
-    : (Entier@ 0 1000)
-    -> 648
-
-Puis dans une autre, plus tard :
-
-    : (Entier@ 0 1000)
-    -> 0
-    : (Entier@ 0 1000)
-    -> 648
-
-Alors que :
-
-    : (Initialiser@)
-    -> Rien
-    : (Entier@ 0 1000)
-    -> 422  # Cette valeur sera différente à chaque seconde de la journée.
-")
-(put 'Initialiser@ 'text "Commande `Initialiser@`.")
-(de Initialiser@ ()
-    (seed (time))
-    Rien)
-(put 'Entier@ 'doc
-"Retourne un nombre entier pseudo-aléatoire dans [`min`;`max`] (les deux
-paramètres entiers).
-
-    : (Entier@ 1 6)
-    -> 2
-    : (Entier@ 1 6)
-    -> 6
-
-Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
-(put 'Entier@ 'text "Commande `Entier@`.")
-(de Entier@ (!min !max !rien_ici)
-    # Quelques vérifications
-    (ifn (and !min !max) (quit "`Entier@` prend deux paramètres (entiers)."))
-    (if !rien_ici (quit "`Entier@` ne prend que deux paramètres (entiers)."))
-    (cond
-        ((<> !min (format (round !min 0) 0 "." ","))
-         (quit "Le minimum de `Entier@` n’est pas entier." !min))
-        ((<> !max (format (round !max 0) 0 "." ","))
-         (quit "Le maximum de `Entier@` n’est pas entier." !max))
-        ((!boolM2P (> !min !max))
-         (quit "Le minimum et le maximum de `Entier@` ne sont pas dans l’ordre."))
-    )
-    # Le calcul
-    (rand !min !max)
-)
-(put 'Nieme@ 'doc
-"Retourne un élément choisi pseudo-aléatoirement dans la liste ou le texte
- fourni en paramètre.
-
-    : (Nieme@ (Liste 13 666 2015))
-    -> 2015
-    : (Nieme@ (Liste 13 666 2015))
-    -> 666
-    : (Nieme@ \"bonjour\")
-    -> n
-    : (Nieme@ \"bonjour\")
-    -> o
-
-Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
-(put 'Nieme@ 'text "Commande `Nieme@`.")
-(de Nieme@ (obj !rien_ici)
-    # Quelques vérifications
-    (setq !onppeuv "`Nieme@` ne peut pas extraire un élément pseudo-aléatoire ")
-    (cond
-        ((num? obj) (quit (pack !onppeuv "d’un nombre.") obj))
-        ((== obj 'Vrai) (quit (pack !onppeuv "du booléen Vrai.")))
-        ((== obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
-        ((== obj 'Rien) (quit (pack !onppeuv "de Rien.")))
-    )
-    (if !rien_ici (quit "`Nieme@` ne prend qu’un paramètre (liste ou texte)."))
-    # Le calcul
-    (cond
-        ((!boolM2P (Liste? obj)) (nth> obj (rand 1 (length> obj))))
-        ((str? obj) (car (nth (chop obj) (rand 1 (length obj)))))
-        (T Rien)
-    )
-)
-
 # Demander.
 # Avec EmuLisp, les entrées utilisateur se font au travers de la fonction
 # _stdPrompt, surchargée dans ide_injection.js. Dans un navigateur, la dernière
@@ -501,9 +429,16 @@ Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
     salut  <--- Ici, c’est l’utilisateur qui tape ;
     salut  <--- là, c’est MicroAlg qui affiche.
     -> Rien
+
+On peut s’en servir pour marquer une pause dans un programme :
+
+    (Afficher \"Pause, appuyez sur Entrée.\")
+    (Demander)
 ")
 (put 'Demander 'text "Commande `Demander`.")
-(de Demander () (in NIL (line T)))
+(de Demander (!rien_ici)
+  (if !rien_ici (quit "`Demander` ne prend pas de paramètre."))
+  (in NIL (line T)) )
 
 # Listes
 # Implémentation interne des listes (POO)
@@ -578,9 +513,7 @@ Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.")
         !deuze (cadr arg_lst))
     # Quelques vérifications
     (if !deuze (quit "`Longueur` n’a qu’un paramètre."))
-    (ifn !obj 0  # pour gérer texte vide
-      (ifn (!inited !obj !evaled_obj) (quit "`Longueur` : la variable n’est pas initialisée." !obj))
-    )
+    (ifn (!inited !obj !evaled_obj) (quit "`Longueur` : la variable n’est pas initialisée." !obj))
     (setq !npdl " n’a pas de `Longueur`.")
     (cond
         ((num? !evaled_obj) (quit (pack "Un nombre" !npdl) !evaled_obj))
@@ -619,7 +552,7 @@ La numérotation commence à 1.
         ((==   !evaled_obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
         ((==   !evaled_obj 'Rien) (quit (pack !onppeuv "de Rien.")))
     )
-    (let (len (Longueur !evaled_obj))
+    (let (len (!longueur !evaled_obj))
       (cond
         ((not !idx) (quit "`Nieme` : Il manque le deuxième paramètre : l’indice."))
         ((<> !idx (format (round !idx 0) 0 "." ",")) (quit "Indice non entier." !idx))
@@ -717,7 +650,7 @@ Avec une liste :
        (ifn (!inited !sym !evaled_sym) (quit "`Ajouter_a` : la variable n’est pas initialisée." !sym))
        (if (!boolM2P (!texte? !sym))
            (if (or (not (!boolM2P (Texte? !elt)))
-                   (!boolM2P (> (Longueur !elt) 1)) )
+                   (!boolM2P (> (!longueur !elt) 1)) )
                (quit "On peut `Ajouter_a` un texte qu’un caractère." !elt) ))
        # Le calcul
        (cond
@@ -771,6 +704,168 @@ Avec une liste :
          (T (quit "Le premier argument de `Retirer_de` doit être du texte ou une liste." !sym))
        )
   )
+)
+
+# Tirages pseudo-aléatoires.
+(de !prochain_etat@ ()
+  (ifn !etat@ (setq !etat@ 0))
+  # http://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
+  (setq !etat@ (% (+ (* !etat@ 1664525) 1013904223) 4294967296)) )
+(put 'sequence_tirages@ 'doc
+"Liste contenant les nombres entiers qui seront « tirés au sort » par les
+commandes `Entier@` et `Nieme@`, dans cet ordre.
+
+    : (Affecter_a sequence_tirages@ (Liste 1 3 5 7))
+    -> Rien
+    : (Afficher (Entier@ 1 10))
+    1
+    -> Rien
+    : (Afficher (Nieme@ (Liste \"bonjour\" \"tout\" \"le\" \"monde\")))
+    \"le\"
+    -> Rien
+    : (Afficher (Entier@ 1 10))
+    5
+    -> Rien
+    : (Afficher (Entier@ 1 10))
+    7
+    -> Rien
+    : (Afficher (Entier@ 1 10))
+    1
+    -> Rien
+    : (Afficher (Entier@ 1 10))
+    3
+    -> Rien
+")
+(setq sequence_tirages@ (Liste))
+(put 'sequence_tirages@ 'type "liste")
+(de !rand (!min !max)
+  (if (!boolM2P (> (!longueur sequence_tirages@) 0))
+      (let !val (car (elts> sequence_tirages@))
+        (if (or (gt0 (- !min !val)) (gt0 (- !val !max)))
+          (quit (pack "Mauvais tirage forcé : " !val " n’est pas compris entre "
+                      !min " et " !max "."))
+        )
+        (setq sequence_tirages@ (apply Liste (cdr (elts> sequence_tirages@))))
+        (push> sequence_tirages@ !val)
+        !val
+      )
+      (let !mod (- (+ !max 1) !min)
+        (+ !min (% (!prochain_etat@) !mod))
+      )
+  )
+)
+# Définition des commandes.
+(put 'Initialiser@ 'doc
+"Permet d’initialiser la séquence des nombres pseudo-aléatoires.
+
+Cette commande est à appeler une seule fois au début de votre programme. Elle
+résout le problème suivant :
+
+Dans une session :
+
+    : (Entier@ 0 1000)
+    -> 0
+    : (Entier@ 0 1000)
+    -> 332
+
+Puis dans une autre, plus tard :
+
+    : (Entier@ 0 1000)
+    -> 0
+    : (Entier@ 0 1000)
+    -> 332
+
+Alors que :
+
+    : (Initialiser@)
+    -> Rien
+    : (Entier@ 0 1000)
+    -> 422  # Cette valeur dépendra du moment où la commande `Initialiser@`
+            # aura été exécutée, au moins à la milliseconde près.
+
+**Utilisation avancée** : en passant une valeur à `Initialiser@` comprise entre
+0 (inclus) et 2 puissance 32 (exclus), on initialise l’état du générateur à
+cette valeur.
+")
+(put 'Initialiser@ 'text "Commande `Initialiser@`.")
+(de Initialiser@ (x)
+  (let 2^32 (** 2 32)
+    (ifn x (setq !etat@ (% (+ (time) (usec)) 2^32))
+           (if (or (lt0 (- x 0)) (le0 (- 2^32 x)))
+               (quit (pack "Initialiser@ n’accepte que des valeurs entre "
+                           "0 (inclus) et 2 puissance 32 (exclus).") x)
+               (setq !etat@ x)
+           )
+    )
+    Rien)
+  )
+(put 'Entier@ 'doc
+"Retourne un nombre entier pseudo-aléatoire dans [`min`;`max`] (les deux
+paramètres entiers).
+
+    : (Entier@ 1 6)
+    -> 2
+    : (Entier@ 1 6)
+    -> 3
+
+Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.
+
+**Attention** : La séquence des valeurs retournées sera toujours la même à
+chaque exécution d’un programme. Si ce n’est pas le comportement désiré, il
+faut ajouter `(Initialiser@)` au début du programme.
+")
+(put 'Entier@ 'text "Commande `Entier@`.")
+(de Entier@ (!min !max !rien_ici)
+    # Quelques vérifications
+    (ifn (and !min !max) (quit "`Entier@` prend deux paramètres (entiers)."))
+    (if !rien_ici (quit "`Entier@` ne prend que deux paramètres (entiers)."))
+    (cond
+        ((<> !min (format (round !min 0) 0 "." ","))
+         (quit "Le minimum de `Entier@` n’est pas entier." !min))
+        ((<> !max (format (round !max 0) 0 "." ","))
+         (quit "Le maximum de `Entier@` n’est pas entier." !max))
+        ((!boolM2P (> !min !max))
+         (quit "Le minimum et le maximum de `Entier@` ne sont pas dans l’ordre."))
+    )
+    # Le calcul
+    (!rand !min !max)
+)
+(put 'Nieme@ 'doc
+"Retourne un élément choisi pseudo-aléatoirement dans la liste ou le texte
+ fourni en paramètre.
+
+    : (Nieme@ (Liste 13 666 2015))
+    -> 666
+    : (Nieme@ (Liste 13 666 2015))
+    -> 2015
+    : (Nieme@ \"bonjour\")
+    -> b
+    : (Nieme@ \"bonjour\")
+    -> n
+
+Le suffixe `@` indique le caractère pseudo-aléatoire de cette commande.
+
+**Attention** : La séquence des valeurs retournées sera toujours la même à
+chaque exécution d’un programme. Si ce n’est pas le comportement désiré, il
+faut ajouter `(Initialiser@)` au début du programme.
+")
+(put 'Nieme@ 'text "Commande `Nieme@`.")
+(de Nieme@ (obj !rien_ici)
+    # Quelques vérifications
+    (setq !onppeuv "`Nieme@` ne peut pas extraire un élément pseudo-aléatoire ")
+    (cond
+        ((num? obj) (quit (pack !onppeuv "d’un nombre.") obj))
+        ((== obj 'Vrai) (quit (pack !onppeuv "du booléen Vrai.")))
+        ((== obj 'Faux) (quit (pack !onppeuv "du booléen Faux.")))
+        ((== obj 'Rien) (quit (pack !onppeuv "de Rien.")))
+    )
+    (if !rien_ici (quit "`Nieme@` ne prend qu’un paramètre (liste ou texte)."))
+    # Le calcul
+    (cond
+        ((!boolM2P (Liste? obj)) (nth> obj (!rand 1 (length> obj))))
+        ((str? obj) (car (nth (chop obj) (!rand 1 (length obj)))))
+        (T Rien)
+    )
 )
 
 # Types et conversions
@@ -925,6 +1020,22 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
     (!boolP2M (or (!boolM2P !P) (!boolM2P !Q))) )
 
 # Structures itératives
+(put 'credit_iterations 'doc
+"Variable stockant le nombre d’itérations possibles restantes.
+
+    : (Tant_que Vrai Faire (Afficher credit_iterations))
+    999
+    998
+    997
+    [...]
+    3
+    2
+    1
+    Erreur :
+    Crédit d’itérations épuisé (1 000 par défaut).
+    Vous pouvez recharger votre crédit en affectant une valeur
+    à la variable `credit_iterations`.
+")
 (setq credit_iterations 1000)
 (put 'credit_iterations 'type "nombre")
 (setq credit_iterations_message
@@ -1390,6 +1501,30 @@ Exemples :
 (put 'Rien 'doc
 "Valeur de contenant aucune information, représentant l’absence de valeur.")
 (setq Rien 'Rien)
+(put '... 'text "Commande `...`.")
+(put '... 'doc "Commande permettant de présenter les exercices à trous.")
+(de ... ()
+  (quit (pack "Les trois points et/ou les parenthèses `(...)` doivent être "
+              "remplacés pour que le programme fonctionne.")) )
+
+# Mesure du temps d’exécution
+(put 'Millisecondes 'doc
+"Retourne le nombre de millisecondes écoulées depuis le début du programme.
+
+Exemples :
+
+    : (Millisecondes)
+    -> 4167
+    : (Millisecondes)
+    -> 9511
+
+Cette commande s’utilise surtout en calculant la différence entre deux appels,
+le premier étant stocké dans une variable.
+
+")
+(de Millisecondes (!rien_ici)
+  (if !rien_ici (quit "`Millisecondes` ne prend pas de paramètre."))
+  (/ (usec) 1000) )
 
 # Ignorer les balises de la galerie (http://galerie.microalg.info) si utilisées
 # par inadvertance, ou une fois de trop dans la galerie.

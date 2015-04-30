@@ -7,11 +7,14 @@
               content="Tutoriel en ligne pour MicroAlg." />
         <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="web/jquery.min.js"><\/script>')</script>
         <script src="web/showdown.js"></script>
         <script src="web/showup.js"></script>
         <link type="text/css" href="web/showup.css" rel="stylesheet" />
+        <script src="emulisp/int.js" type="text/javascript"></script>
         <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="web/style.css" />
+        <link rel="stylesheet" type="text/css" href="web/parenedit.css" />
     </head>
     <body class="microalg doc">
         <div class="navbar">
@@ -20,7 +23,7 @@
         </div>
         <noscript>
             <div style="color:#CC0000; text-align:center">
-            Besoin de Javascript pour afficher certaines listes.
+            Besoin de JavaScript pour afficher certaines listes.
             </div>
         </noscript>
         <script>EMULISP_CORE.loadLisp("microalg.l");</script>
@@ -110,7 +113,7 @@ installation, MicroAlg travaille avec des
 flottants</a>.
 
 *EN DÉTAILS*  
-Dans les versions reposant sur Javascript, c’est-à-dire dans le navigateur mais
+Dans les versions reposant sur JavaScript, c’est-à-dire dans le navigateur mais
 aussi hors web grâce à
 <a href="https://developer.mozilla.org/fr/docs/Rhino" class="offi">Rhino</a> ou
 <a href="http://fr.wikipedia.org/wiki/Node.js" class="wp">NodeJS</a>,
@@ -143,7 +146,8 @@ en sorte que `(Demander)` attende l’utilisateur.
   forme :  
   `(!!! "Ceci est un commentaire")`
 * Si une *commande* ne prend pas d’*argument*, on écrira simplement :  
-`(Commande)`
+  `(Commande)`. C’est assez rare, les seules commandes qui n’ont pas besoin de
+  paramètre sont `Demander`, `Initialiser@` et `Millisecondes`.
 * Les *instructions* peuvent être imbriquées. En effet, dans une *instruction*,
   un des *arguments* d’une *commande* peut être remplacé par une autre
   *instruction* :  
@@ -251,7 +255,7 @@ En cours de rédaction.
 
 En cours de rédaction.
 
-# Erreurs fréquentes
+## Erreurs fréquentes
 
 Les messages sont classés par ordre alphabétique, sans tenir compte de la
 valeur ou de la commande qui est parfois fournie :
@@ -277,25 +281,26 @@ valeur ou de la commande qui est parfois fournie :
       de plus d’itérations, vous pouvez recharger votre crédit en affectant
       une valeur à la variable `credits_iterations`.
 * `Entier@` prend 2 paramètres. Vous en donnez X.
-* `EOF Overrun`
+* EOF Overrun
     * Il manque une parenthèse fermante quelque part. La ligne indiquée est
       celle de la parenthèse ouvrante isolée.
-* `X -- Executable or Number expected`.
+* X -- Executable or Number expected.
+    * Vous avez ouvert deux parenthèses de suite.
     * Il y a une parenthèse en trop devant `X`.
 * Il manque le deuxième paramètre : l’indice.
 * Indice négatif ou nul.
 * Indice non entier.
 * Indice trop grand.
 * `Initialiser` prend 2 paramètres. Vous en donnez X.
-* `java.lang.ClassCastException: PicoLisp$Symbol cannot be cast to PicoLisp$Number`
+* java.lang.ClassCastException: PicoLisp$Symbol cannot be cast to PicoLisp$Number
     * Une commande qui concerne uniquement les nombres (comme `+`, `-`, `*`,
     `/`, `%` ou `**`) a été écrite avec autre chose qu’un nombre en argument
     (peut-être du texte, un booléen, une liste ou `Rien`).
-* `java.lang.NullPointerException`
+* java.lang.NullPointerException
     * Il y a peut-être dans votre code une commande de la forme `(x)` ou `x`
       est une variable contenant un nombre. Dans ce cas, vous voulez peut-être
       juste écrire la valeur de `x`, car `x` n’est pas une commande.
-* `java.lang.StackOverflowError`
+* java.lang.StackOverflowError
     * Voir la sous-section [récursion](#rcursion).
 * X -- La condition n’est pas un booléen.
     * Voir la sous-section [booléens](#boolens).
@@ -309,6 +314,7 @@ valeur ou de la commande qui est parfois fournie :
 * Le second paramètre de X doit être un booléen.
     * Voir la sous-section [booléens](#boolens).
 * (V est un W ; X un Y) -- Le type ne correspond pas.
+* Mauvais tirage forcé : x n’est pas compris entre min et max.
 * Maximum call stack size exceeded.
     * Voir la sous-section [récursion](#rcursion).
 * Mot-clef `Alors` manquant.
@@ -321,6 +327,10 @@ valeur ou de la commande qui est parfois fournie :
       une valeur qui n’est pas du type nombre. C’est souvent le cas si vous
       utilisez la commande `Demander`.  
       Pensez à utiliser la commande `Nombre` pour convertir cette valeur.
+* X not found.
+    * Voir la sous-section [espaces dans les noms de fichiers](#espacesdanslesnomsdefichiers).
+* X -- Read open error
+    * Voir la sous-section [espaces dans les noms de fichiers](#espacesdanslesnomsdefichiers).
 * too much recursion
     * Voir la sous-section [récursion](#rcursion).
 * Un objet vide n’a pas de queue.
@@ -343,13 +353,13 @@ le signaler en :
 * envoyant un <a href="mailto:profgra.org@gmail.com" class="email">email au
   créateur de MicroAlg</a>.
 
-## Booléens
+### Booléens
 
 *  Si un comparateur est utilisé pour produire un booléen, penser à le mettre
    en premier car c’est une commande comme les autres. Par exemple `(n > 1)`
    ne fonctionnera pas, il faut écrire `(> n 1)`.
 
-## Récursion
+### Récursion
 
 * Il est possible que vos appels récursifs (appel d’une commande depuis sa
   définition) ne trouvent pas de point d’appui. Votre test est-il bon ?  
@@ -357,7 +367,14 @@ le signaler en :
   MicroAlg arrête ce qui lui semble être un travail infini. La limite est
   variable et ne peut que très rarement être modifiée.
 
-# Feuille de route
+### Espaces dans les noms de fichiers
+
+* Le fichier que vous voulez exécuter n’a pas été trouvé. C’est sans doute
+  parce que son nom contient des espaces. Pour le confirmer, observez le nom de
+  fichier qui précède ce message d’erreur, il s’arrête sans doute au premier
+  espace rencontré.
+
+## Feuille de route
 
 Voici les directions que le projet va prendre :
 
@@ -378,7 +395,7 @@ Voici les directions que le projet va prendre :
 À un niveau moins général, des rapports de bugs ou idées d’amélioration sont
 régulièrement [reportées sur Github](https://github.com/Microalg/Microalg/issues?state=open).
 
-# Contribuer
+## Contribuer
 
 Toutes les bonnes volontés sont les bienvenues pour contribuer à MicroAlg. Il
 y aura de la place pour tout le monde. Voici une liste non exhaustive suivant
@@ -403,7 +420,7 @@ les compétences techniques au autres du contributeur :
     * écrire d’autres tutoriels, par exemple pour détailler un sujet précis ;
 * compétences en **visuels numériques**, **HTML/CSS** :
     * travailler sur l’apparence du site ;
-* compétences en **développement** (Java, Javascript, jQuery, PicoLisp…) :
+* compétences en **développement** (Java, JavaScript, jQuery, PicoLisp…) :
     * améliorer l’interface web ;
     * applis Android ou iOS, installateurs pour Mac ou PC ;
     * construire de nouvelles interfaces, par exemple avec GeoGebra ;
@@ -420,7 +437,37 @@ Pour cela, il y a plusieurs méthodes :
 * envoyer un <a href="mailto:profgra.org@gmail.com" class="email">email au
   créateur de MicroAlg</a>.
 
-# Architecture
+## Architecture
+
+### Diagramme
+
+<img alt="Diagramme d’architecture" src="visuels/archi.svg" />
+
+**Légende**
+
+* MACHINE : l’ordinateur, le smartphone, la tablette, la machine virtuelle…
+* JVM : pour <a href="http://fr.wikipedia.org/wiki/Machine_virtuelle_Java"
+  class="wp">Java Virtual Machine</a>,
+  exécute du byte-code Java
+* Rhino : plateforme en Java pur permettant d’interpréter du code JavaScript
+  (voir <a href="http://fr.wikipedia.org/wiki/Rhino_%28moteur_JavaScript%29"
+  class="wp">l’article Wikipedia</a>)
+* NodeJS : plateforme permettant d’interpréter du code JavaScript
+  (voir <a href="http://fr.wikipedia.org/wiki/Nodejs"
+  class="wp">l’article Wikipedia</a>)
+* browser : le navigateur (Internet) installé sur la MACHINE
+* PicoLisp : la version officielle du langage hôte, PicoLisp
+* Ersatz : implémentation en Java de PicoLisp
+* EmuLisp : implémentation en JavaScript de PicoLisp
+* `pil`, `pil-j`, `pil-rjs` et `pil-njs` : les interpréteurs des
+  implémentations de PicoLisp
+* `microalg.l` : le fichier définissant le langage MicroAlg
+* `malg`, `malg-j`, `malg-rjs` et `malg-njs` : les interpréteurs de MicroAlg,
+  correspondants aux implémentations de PicoLisp
+* « depuis éditeur » concerne par exemple [SciTE](doc.html#scite)
+* web IDE : interface permettant de manipuler MicroAlg depuis un navigateur
+
+### Composants
 
 Cette section explique les relations entre les différents composants de
 MicroAlg et les composants sur lequels elle repose.
@@ -429,13 +476,13 @@ MicroAlg est un langage embarqué dans un langage de type
 <a href="http://fr.wikipedia.org/wiki/Lisp" class="wp">Lisp</a>, nommé
 <a href="http://picolisp.com/" class="offi">PicoLisp</a>.
 Ce dernier est implémenté au moins avec trois langages, C+ASM, Java et
-Javascript.
+JavaScript.
 
 * En C+ASM, c’est la version dite *officielle*
   d’[Alexander Burger](http://software-lab.de/).
 * En Java, c’est l’implémentation nommée Ersatz et réalisée par le créateur de
   PicoLisp lui-même.
-* En Javascript, c’est l’implémentation nommée EmuLisp, réalisée par
+* En JavaScript, c’est l’implémentation nommée EmuLisp, réalisée par
   [Jon Kleiser](http://folk.uio.no/jkleiser/), dont je suis quasiment le seul
   utilisateur, et que je maintiens dans un
   [dépôt semi-officiel](https://github.com/grahack/emulisp).
@@ -452,67 +499,105 @@ Attention, `pil-j` n’est pas le nom officiel de l’exécutable d’Ersatz (c�
 pas de `pil-Xjs`. `pil-rjs` et `pil-njs` n’existent (pour l’instant) que dans
 MicroAlg.
 
-MicroAlg offre donc naturellement les programmes `malg`, `malg-j`, `malg-rjs`
-et `malg-njs`. Ils ont les mêmes missions que leurs homologues, la seule
-différence est qu’ils chargent `microalg.l`, le cœur du projet MicroAlg, où les
-commandes du langage sont définies.
+### Interpréteurs
 
-<img id="diagramme" alt="Diagramme d’architecture" src="visuels/archi.svg" />
+MicroAlg offre les programmes `malg`, `malg-j`, `malg-rjs` et `malg-njs`, qui
+correspondent à leur `pil*` respectif. Ils ont les mêmes missions que leurs
+homologues, à ces différences près :
 
-**Légende**
+* ils chargent `microalg.l`, le cœur du projet MicroAlg, où les commandes du
+  langage sont définies ;
+* ils n’acceptent qu’un argument : le fichier à exécuter ;
+* ils n’entrent pas en mode interactif si un fichier est exécuté.
 
-* MACHINE : l’ordinateur, le smartphone, la tablette, la machine virtuelle…
-* JVM : pour <a href="http://fr.wikipedia.org/wiki/Machine_virtuelle_Java"
-  class="wp">Java Virtual Machine</a>,
-  exécute du byte-code Java
-* Rhino : plateforme en Java pur permettant d’interpréter du code Javascript
-  (voir <a href="http://fr.wikipedia.org/wiki/Rhino_%28moteur_JavaScript%29"
-  class="wp">l’article Wikipedia</a>)
-* NodeJS : plateforme permettant d’interpréter du code Javascript
-  (voir <a href="http://fr.wikipedia.org/wiki/Nodejs"
-  class="wp">l’article Wikipedia</a>)
-* browser : le navigateur (Internet) installé sur la MACHINE
-* PicoLisp : la version officielle du langage hôte, PicoLisp
-* Ersatz : implémentation en Java de PicoLisp
-* EmuLisp : implémentation en Javascript de PicoLisp
-* `pil`, `pil-j`, `pil-rjs` et `pil-njs` : les interpréteurs des
-  implémentations de PicoLisp
-* `microalg.l` : le fichier définissant le langage MicroAlg
-* `malg`, `malg-j`, `malg-rjs` et `malg-njs` : les interpréteurs de MicroAlg,
-  correspondants aux implémentations de PicoLisp
-* « depuis éditeur » concerne par exemple [SciTE](doc.html#scite)
-* web IDE : interface permettant de manipuler MicroAlg depuis un navigateur
+### Performances
 
-# Intégrations
+Concernant les performances, la commande [`Millisecondes`](#cmd-Millisecondes)
+nous permet d’avoir les valeurs suivantes (sur la machine de développement du
+patron, et sans moyenne sur plusieurs exécutions) :
+
+    $ malg exemples/test_millisecondes.malg
+    MicroAlg (PicoLisp)
+    "39 millisecondes écoulées avant l’exécution de la première ligne."
+    "Nous en sommes à 48 millisecondes après 500 Ajouter_a."
+    "Soit 9 millisecondes pour 2ème la boucle."
+    "Nous en sommes à 60 millisecondes après 500 autres Ajouter_a."
+    "Soit 12 millisecondes pour 2ème la boucle."
+
+    $ malg-njs exemples/test_millisecondes.malg
+    MicroAlg (NodeJS + EmuLisp)
+    "41 millisecondes écoulées avant l’exécution de la première ligne."
+    "Nous en sommes à 181 millisecondes après 500 Ajouter_a."
+    "Soit 140 millisecondes pour 2ème la boucle."
+    "Nous en sommes à 289 millisecondes après 500 autres Ajouter_a."
+    "Soit 108 millisecondes pour 2ème la boucle."
+
+    $ malg-j exemples/test_millisecondes.malg
+    MicroAlg (Ersatz)
+    "211 millisecondes écoulées avant l’exécution de la première ligne."
+    "Nous en sommes à 371 millisecondes après 500 Ajouter_a."
+    "Soit 160 millisecondes pour 2ème la boucle."
+    "Nous en sommes à 454 millisecondes après 500 autres Ajouter_a."
+    "Soit 83 millisecondes pour 2ème la boucle."
+
+    $ malg-rjs exemples/test_millisecondes.malg
+    MicroAlg (RhinoJS + EmuLisp)
+    "748 millisecondes écoulées avant l’exécution de la première ligne."
+    "Nous en sommes à 1861 millisecondes après 500 Ajouter_a."
+    "Soit 1113 millisecondes pour 2ème la boucle."
+    "Nous en sommes à 2748 millisecondes après 500 autres Ajouter_a."
+    "Soit 887 millisecondes pour 2ème la boucle."
+
+En résumé :
+
+* La version avec PicoLisp (`malg`) est de loin la plus rapide. Attention,
+  elle ne peut travailler qu’avec les nombres entiers.
+* Ensuite vient la version NodeJS+EmuLisp (`malg-njs`), qui démarre très vite
+  et est sensiblement aussi rapide que la version Ersatz (`malg-j`).
+* La version Ersatz (`malg-j`), qui est sans doute longue à démarrer à cause de
+  Java (sans compter le démarrage de Java lui-même, qui n’est pas mesuré),
+  peut rattraper la précédente version à moyen terme. Attention, elle ne peut
+  travailler qu’avec les nombres entiers.
+* Pour finir, la version Rhino+EmuLisp (`malg-rjs`) est bonne dernière. En
+  effet, elle est à la fois pénalisée par Java et par l’interprétation avec
+  JavaScript. Néanmoins, elle permet de travailler avec les nombres flottants
+  avec le minimum d’installation de la part de l’utilisateur.
+
+## Intégrations
 
 MicroAlg s’intègre à d’autres systèmes. Pour l’instant, à part l’intégration
 avec des éditeurs de texte, MicroAlg s’intègre uniquement avec Blockly,
 mais il est prévu de travailler sur Processing et ProcessingJS, Mario, NetLogo,
 GeoGebra, GeoTortue…
 
-## SciTE
+### SciTE
 
 Moins populaire que NotePad++, il est pourtant très souple et intéressant,
 notamment pour mettre en place un nouveau langage.
 
-### Exécution
+#### Exécution
 
 `F5` pour lancer le programme. Si c’est un nouveau fichier, il faudra tout
 d’abord l’enregistrer, sans oublier l’extension `.malg`.
 
+Par défaut, c’est `malg-rjs` qui est utilisé pour l’interprétation (voir la
+section [architecture](#architecture)). Vous pouvez changer cette valeur en
+allant dans le menu `View` puis `Parameters` (`SHIFT`+`F8` avec Windows).
+
 La sortie apparaît dans le panneau de droite. Ce panneau sert aussi à interagir
 avec le programme. Les valeurs demandées par le programme doivent y être tapées.
 
-### Panneau de sortie
+#### Panneau de sortie
 
 * S’il est caché, il suffit de tirer la poignée à la souris.
 * Si vous le trouvez encombré, vous pouvez supprimer son contenu comme si
   vous éditiez un fichier.
+* Pour changer le focus de panneau, utiliser `CTRL`+`F6`.
 
 **Bug connu** (si vous utilisez autre chose que Windows) : pas moyen de faire
 en sorte que `(Demander)` attende l’utilisateur.
 
-### Abbréviations
+#### Abbréviations
 
 Après avoir tapé les préfixes ci-dessous, un appui sur `Ctrl`+`B` vous
 donnera la suite.
@@ -539,9 +624,9 @@ donnera la suite.
     # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
     (Tq  ->  (Tant_que (|) Faire...
 
-### Problèmes connus
+#### Problèmes connus
 
-#### Pas de réaction
+##### Pas de réaction
 
 Si SciTE ne réagit pas, c’est peut-être parce que le précédent programme ne
 s’est pas terminé correctement. Dans ce cas, plusieurs solutions :
@@ -552,11 +637,11 @@ s’est pas terminé correctement. Dans ce cas, plusieurs solutions :
 puis réessayer. Attention, si vous utilisez la seconde méthode, un processus
 `java.exe` peut continuer de tourner.
 
-#### Unable to access jarfile
+##### Unable to access jarfile
 
 Merci d’éviter les espaces dans les différents chemins.
 
-## Vim
+### Vim
 
 Voici ce que vous pouvez mettre dans votre `.vimrc` si vous avez un fond
 sombre. Si vous avez un fond clair, dîtes-moi ce qui fonctionne en envoyant
@@ -576,7 +661,7 @@ une copie d’écran.
     hi def hlLevel5   ctermfg=blue
     hi def hlLevel6   ctermfg=darkmagenta
 
-## Blockly
+### Blockly
 
 C’est un système de blocs à glisser et déposer, très souple, utilisé ici pour
 rédiger des programmes de façon visuelle. Blockly ne peut s’utiliser qu’au
@@ -588,25 +673,25 @@ ou [l’installation hors ligne pour les autres OS](https://github.com/Microalg/
 Voir [le site officiel](https://code.google.com/p/blockly/) et
 [les démos](https://blockly-demo.appspot.com/static/apps/index.html) de Blockly.
 
-### Bloc Programme
+#### Bloc Programme
 
 Le bloc `Programme` ne fait rien en lui-même, mais seuls les blocs contenus
 dans le bloc `Programme` seront pris en compte.
 
-### Nombres avec Blockly
+#### Nombres avec Blockly
 
 Il faut taper un nombre dans un bloc nombre, sinon la valeur par défaut est 0.
 
 Voir aussi [cette section](#nombre).
 
-### Textes avec Blockly
+#### Textes avec Blockly
 
 Il faut taper du texte dans un bloc de texte, sinon la valeur par défaut est
 le texte vide `""`.
 
 Voir aussi [cette section](#texte).
 
-### Opérations avec Blockly
+#### Opérations avec Blockly
 
 Un même bloc permet d’obtenir différentes opérations. Pour choisir, cliquer sur
 le menu déroulant, qui contient par défaut l’opération `+`.
@@ -614,7 +699,7 @@ le menu déroulant, qui contient par défaut l’opération `+`.
 Voir aussi les commandes 
 [`+`](#cmd-+), [`-`](#cmd--), [`*`](#cmd-*) et [`/`](#cmd-/).
 
-### Comparaisons avec Blockly
+#### Comparaisons avec Blockly
 
 Un même bloc permet d’obtenir différentes comparaisons. Pour choisir, cliquer sur
 le menu déroulant, qui contient par défaut la comparaison `=`.
@@ -623,7 +708,7 @@ Voir aussi les commandes 
 [`=`](#cmd-=), [`=/`](#cmd-=/), [`<`](#cmd-<), [`>`](#cmd-\>), [`<=`](#cmd-<=)
 et [`>=`](#cmd->=).
 
-# Remerciements
+## Remerciements
 
 <a name="testeurs"/>Relecteurs, testeurs et commentateurs :
 

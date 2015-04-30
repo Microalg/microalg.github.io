@@ -57,7 +57,10 @@ function stdPrint(text, state) {
 }
 
 function stdPrompt() {
+    // Since the prompt appears in the little usual modal window, we need
+    // to show the user the last thing displayed (it should be a question).
     var last_line_displayed = cleanTransient(EMULISP_CORE.eval('*LastStdOut'));
+    if (last_line_displayed == "NIL") last_line_displayed = "?";
     var user_input = window.prompt(last_line_displayed);
     if (user_input !== null) return user_input;
     else throw new Error("Commande `Demander` annulée.")
@@ -70,25 +73,33 @@ function onCtrl(elt, f) {
                 f(elt);
             } else if (e.keyCode == 66) {
                 e.preventDefault();
+                // Voir aussi dans editeurs/scite/malg_abbrev.properties.
                 var abbrevs = {
                   "(Af": "(Affecter_a |)",
                   "(Afe": "(Affecter_a | En_position )",
                   "(A": "(Afficher |)",
                   "(Aj": "(Ajouter_a |)",
+                  "(Al": "(!!! \"Algo |\")\n(!!! \"Fin algo \")",
+                  "(At": "(Afficher \"|\")",
                   "(Co": "(Concatener |)",
                   "(D": "(Definir |\n    \"...\"\n    \"...\"\n    (Retourner )\n)",
                   "(Dm": "(Demander)|",
                   "(E": "(Exemples_de |\n    (Liste\n        (? )\n        (? )\n    )\n)",
+                  "(E@": "(Entie@ |)\n",
                   "(F": "(Faire (|)\n       ()\n Tant_que ()\n)",
                   "(I": "(Initialiser |)",
+                  "(I@":"(Initialiser@)\n|",
                   "(Li": "(Liste |)",
                   "(Lo": "(Longueur |)",
+                  "(M": "(Millisecondes)|",
                   "(Ni": "(Nieme |)",
+                  "(N@": "(Nieme@ |)",
                   "(No": "(Nombre |)",
                   "(Rd": "(Retirer_de |)",
                   "(R": "(Retourner |)",
                   "(S": "(Si (|) Alors\n    ()\n)",
                   "(Ss": "(Si (|)\n Alors ()\n Sinon ()\n)",
+                  "(Te": "(Tester |)",
                   "(Tq": "(Tant_que (|) Faire\n    ()\n    ()\n)"
                 };
                 // Grab content and split in 'before' and 'after' caret.
@@ -212,6 +223,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 ' <category name="Cmdes sans retour">' +
                 '  <block type="commentaire"></block>' +
                 '  <block type="afficher"></block>' +
+                '  <block type="initialiser_pseudo_aleatoire"></block>' +
                 '  <block type="si"></block>' +
                 ' </category>' +
                 ' <category name="Cmdes avec retour">' +

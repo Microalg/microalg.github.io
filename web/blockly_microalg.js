@@ -34,7 +34,8 @@ Blockly.MicroAlg.addReservedWords(
     'Affecter_a, Afficher, Aide, Ajouter_a, Alors, Booleen?, Concatener, ' +
     'Definir, Demander, En_position, Entier@, Et, Exemples_de, ' +
     'Faire, Faux, Faux?, Initialiser, Initialiser@, ' +
-    'Liste, Liste?, Longueur, Nieme, Nieme@, Nombre, Nombre?, Non, Ou, ' +
+    'Liste, Liste?, Longueur, Millisecondes, ' +
+    'Nieme, Nieme@, Nombre, Nombre?, Non, Ou, ' +
     'Queue, Retirer_de, Retourner, Rien, Si, Sinon, ' +
     'Tant_que, Tester, Tete, Texte, Texte?, Type, ' +
     'Vide?, Vrai, Vrai?');
@@ -450,6 +451,24 @@ Blockly.MicroAlg['entier_pseudo_aleatoire'] = function(block) {
 // Gen Faire
 // Bloc Initialiser
 // Gen Initialiser
+
+// Bloc Initialiser@
+Blockly.Blocks['initialiser_pseudo_aleatoire'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#cmd-Initialiser@');
+    this.setColour(250);
+    this.appendDummyInput()
+        .appendField('Initialiser@');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Initialiser la séquence des nombres pseudo-aléatoire.');
+  }
+};
+
+// Gen Initialiser@
+Blockly.MicroAlg['initialiser_pseudo_aleatoire'] = function(block) {
+  return '(Initialiser@)';
+};
 
 // Bloc Nombre
 Blockly.Blocks['nombre'] = {

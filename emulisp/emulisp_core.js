@@ -1,10 +1,10 @@
-/* 15dec14jk
+/* 13apr15jk
  * (c) Jon Kleiser
  */
 
 var EMULISP_CORE = (function () {
 
-var VERSION = [2, 0, 3, 0],
+var VERSION = [2, 0, 4, 0],
 	MONLEN = [31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	BOXNAT_EXP = "Boxed native object expected",
 	BOOL_EXP = "Boolean expected", CELL_EXP = "Cell expected", LIST_EXP = "List expected",
@@ -409,11 +409,21 @@ Source.prototype.EOF = null;
 
 Source.prototype.unescMap = {I: "\t", i: "\t", J: "\n", j: "\n", M: "\r", m: "\r"};
 
+Source.prototype.more = function() { return this.pos < this.src.length; }
+
 Source.prototype.getNextSignificantChar = function() {
-	while (this.pos < this.src.length) {
+	while (this.more()) {
 		while (this.src.charAt(this.pos) == "#") {
-			var ch;
-			do { ch = this.src.charAt(this.pos++); } while ((ch != "\n") && (this.pos < this.src.length));
+			var ch = this.src.charAt(++this.pos);
+			if (ch == "{") {
+				// Multi-line comment
+				while (this.more()) {
+					ch = this.src.charAt(this.pos++);
+					if ((ch == "}") && (this.src.charAt(this.pos++) == "#")) break;
+				}
+			} else {
+				while ((ch != "\n") && this.more()) ch = this.src.charAt(this.pos++);
+			}
 		}
 		if (this.src.charAt(this.pos) == "\\") this.pos++;
 		if (" \t\r\n".indexOf(this.src.charAt(this.pos)) == -1) return this.src.charAt(this.pos++);
@@ -423,7 +433,7 @@ Source.prototype.getNextSignificantChar = function() {
 }
 
 Source.prototype.getNextStringChar = function() {
-	while (this.pos < this.src.length) {
+	while (this.more()) {
 		var ch = this.src.charAt(this.pos++);
 		if (ch == "\"") return this.QUOTE2;
 		if (ch == "\\") return this.src.charAt(this.pos++);
@@ -508,10 +518,10 @@ var gEmptyObj = {}, TheCls, TheKey;
 var cst, QUOTE;
 
 function emuEnv() {
-		if (typeof window != 'undefined') return "browser";
-		if (typeof process != 'undefined') return "nodejs";
-		if (typeof print != 'undefined') return "rhino";
-		return NIL;
+	if (typeof window != 'undefined') return "browser";
+	if (typeof process != 'undefined') return "nodejs";
+	if (typeof print != 'undefined') return "rhino";
+	return NIL;
 }
 
 function prepareNewState(optionalState) {
@@ -523,7 +533,8 @@ function prepareNewState(optionalState) {
 		compExprArr: [],	// sort expression stack
 		evFrames: NIL,
 		trcIndent: "",
-		startupMillis: Date.now()
+		startupMillis: Date.now(),
+		seed: Int(0)
 	};
 	QUOTE = getSymbol("quote");
 	getSymbol("*EMUENV").setVal(new Symbol(emuEnv()));
@@ -759,12 +770,8 @@ function parseList(src, evaluate, editMode) {
 			quotes++;
 		} else if (ch == ")") {
 			break;
-		} else if ((ch == ".") && (items.length > 0)) {
-			if (dotPos > 0) throw new Error(newErrMsg(BAD_DOT,
-												"(" + lispToStr(items[items.length-1]) + " . \\.)"));
-			dotPos = items.length;
 		} else if (ch !== src.EOF) {
-			var item;
+			var item = null;
 			if (ch == "(") {
 				var tmp = parseList(src, false, editMode);
 				if (evaluate && (tmp !== NIL)) evRes = evalLisp(tmp);
@@ -777,14 +784,19 @@ function parseList(src, evaluate, editMode) {
 			} else {
 				s = ch;
 				while (typeof (ch = src.getNextSymbolChar()) === "string") s += ch;
-				item = isNaN(s) ? getSymbol(s, editMode) : new Number(s);
-				src.traceItemEnd(item);		// in case we would like to know item's position
+				if (s == ".") {
+					dotPos = items.length;
+				} else {
+					item = (isNaN(s) || s.match(/^[+-]?\./)) ? getSymbol(s, editMode) : new Number(s);
+					src.traceItemEnd(item);		// in case we would like to know item's position
+				}
 			}
 			if (evaluate && (item === NIL)) return evRes;
-			if ((dotPos > 0) && (items.length > dotPos)) throw new Error(newErrMsg(BAD_DOT));
-			// TODO: provide a 'badValue' param for newErrMsg(BAD_DOT) above. Case: (1 (2 3) . 4 5)
+			if ((dotPos > 0) && (items.length > dotPos)) {
+				throw new Error(newErrMsg(BAD_DOT, lispToStr(new Cell(items[dotPos - 1], items[dotPos]))));
+			}
 			while (quotes > 0) { item = new Cell(QUOTE, item); quotes--; }
-			items.push(item);
+			if (item !== null) items.push(item);
 		}
 	} while ((ch !== src.CLOSEPAREN) && (ch !== src.EOF));
 	if (evaluate) return evRes;
@@ -829,6 +841,28 @@ function printx(c, x) { var arr = [];
 	c = evalArgs(c); arr.push(lispToStr(c.car));
 	while (c.cdr !== NIL) { c = c.cdr; arr.push(lispToStr(c.car)); }
 	_stdPrint(arr.join(" ") + x); return c.car;
+}
+
+function initSeed(c) {
+	var n = Int(0);
+	while (c instanceof Cell) {
+		n = n.add(initSeed(c.car));
+		c = c.cdr;
+	}
+	if (c != NIL) {
+		if (c instanceof Number) {
+			if (c >= -2147483648 && c <= 2147483647) {
+				n = n.add(c);
+			} else {
+				// not implemented yet
+				throw "Seeding with such a big number is not implemented.";
+			}
+		} else {
+			throw "Seeding with something other than a number is not implemented yet.";
+		}
+	}
+	n = n.gte(0)? n.mul(2) : n.neg().mul(2).add(1);
+	return n;
 }
 
 function rand(c, picoSize) {
@@ -1345,8 +1379,37 @@ var coreFunctions = {
 		if (value == NIL) throw new Error(newErrMsg(evalLisp(c.car)));
 		else throw new Error(newErrMsg(evalLisp(c.car), value));
 	},
-	"rand": function(c) { return rand(c, 2147483648); },
+	"rand": function(c) {
+		cst.seed = cst.seed.mul(Int("6364136223846793005")).add(1).mod("18446744073709551616");
+		var x = evalLisp(c.car)
+		var shiftedSeed = cst.seed.div(4294967296);
+		if (x == NIL) {
+			var ersatz = true;
+			if (ersatz) {
+				var seed_bits = cst.seed.mod(4294967296); // lower bits
+				// Convert unsigned 32 bit number to 32 bit signed number.
+				var converted = seed_bits.lt(2147483648) ?  seed_bits : seed_bits.sub(4294967296);
+				return new Number(converted);
+			} else {
+				var seed_bits = shiftedSeed; // higher bits
+				var converted = seed_bits.mod(2).eq0() ? seed_bits.div(2) : seed_bits.sub(1).div(2).neg() ;
+				return new Number(converted);
+			}
+		}
+		if (x == T) return (shiftedSeed.mod(2).eq0())? NIL : T;
+		// x is now the min, n will be the max
+		x = numeric(x);
+		var n = numeric(evalLisp(c.cdr.car));
+		n = n + 1 - x;
+		if (n != 0) {
+			// A last shift to conform to Ersatz (>>> 33)
+			shiftedSeed = shiftedSeed.div(2);
+			n = shiftedSeed.mod(n);
+		}
+		return new Number(n.add(x));
+	},
 	"randfloat": function(c) { return rand(c); },	// not std. PicoLisp
+	"randjs": function(c) { return rand(c, 2147483648); },  // idem
 	"range": function(c) {
 		var n = numeric(evalLisp(c.car)), n2 = numeric(evalLisp(c.cdr.car)), s = evalLisp(c.cdr.cdr.car);
 		if (s === NIL) { s = 1; } else if (numeric(s) <= 0) throw new Error(newErrMsg(BAD_ARG, s));
@@ -1371,7 +1434,15 @@ var coreFunctions = {
 	"run": function(c) { var cv = evalLisp(c.car);
 		return (cv instanceof Cell) ? prog(cv) : cv;	// TODO: binding env. offset cnt
 	},
-	"seed": function(c) { return rand(NIL, 2147483648); },  // not std. PicoLisp
+	"seed": function(c) {
+		// The seed is correctly set,
+		// but the number returned is the seed rounded to a JS number.
+		var n = initSeed(evalLisp(c.car)).mul("6364136223846793005");
+		// Convert unsigned 64 bit number to 64 bit signed number.
+		n = n.lt("9223372036854775808") ? n : n.sub("18446744073709551616");
+		cst.seed = n;
+		return new Number(n + "");
+	},
 	"send": function(c) { var m = evalLisp(c.car), t = evalLisp(c.cdr.car);
 		TheKey = m; TheCls = null;
 		console.log("send #1: %s, %s", lispToStr(t), lispToStr(m));
@@ -1495,6 +1566,9 @@ var coreFunctions = {
 		if (cl === NIL) return NIL;
 		throw new Error(newErrMsg(NUM_EXP, cl));
 	},
+	"time": function(c) { // Doesn't accept args for now.
+		var d = new Date();
+		return new Number(d.getSeconds() + 60*d.getMinutes() + 3600*d.getHours()); },
 	"trace": function(c) { var s = evalLisp(c.car), f = evalLisp(s);
 		if (f instanceof Cell) {
 			setSymbolValue(s, new Cell(f.car, new Cell(new Cell(cst.iSym["$"], new Cell(s, f)), NIL)));
