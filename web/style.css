@@ -19,6 +19,12 @@ body.microalg {
     text-decoration: none;
     border: 0 none;
 }
+.microalg h2 {
+    margin-top: 2.3em;
+}
+.microalg h3 {
+    margin-top: 1.8em;
+}
 .microalg.doc h2 {
     border-top: 1px solid black;
     padding-top: 0.5em;
