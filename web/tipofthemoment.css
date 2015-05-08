@@ -1,0 +1,10 @@
+#tip {
+    padding: 1em;
+    border: solid 1px;
+}
+#tip-next {
+    text-decoration: underline;
+    cursor: pointer;
+    display: block;
+    float:right;
+}
