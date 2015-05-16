@@ -4,6 +4,8 @@ body.microalg {
     font-family: Verdana, Arial, sans-serif;
     color: black;
     background-color: #D1D1D1;
+}
+.microalg p {
     line-height: 1.3em;
 }
 .microalg a:link {color:#337;}
