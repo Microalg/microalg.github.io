@@ -230,6 +230,8 @@ pre,
 samp {
   font-family: monospace, monospace;
   font-size: 1em;
+  background-color: #ddd;
+  padding: 1px 0.2em 1px 0.2em;
 }
 
 /* Forms
