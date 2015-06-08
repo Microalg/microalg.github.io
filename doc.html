@@ -14,6 +14,7 @@
         <script src="emulisp/int.js" type="text/javascript"></script>
         <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
         <link rel="stylesheet" type="text/css" href="web/style.css" />
+        <script type="text/javascript" src="web/ide_injections.js"></script>
         <link rel="stylesheet" type="text/css" href="web/parenedit.css" />
     </head>
     <body class="microalg doc">
@@ -186,6 +187,15 @@ organisés comme ceci :
     * mots-clefs
         * intermédiaires (`Alors`, `Sinon`…)
         * autres (`Vrai`, `Faux`, `Rien`…)
+    * variables (le reste des symboles), qui le plus souvent :
+        * sont définies par l’utilisateur
+        * commencent par une minuscule
+
+<div id="variables"></div>
+
+Les variables sont des symboles qui renferment un valeur. Dans un algorithme,
+elles servent souvent à stocker une valeur qui va servir plusieurs fois ou
+suivre l’évolution d’une quantité.
 
 ### Conventions
 
@@ -224,25 +234,25 @@ Deux valeurs : `Vrai` ou `Faux`.
 
 ### Nombre
 
-Les nombres de MicroAlg sont ceux de Picolisp.
+Les nombres de MicroAlg sont ceux de PicoLisp.
 
 * Les entiers sont arbitrairement grands, positifs ou négatifs.
-    * [Documentation Picolisp](http://software-lab.de/doc/ref.html#number)
+    * [Documentation PicoLisp](http://software-lab.de/doc/ref.html#number)
       (en anglais)
 * Les décimaux sont à <a href="http://fr.wikipedia.org/wiki/Virgule_fixe"
   class="wp">virgule fixe</a>.
     * Le séparateur décimal est `.`.
     * L’échelle est `*Scl`. <!-- TODO: http://pastebin.com/A6tPQNqT -->
-    * [Documentation Picolisp](http://software-lab.de/doc/ref.html#num-io)
+    * [Documentation PicoLisp](http://software-lab.de/doc/ref.html#num-io)
       (en anglais)
 
 ### Texte
 
 Délimités par des guillemets doubles : `"salut"`.
 
-* [Documentation Picolisp](http://software-lab.de/doc/ref.html#transient)
+* [Documentation PicoLisp](http://software-lab.de/doc/ref.html#transient)
   (en anglais)
-* [Documentation Picolisp](http://software-lab.de/doc/ref.html#transient-io)
+* [Documentation PicoLisp](http://software-lab.de/doc/ref.html#transient-io)
   (en anglais)
 
 ### Liste
@@ -759,8 +769,8 @@ et [`>=`](#sym->=).
 
 <p id="libs">Bases techniques et bibliothèques :</p>
 
-* **Picolisp** et **Ersatz**, par Alexander Burger &mdash; [site officiel](http://picolisp.com)
-* **Emulisp**, par Jon Kleiser &mdash; [GitHub](https://github.com/Grahack/EmuLisp)
+* **PicoLisp** et **Ersatz**, par Alexander Burger &mdash; [site officiel](http://picolisp.com)
+* **EmuLisp**, par Jon Kleiser &mdash; [GitHub](https://github.com/Grahack/EmuLisp)
 * **jQuery**, par John Resig et la communauté &mdash; [site officiel](http://jquery.com/)
 * **jQuery-term**, par Jakub T. Jankiewicz &mdash; [site officiel](http://terminal.jcubic.pl/)
 * **parenedit**, &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
@@ -797,9 +807,9 @@ nom digne de ce nom.</p>
         <script>
             var syms_as_list = EMULISP_CORE.eval("symboles").toString();
             var syms_as_strings = syms_as_list
-                .slice(1, -1)
+                .slice(1, -1) // les parenthèses
                 .split(' ')
-                .map(function (x) {return x.slice(1, -1);});
+                .map(cleanTransient);
             // TOC
             var toc = $('<div/>').appendTo($('#syms'));
             $.each(syms_as_strings, function(i, sym) {
@@ -820,11 +830,7 @@ nom digne de ce nom.</p>
                 var span = $('<span/>').appendTo(dt);
                 $('<a/>').attr("href", "#sym-" + sym).html(sym).appendTo(span);
                 var sym_doc = EMULISP_CORE.eval("(get '" + sym + " 'doc)");
-                sym_doc = sym_doc.replace(/\^J/g,'\n');  // PicoLisp control char
-                sym_doc = sym_doc.replace(/\\"/g,'"');   // PicoLisp quoted quote
-                if (sym_doc.charAt(0) == '"' && sym_doc.charAt(sym_doc.length-1) == '"') {
-                    sym_doc = sym_doc.slice(1, -1);      // remove enclosing quotes
-                }
+                sym_doc = cleanTransient(sym_doc);
                 sym_doc = new Showdown.converter().makeHtml(sym_doc);
                 $("<dd/>").html(sym_doc).appendTo(dl);
                 // corps fonction $("<dd/>").html(lisp_sym.props.car.car.name).appendTo(dl);

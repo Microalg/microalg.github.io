@@ -1,4 +1,4 @@
-(setq version "0.3.15")
+(setq version "0.3.16")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -9,7 +9,7 @@ Voir <http://microalg.info>.")
 (put 'apropos 'doc "Symbole contenant des informations sur MicroAlg.")
 
 (setq symboles '(
-"+" "-" "*" "/" "%" "**"
+"+" "-" "*" "/" "%" "**" "\^"
 "!!!" "=" "=/" "<" "<=" ">" ">=" "?"
 "Affecter_a" "Afficher" "Aide" "Ajouter_a" "Alors"
 "Booleen?"
@@ -126,9 +126,12 @@ Voir <http://microalg.info>.")
 
 # Vérif qu’une variable est bien initialisée :
 (de !inited (!sym !evaled_sym)
-    (or (not !sym)
-        !evaled_sym
-        (get !sym 'type) ) )
+    (or
+        (not (sym? !sym))  # pas un symbole
+        !evaled_sym        # une valeur non NIL, donc initialisée
+        (not !sym)         # le symbole non évalué est NIL, donc ""
+        (get !sym 'type)   # un symbole contenant une valeur typée
+    ) )
 
 # Doc pour les fonctions PicoLisp
 (put '+ 'doc
@@ -188,12 +191,20 @@ Sinon :
 ")
 (put '% 'text "Commande reste.")
 (put '** 'doc
-"Commande qui retourne son premier paramètre à la puissance du second paramètre.
+"**Abandonnée dans 0.4.** Commande qui retourne son premier paramètre à la puissance du second paramètre.
 
     : (** 2 3)
     -> 8
 ")
-(put '** 'text "Commande puissance.")
+(put '** 'text "Commande puissance, abandonnée dans la version 0.4.")
+(put '^ 'doc
+"Commande qui retourne son premier paramètre à la puissance du second paramètre.
+
+    : (\^ 2 3)
+    -> 8
+")
+(put '^ 'text "Commande puissance.")
+(de ^ (!x !y) (** !x !y))
 
 # Commentaires
 (put '!!! 'doc
@@ -998,11 +1009,20 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_NON>.")
 
 Voir <http://fr.wikipedia.org/wiki/Fonction_ET>.")
 (put 'Et 'text "Commande `Et`.")
-(de Et (!P !Q !rien_ici)
-    (if !rien_ici (quit "`Et` ne prend que deux paramètres (booléens)."))
-    (ifn (!boolCheck !P) (quit "Le premier paramètre de `Et` doit être un booléen."))
-    (ifn (!boolCheck !Q) (quit "Le second paramètre de `Et` doit être un booléen."))
-    (!boolP2M (and (!boolM2P !P) (!boolM2P !Q))) )
+(de Et !arg_lst
+    # Quelques vérifications :
+    (for (!arg_num . !arg) !arg_lst
+        (let (!evaled_arg (eval !arg)
+              !error_prefix "`Et` : l’argument n°")
+             (ifn (!inited !arg !evaled_arg)
+                  (quit (pack !error_prefix !arg_num " n’est pas initialisé." !arg)) )
+             (ifn (!boolCheck !evaled_arg)
+                  (quit (pack !error_prefix !arg_num " doit être un booléen." !arg)) )
+        )
+    )
+    # Le calcul :
+    (!boolP2M (apply 'and (mapcar '((x) (!boolM2P (eval x))) !arg_lst)))
+)
 (put 'Ou 'doc
 "Ou logique.
 
@@ -1013,11 +1033,20 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_ET>.")
 
 Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
 (put 'Ou 'text "Commande `Ou`.")
-(de Ou (!P !Q !rien_ici)
-    (if !rien_ici (quit "`Ou` ne prend que deux paramètres (booléens)."))
-    (ifn (!boolCheck !P) (quit "Le premier paramètre de `Ou` doit être un booléen."))
-    (ifn (!boolCheck !Q) (quit "Le second paramètre de `Ou` doit être un booléen."))
-    (!boolP2M (or (!boolM2P !P) (!boolM2P !Q))) )
+(de Ou !arg_lst
+    # Quelques vérifications :
+    (for (!arg_num . !arg) !arg_lst
+        (let (!evaled_arg (eval !arg)
+              !error_prefix "`Ou` : l’argument n°")
+             (ifn (!inited !arg !evaled_arg)
+                  (quit (pack !error_prefix !arg_num " n’est pas initialisé." !arg)) )
+             (ifn (!boolCheck !evaled_arg)
+                  (quit (pack !error_prefix !arg_num " doit être un booléen." !arg)) )
+        )
+    )
+    # Le calcul :
+    (!boolP2M (apply 'or (mapcar '((x) (!boolM2P (eval x))) !arg_lst)))
+)
 
 # Structures itératives
 (put 'credit_iterations 'doc
@@ -1059,14 +1088,14 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
     -> Rien
 ")
 (put 'Tant_que 'text "Commande `Tant_que`.")
-(de Tant_que arg_lst (let (Bool (car arg_lst)
-                           Mot-Clef (cadr arg_lst)
-                           Corps (cddr arg_lst))
-                          (if (<> 'Faire Mot-Clef) (quit "Commande `Tant_que` sans mot-clé `Faire`."))
-                          (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
+(de Tant_que arg_lst (let (!cond (car arg_lst)
+                           !mot-clef (cadr arg_lst)
+                           !corps (cddr arg_lst))
+                          (if (<> 'Faire !mot-clef) (quit "Commande `Tant_que` sans mot-clé `Faire`."))
+                          (while (!boolCheckM2P (eval !cond) "La condition n’est pas un booléen.")
                                  (if (=0 (dec 'credit_iterations))
                                      (quit credit_iterations_message))
-                                 (run Corps))
+                                 (run !corps))
                           Rien
                      )
 )
@@ -1087,19 +1116,19 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
     -> Rien
 ")
 (put 'Faire 'text "Commande `Faire`.")
-(de Faire arg_lst (let (Splitted (split arg_lst 'Tant_que)
-                        Corps (car Splitted)
-                        Bool (caadr Splitted))
-                       (ifn (<> arg_lst Corps)
+(de Faire arg_lst (let (!splitted (split arg_lst 'Tant_que)
+                        !corps (car !splitted)
+                        !cond (caadr !splitted))
+                       (ifn (<> arg_lst !corps)
                             (quit "Commande `Faire` sans mot-clé `Tant_que`."))
-                       (if  (!boolM2P (> (length (cadr Splitted)) 1))
+                       (if  (!boolM2P (> (length (cadr !splitted)) 1))
                             (quit "Il ne faut qu’un seul élément après le mot-clé `Tant_que`."))
-                       (run Corps)
-                       (if (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
-                           (while (!boolCheckM2P (eval Bool) "La condition n’est pas un booléen.")
+                       (run !corps)
+                       (if (!boolCheckM2P (eval !cond) "La condition n’est pas un booléen.")
+                           (while (!boolCheckM2P (eval !cond) "La condition n’est pas un booléen.")
                                   (if (=0 (dec 'credit_iterations))
                                       (quit credit_iterations_message))
-                                  (run Corps)))
+                                  (run !corps)))
                        Rien
                   )
 )

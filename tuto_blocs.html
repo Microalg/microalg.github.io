@@ -44,7 +44,6 @@
     <a href="#calculs-nombres-demandes">Calculs avec des nombres demandés à l’utilisateur</a>,
     <a href="#booleens">Booléens</a>,
     <a href="#si">Si</a>,
-    <a href="#taper-du-code">Taper du code</a>,
     <a href="#contact">Contact</a>.
     </p>
 
@@ -221,8 +220,8 @@
     <!-- TODO: sequence_tirages@ -->
 
     <h2 id="demander"><a href="#demander">: </a>Demander à l’utilisateur</h2>
-    <p>Il est possible de demander une valeur à l’utilisateur, pour ensuite
-    l’afficher :</p>
+    <p>Plutôt que de demander une valeur pseudo-aléatoire à l’ordinateur, il est
+    possible de demander une valeur à l’utilisateur, pour ensuite l’afficher :</p>
     <div id="script-afficher-demander"></div>
     <script>inject_microalg_editor_in('script-afficher-demander', {
      blockly_only: true,
@@ -715,79 +714,10 @@ Sinon commande-1-si-faux
     });</script>
     -->
 
-    <h2 id="taper-du-code"><a href="#taper-du-code">: </a>Taper du code</h2>
-    <p>Bouger des blocs à la souris, c’est bien. Mais taper son code soi-même,
-    c’est mieux. Voici un espace de travail qui vous permet de voir à quoi
-    ressemble MicroAlg sans les blocs. Observez le code (juste en dessous) au
-    fur et à mesure que vous bougez les blocs. Attention : les couleurs des
-    parenthèses n’ont rien à voir avec la couleur des blocs.</p>
-    <div id="script-taper-du-code"></div>
-    <script>inject_microalg_editor_in('script-taper-du-code', {
-     blockly: true,
-     src:
-        '(Afficher (Concatener\n' +
-        '              "Un de plus : "\n' +
-        '              (Texte (+\n' +
-        '                      1\n' +
-        '                      (Nombre (Demander))\n' +
-        '                     )\n' +
-        '              )\n' +
-        '))'
-    });</script>
-    <a name="abandonner-blocs">
-    <p>Ce que vous allez perdre en abandonnant les blocs :</p>
-    <ul>
-        <li><strong>de l’assurance</strong> : au début vous serez un peu perdues
-            car vous ne serez pas sûres de l’orthographe des commandes,
-            de l’ordre dans lequel les disposer, des parenthèses… ;
-        </li>
-        <li><strong>de la vitesse</strong> : tant que vous ne saurez pas taper
-            vite, taper du code vous semblera très long, il faut donc
-            apprendre à taper !!!
-        </li>
-    </ul>
-    <p>Ce que vous allez gagner en abandonnant les blocs :</p>
-    <ul>
-        <li><strong>de l’assurance</strong> : vous serez tellement heureuse quand
-            vous aurez franchi ce cap, que vous y prendrez goût et ne reviendrez
-            jamais aux blocs ;
-        </li>
-        <li><strong>de la vitesse</strong> : comme vous allez apprendre à taper,
-            peut-être même en <a href="http://bepo.fr">Bépo</a>, vous serez bien
-            plus rapide en laissant la souris tranquille (et votre corps vous
-            remerciera) ;
-        </li>
-        <li><strong>de la souplesse</strong> : vous pourrez présenter votre
-            code comme il vous plaira, passer à la ligne au meilleur moment
-            pour transformer votre programme en œuvre d’art. Finie la peinture
-            par numéros, à vous les pinceaux !!!
-        </li>
-        <li><strong>des neurones</strong> : l’effort fourni vous permettra
-            de devenir mentalement plus solide ;
-        </li>
-        <li><strong>des fichiers</strong> : les blocs sont pour l’instant
-            réservés au travail sur navigateur. Passer au code vous permettra
-            <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">d’installer MicroAlg</a>
-            sur votre machine et de travailler avec des fichiers ;
-        </li>
-    </ul>
-    <p>Quand vous passerez au code, le travail avec les blocs ne doit pas être
-    oublié. La forme des pièces indique :</p>
-    <ul>
-        <li>si l’instruction peut être utilisée sans être imbriquée dans une
-            autre (pas d’attache sortant à gauche, mais un creux en haut) ;</li>
-        <li>si elle retourne une valeur (attache sortant à gauche) ;</li>
-        <li>si elle a besoin d’arguments (creux à droite) ;</li>
-        <li>et si oui, de combien ;</li>
-        <li>…</li>
-    </ul>
-
-    <h2 id="fin">Fin</h2>
-    <p>Ce tutoriel est en cours de rédaction (tous les blocs ne sont pas codés :
-    appel à contribution !).</p>
-    <p>Il est temps de toutes façons de lacher la souris et de taper
-    directement du code ! Pour cela, voir les
-    <a href="#autres-tutos">autres tutoriels</a>.</p>
+    <h2 id="suite">La suite</h2>
+    <p>Bravo ! Vous êtes arrivé à la moitié de ce tutoriel.</p>
+    <p>C’est le moment de faire une petite pause, pour récupérer des forces
+    pour <a href="tuto_blocs_2.html">la suite</a> !</p>
     <br>
     <br>
     <br>

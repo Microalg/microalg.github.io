@@ -26,6 +26,7 @@ var malg_prompt = ": ";
 function cleanTransient(text) {
     text = text.replace(/\^J/g,'\n');  // PicoLisp control char
     text = text.replace(/\\"/g,'"');   // unescape double quotes
+    text = text.replace(/\\\^/g,'^');  // unescape hat char
     text = text.replace(/\n$/,'');     // remove last newline
     if (text.charAt(0) == '"' && text.charAt(text.length-1) == '"') {
         text = text.slice(1, -1);      // remove enclosing quotes
@@ -220,31 +221,50 @@ function inject_microalg_editor_in(elt_id, config) {
         // http://stackoverflow.com/questions/13214419/alternatives-to-iframe-srcdoc
         var toolbox_string =
                 '<xml id="' + elt_id + '-toolbox" style="display: none">' +
+                ' <category name="Valeurs">' +
+                '  <block type="variable"></block>' +
+                '  <block type="texte_litteral"></block>' +
+                '  <block type="nombre_litteral"></block>' +
+                '  <block type="vrai"></block>' +
+                '  <block type="faux"></block>' +
+                '  <block type="liste"></block>' +
+                '  <block type="rien"></block>' +
+                ' </category>' +
                 ' <category name="Cmdes sans retour">' +
                 '  <block type="commentaire"></block>' +
                 '  <block type="afficher"></block>' +
+                '  <block type="initialiser"></block>' +
+                '  <block type="affecter_a"></block>' +
                 '  <block type="initialiser_pseudo_aleatoire"></block>' +
                 '  <block type="si"></block>' +
+                '  <block type="faire"></block>' +
+                '  <block type="tant_que"></block>' +
                 ' </category>' +
                 ' <category name="Cmdes avec retour">' +
                 '  <block type="concatener"></block>' +
                 '  <block type="demander"></block>' +
                 '  <block type="operations"></block>' +
+                '  <block type="comparaisons"></block>' +
                 '  <block type="entier_pseudo_aleatoire"></block>' +
+                '  <block type="longueur"></block>' +
+                '  <block type="vide?"></block>' +
+                '  <block type="nieme"></block>' +
+                '  <block type="nieme@"></block>' +
+                '  <block type="tete"></block>' +
+                '  <block type="queue"></block>' +
+                ' </category>' +
+                ' <category name="Types et conversions">' +
                 '  <block type="type"></block>' +
+                '  <block type="texte?"></block>' +
+                '  <block type="nombre?"></block>' +
+                '  <block type="booleen?"></block>' +
                 '  <block type="texte"></block>' +
                 '  <block type="nombre"></block>' +
                 ' </category>' +
-                ' <category name="Prédicats">' +
-                '  <block type="comparaisons"></block>' +
-                '  <block type="texte?"></block>' +
-                '  <block type="nombre?"></block>' +
-                ' </category>' +
-                ' <category name="Autres">' +
-                '  <block type="texte_litteral"></block>' +
-                '  <block type="nombre_litteral"></block>' +
-                '  <block type="vrai"></block>' +
-                '  <block type="faux"></block>' +
+                ' <category name="Opérat. logiques">' +
+                '  <block type="et"></block>' +
+                '  <block type="ou"></block>' +
+                '  <block type="non"></block>' +
                 ' </category>' +
                 '</xml>';
         var content = '<!DOCTYPE html>' +
@@ -395,9 +415,9 @@ function inject_microalg_jrepl_in(elt_id, msg) {
 function malg2blockly(src) {
     EMULISP_CORE.init();
     EMULISP_CORE.eval(microalg_export_src);
-    var litteraux_proteges = EMULISP_CORE.eval("(proteger_litteraux  " + src + ")");
+    var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")");
     EMULISP_CORE.eval(microalg_export_blockly_src);
-    var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + litteraux_proteges + ")");
+    var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + source_protegee + ")");
     // Le car pour récupérer l’unique élément de la liste finale.
     var xml = cleanTransient(EMULISP_CORE.eval('(pack (car ' + avec_des_next + ')'));
     xml = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="programme"><value name="VALUE">' +

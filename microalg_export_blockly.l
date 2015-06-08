@@ -8,6 +8,18 @@
                           "</field></block>"))
     (T "Littéral de type inconnu.")
   ))
+(de Variable inputs
+  (let (nom_var (car inputs))
+    (if nom_var (pack "<block type=\"variable\"><field name=\"VAR\">"
+                               nom_var
+                               "</field></block>")
+                "<block type=\"texte_litteral\"><field name=\"TEXT\"></field></block>"
+    )
+  )
+)
+# Attention, insertion_next ne plonge pas dans les instruction contenant des
+# blocs, comme Faire, Tant_que et Si. Ce genre d’instructions doivent utiliser
+# insertion_next sur leurs blocs.
 (de insertion_next (src) (car (insertion_next_aux (reverse src))))
 (de insertion_next_aux (src)
   (ifn (and (<> (length src) 0) (<> (length src) 1)) src  # if (<= len 1)
@@ -92,10 +104,28 @@
         "</value>"
         next
         "</block>"))
+(de Affecter_a inputs
+  (let (!var (cadr (car inputs))  # var name is in (Variable ...)
+        !val (eval (cadr inputs))
+        !next (eval (caddr inputs)))
+       (pack "<block type=\"affecter_a\">"
+             "<field name=\"VAR\">" !var "</field>"
+             "<value name=\"VALUE\">" !val "</value>"
+             !next
+             "</block>")))
+(de Booleen? (content)
+  (pack "<block type=\"booleen?\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
 (de Concatener inputs
   (pack "<block type=\"concatener\">"
         "<mutation items=\"" (length inputs) "\"></mutation>"
-        (mapcar '((i input) (pack "<value name=\"ADD" i "\">" (eval input) "</value>")) (range 0 (dec (length inputs))) inputs)
+        (if (<> 0 (length inputs))
+            (mapcar '((i input) (pack "<value name=\"ITEM" i "\">" (eval input) "</value>"))
+                    (range 0 (dec (length inputs)))
+                    inputs))
         "</block>"))
 (de Demander ()
   "<block type=\"demander\"></block>")
@@ -104,14 +134,62 @@
         "<value name=\"MIN\">" MIN "</value>"
         "<value name=\"MAX\">" MAX "</value>"
         "</block>"))
+(de Et inputs
+  (pack "<block type=\"et\">"
+        "<mutation items=\"" (length inputs) "\"></mutation>"
+        (mapcar '((i input) (pack "<value name=\"BOOL" i "\">" (eval input) "</value>")) (range 0 (dec (length inputs))) inputs)
+        "</block>"))
+(de Faire inputs
+  (let (!splitted (split inputs 'Tant_que)
+        !corps    (car !splitted)
+        !cond     (car (cadr !splitted))
+        # !next est le dernier de la liste inputs, si son car vaut Next.
+        !next (let !last (last inputs) (if (= (car !last) 'Next) !last)))
+       (pack "<block type=\"faire\">"
+             "<statement name=\"INSTR\">" (eval (insertion_next !corps)) "</statement>"
+             "<value name=\"COND\">" (eval !cond) "</value>"
+             (eval !next)
+             "</block>") ))
+(de Initialiser inputs
+  (let (!var (cadr (car inputs))  # var name is in (Variable ...)
+        !val (eval (cadr inputs))
+        !next (eval (caddr inputs)))
+       (pack "<block type=\"initialiser\">"
+             "<field name=\"VAR\">" !var "</field>"
+             "<value name=\"VALUE\">" !val "</value>"
+             !next
+             "</block>")))
 (de Initialiser@ (next)
   (pack "<block type=\"initialiser_pseudo_aleatoire\">"
         next
         "</block>"))
-(de Type (content)
-  (pack "<block type=\"type\">"
+(de Liste inputs
+  (pack "<block type=\"liste\">"
+        "<mutation items=\"" (length inputs) "\"></mutation>"
+        (if (<> 0 (length inputs))
+            (mapcar '((i input) (pack "<value name=\"ITEM" i "\">" (eval input) "</value>"))
+                    (range 0 (dec (length inputs)))
+                    inputs))
+        "</block>"))
+(de Longueur (content)
+  (pack "<block type=\"longueur\">"
         "<value name=\"VALUE\">"
         content
+        "</value>"
+        "</block>"))
+(de Nieme (value index)
+  (pack "<block type=\"nieme\">"
+        "<value name=\"VALUE\">"
+        value
+        "</value>"
+        "<value name=\"INDEX\">"
+        index
+        "</value>"
+        "</block>"))
+(de Nieme@ (value)
+  (pack "<block type=\"nieme@\">"
+        "<value name=\"VALUE\">"
+        value
         "</value>"
         "</block>"))
 (de Nombre (content)
@@ -122,6 +200,23 @@
         "</block>"))
 (de Nombre? (content)
   (pack "<block type=\"nombre?\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
+(de Ou inputs
+  (pack "<block type=\"ou\">"
+        "<mutation items=\"" (length inputs) "\"></mutation>"
+        (mapcar '((i input) (pack "<value name=\"BOOL" i "\">" (eval input) "</value>")) (range 0 (dec (length inputs))) inputs)
+        "</block>"))
+(de Non (content)
+  (pack "<block type=\"non\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
+(de Queue (content)
+  (pack "<block type=\"queue\">"
         "<value name=\"VALUE\">"
         content
         "</value>"
@@ -149,6 +244,22 @@
              (eval !next)
              "</block>")
 ))
+(de Tant_que inputs
+  (let (!cond  (car inputs)
+        !corps (cddr inputs)
+        # !next est le dernier de la liste inputs, si son car vaut Next.
+        !next (let !last (last inputs) (if (= (car !last) 'Next) !last)))
+       (pack "<block type=\"tant_que\">"
+             "<value name=\"COND\">" (eval !cond) "</value>"
+             "<statement name=\"INSTR\">" (eval (insertion_next !corps)) "</statement>"
+             (eval !next)
+             "</block>") ))
+(de Tete (content)
+  (pack "<block type=\"tete\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
 (de Texte (content)
   (pack "<block type=\"texte\">"
         "<value name=\"VALUE\">"
@@ -157,6 +268,18 @@
         "</block>"))
 (de Texte? (content)
   (pack "<block type=\"texte?\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
+(de Type (content)
+  (pack "<block type=\"type\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        "</block>"))
+(de Vide? (content)
+  (pack "<block type=\"vide?\">"
         "<value name=\"VALUE\">"
         content
         "</value>"

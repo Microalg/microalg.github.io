@@ -1,4 +1,5 @@
 var malg_url = 'http://microalg.info/doc.html';
+var colour = 160;
 
 // Un extrait des messages originaux:
 // http://code.google.com/p/blockly/source/browse/trunk/msg/js/fr.js
@@ -176,11 +177,76 @@ Blockly.Generator.prototype.prefixLines = function(text, prefix) {
 // http://code.google.com/p/blockly/source/browse/trunk/blocks
 // http://code.google.com/p/blockly/source/browse/trunk/generators/python
 
+// Bloc Variable
+// https://github.com/google/blockly/blob/master/blocks/variables.js
+Blockly.Blocks['variable'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#variables');
+    this.setColour(colour);
+    this.appendDummyInput()
+    .appendField(new Blockly.FieldVariable('ma_variable'), 'VAR');
+    this.setOutput(true);
+    this.setTooltip("Donne la valeur de la variable.");
+    this.contextMenuMsg_ = Blockly.Msg.VARIABLES_GET_CREATE_SET;
+    this.contextMenuType_ = 'variables_set';
+  },
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+      this.setFieldValue(newName, 'VAR');
+    }
+  },
+  customContextMenu: function(options) {
+    var option = {enabled: true};
+    var name = this.getFieldValue('VAR');
+    option.text = name;
+    var xmlField = goog.dom.createDom('field', null, name);
+    xmlField.setAttribute('name', 'VAR');
+    var xmlBlock = goog.dom.createDom('block', null, xmlField);
+    xmlBlock.setAttribute('type', this.contextMenuType_);
+    option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
+    options.push(option);
+  }
+};
+
+// Gen Variable
+// https://github.com/google/blockly/blob/master/generators/javascript/variables.js
+Blockly.MicroAlg['variable'] = function(block) {
+  return block.getFieldValue('VAR');
+};
+
+// Conteneur pour le mutator du nombre de paramètres
+Blockly.Blocks['nb_params_container'] = {
+  init: function() {
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Nbre de paramètres');
+    this.appendStatementInput('STACK');
+    this.setTooltip('Mettre ici le bon nombre de paramètres.');
+    this.contextMenu = false;
+  }
+};
+
+// Élément pour le mutator du nombre de paramètres
+Blockly.Blocks['nb_params_item'] = {
+  init: function() {
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('un paramètre');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('À placer autant de fois que nécessaire.');
+    this.contextMenu = false;
+  }
+};
+
 // Bloc Programme
 Blockly.Blocks['programme'] = {
   init: function() {
     this.setHelpUrl(malg_url + '#blocprogramme');
-    this.setColour(160);
+    this.setColour(colour);
     this.appendStatementInput('VALUE')
         .appendField('Programme');
     this.setPreviousStatement(false);
@@ -204,8 +270,8 @@ Blockly.MicroAlg['programme'] = function(block) {
 // Bloc Commentaire
 Blockly.Blocks['commentaire'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-!!!');
-    this.setColour(160);
+    this.setHelpUrl(malg_url + '#sym-!!!');
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField('!!!')
         .appendField(this.newQuote_(true))
@@ -233,13 +299,47 @@ Blockly.MicroAlg['commentaire'] = function(block) {
 };
 
 // Bloc Affecter_a
+// https://github.com/google/blockly/blob/master/blocks/variables.js
+Blockly.Blocks['affecter_a'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Affecter_a');
+    this.setColour(colour);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Affecter une valeur à une variable.');
+    this.interpolateMsg(
+      'Affecter_a' + ' %1 ' + ' %2',
+      ['VAR', new Blockly.FieldVariable("ma_variable")],
+      ['VALUE', null],
+      Blockly.ALIGN_RIGHT);
+    this.setInputsInline(false);
+    this.contextMenuMsg_ = "Créer truc"; // ???
+    this.contextMenuType_ = 'variable';
+  },
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+        this.setFieldValue(newName, 'VAR');
+    }
+  },
+  customContextMenu: Blockly.Blocks['variable'].customContextMenu
+};
+
 // Gen Affecter_a
+// https://github.com/google/blockly/blob/master/generators/javascript/variables.js
+Blockly.MicroAlg['affecter_a'] = function(block) {
+  var value = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  var value_cleaned = value.toString().trim();
+  return '(Affecter_a ' + this.getFieldValue('VAR') + ' ' + value_cleaned + ')';
+};
 
 // Bloc Afficher
 Blockly.Blocks['afficher'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Afficher');
-    this.setColour(160);
+    this.setHelpUrl(malg_url + '#sym-Afficher');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Afficher');
     this.setPreviousStatement(true);
@@ -267,13 +367,13 @@ Blockly.MicroAlg['afficher'] = function(block) {
 // Bloc Concatener
 Blockly.Blocks['concatener'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Concatener');
-    this.setColour(160);
-    this.appendValueInput('ADD0')
+    this.setHelpUrl(malg_url + '#sym-Concatener');
+    this.setColour(colour);
+    this.appendValueInput('ITEM0')
         .appendField('Concaténer');
-    this.appendValueInput('ADD1');
+    this.appendValueInput('ITEM1');
     this.setOutput(true, 'String');
-    this.setMutator(new Blockly.Mutator(['text_create_join_item']));
+    this.setMutator(new Blockly.Mutator(['nb_params_item']));
     this.setTooltip('Mettre des textes bout à bout.');
     this.itemCount_ = 2;
   },
@@ -284,11 +384,11 @@ Blockly.Blocks['concatener'] = {
   },
   domToMutation: function(xmlElement) {
     for (var x = 0; x < this.itemCount_; x++) {
-      this.removeInput('ADD' + x);
+      this.removeInput('ITEM' + x);
     }
     this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
     for (var x = 0; x < this.itemCount_; x++) {
-      var input = this.appendValueInput('ADD' + x);
+      var input = this.appendValueInput('ITEM' + x);
       if (x == 0) {
         input.appendField('Concaténer');
       }
@@ -299,12 +399,11 @@ Blockly.Blocks['concatener'] = {
     }
   },
   decompose: function(workspace) {
-    var containerBlock = Blockly.Block.obtain(workspace,
-                                           'text_create_join_container');
+    var containerBlock = Blockly.Block.obtain(workspace, 'nb_params_container');
     containerBlock.initSvg();
     var connection = containerBlock.getInput('STACK').connection;
     for (var x = 0; x < this.itemCount_; x++) {
-      var itemBlock = Blockly.Block.obtain(workspace, 'text_create_join_item');
+      var itemBlock = Blockly.Block.obtain(workspace, 'nb_params_item');
       itemBlock.initSvg();
       connection.connect(itemBlock.previousConnection);
       connection = itemBlock.nextConnection;
@@ -317,14 +416,14 @@ Blockly.Blocks['concatener'] = {
       this.removeInput('EMPTY');
     } else {
       for (var x = this.itemCount_ - 1; x >= 0; x--) {
-        this.removeInput('ADD' + x);
+        this.removeInput('ITEM' + x);
       }
     }
     this.itemCount_ = 0;
     // Rebuild the block's inputs.
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     while (itemBlock) {
-      var input = this.appendValueInput('ADD' + this.itemCount_);
+      var input = this.appendValueInput('ITEM' + this.itemCount_);
       if (this.itemCount_ == 0) {
         input.appendField('Concaténer');
       }
@@ -345,37 +444,12 @@ Blockly.Blocks['concatener'] = {
     var itemBlock = containerBlock.getInputTargetBlock('STACK');
     var x = 0;
     while (itemBlock) {
-      var input = this.getInput('ADD' + x);
+      var input = this.getInput('ITEM' + x);
       itemBlock.valueConnection_ = input && input.connection.targetConnection;
       x++;
       itemBlock = itemBlock.nextConnection &&
           itemBlock.nextConnection.targetBlock();
     }
-  }
-};
-
-// Conteneur pour le mutator de Concatener
-Blockly.Blocks['text_create_join_container'] = {
-  init: function() {
-    this.setColour(160);
-    this.appendDummyInput()
-        .appendField('Nbre de paramètres');
-    this.appendStatementInput('STACK');
-    this.setTooltip('Mettre ici le bon nombre de paramètres.');
-    this.contextMenu = false;
-  }
-};
-
-// Élément pour le mutator de Concatener
-Blockly.Blocks['text_create_join_item'] = {
-  init: function() {
-    this.setColour(160);
-    this.appendDummyInput()
-        .appendField('un paramètre');
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
-    this.setTooltip('À placer autant de fois que nécessaire.');
-    this.contextMenu = false;
   }
 };
 
@@ -386,12 +460,12 @@ Blockly.MicroAlg['concatener'] = function(block) {
   if (block.itemCount_ == 0) {
     code ='(' + cmd + ')';
   } else if (block.itemCount_ == 1) {
-    var argument0 = Blockly.MicroAlg.statementToCode(block, 'ADD0') || '""';
+    var argument0 = Blockly.MicroAlg.statementToCode(block, 'ITEM0') || '""';
     code = '(' + cmd + ' ' + argument0 + ')';
   } else {
     var args = [];
     for (var n = 0; n < block.itemCount_; n++) {
-      args[n] = Blockly.MicroAlg.statementToCode(block, 'ADD' + n) ||
+      args[n] = Blockly.MicroAlg.statementToCode(block, 'ITEM' + n) ||
              Blockly.MicroAlg.INDENT + '""';
     }
     code = '(' + cmd + '\n' + args.join('\n') + '\n)';
@@ -402,8 +476,8 @@ Blockly.MicroAlg['concatener'] = function(block) {
 // Bloc Demander
 Blockly.Blocks['demander'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Demander');
-    this.setColour(0);
+    this.setHelpUrl(malg_url + '#sym-Demander');
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField('Demander');
     this.setOutput(true, 'String');
@@ -419,8 +493,8 @@ Blockly.MicroAlg['demander'] = function(block) {
 // Bloc Entier@
 Blockly.Blocks['entier_pseudo_aleatoire'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Entier@');
-    this.setColour(250);
+    this.setHelpUrl(malg_url + '#sym-Entier@');
+    this.setColour(colour);
     this.appendValueInput('MIN')
         .setCheck('Number')
         .appendField('Entier@');
@@ -447,16 +521,184 @@ Blockly.MicroAlg['entier_pseudo_aleatoire'] = function(block) {
   }
 };
 
+// Bloc Et
+Blockly.Blocks['et'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Et');
+    this.setColour(colour);
+    this.appendValueInput('BOOL0')
+        .appendField('Et');
+    this.appendValueInput('BOOL1');
+    this.setOutput(true, 'Boolean');
+    this.setMutator(new Blockly.Mutator(['nb_params_item']));
+    this.setTooltip('Retourne Vrai si tous les arguments sont vrais.');
+    this.itemCount_ = 2;
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('BOOL' + x);
+    }
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('BOOL' + x);
+      if (x == 0) {
+        input.appendField('Et');
+      }
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Et');
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock = Blockly.Block.obtain(workspace, 'nb_params_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = Blockly.Block.obtain(workspace, 'nb_params_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    // Disconnect all input blocks and remove all inputs.
+    if (this.itemCount_ == 0) {
+      this.removeInput('EMPTY');
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('BOOL' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('BOOL' + this.itemCount_);
+      if (this.itemCount_ == 0) {
+        input.appendField('Et');
+      }
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Et');
+    }
+  },
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('BOOL' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+// Gen Et
+Blockly.MicroAlg['et'] = function(block) {
+  var cmd = 'Et';
+  var code;
+  if (block.itemCount_ == 0) {
+    code ='(' + cmd + ')';
+  } else if (block.itemCount_ == 1) {
+    var argument0 = Blockly.MicroAlg.statementToCode(block, 'BOOL0') || 'Rien';
+    code = '(' + cmd + ' ' + argument0 + ')';
+  } else {
+    var args = [];
+    for (var n = 0; n < block.itemCount_; n++) {
+      args[n] = Blockly.MicroAlg.statementToCode(block, 'BOOL' + n) ||
+             Blockly.MicroAlg.INDENT + 'Rien';
+    }
+    code = '(' + cmd + '\n' + args.join('\n') + '\n)';
+  }
+  return code;
+};
+
 // Bloc Faire
+Blockly.Blocks['faire'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Faire');
+    this.setColour(colour);
+    this.appendStatementInput('INSTR')
+        .appendField('Faire');
+    this.appendValueInput('COND')
+        //.setCheck('Boolean')
+        .appendField('Tant_que');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Structure itérative');
+    },
+};
+
 // Gen Faire
+Blockly.MicroAlg['faire'] = function(block) {
+    var instr = Blockly.MicroAlg.statementToCode(block, 'INSTR') || '';
+    var cond = Blockly.MicroAlg.statementToCode(block, 'COND') || '';
+    instr = instr.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
+    var code = '(Faire \n' + instr +
+               '\nTant_que ' + cond.trim();
+    code += '\n)'
+    return code;
+};
+
 // Bloc Initialiser
+// https://github.com/google/blockly/blob/master/blocks/variables.js
+Blockly.Blocks['initialiser'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Initialiser');
+    this.setColour(colour);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Initialiser une variable avec une valeur.');
+    this.interpolateMsg(
+      'Initialiser' + ' %1 ' + ' %2',
+      ['VAR', new Blockly.FieldVariable("ma_variable")],
+      ['VALUE', null],
+      Blockly.ALIGN_RIGHT);
+    this.setInputsInline(false);
+    this.contextMenuMsg_ = "Créer truc"; // ???
+    this.contextMenuType_ = 'variable';
+  },
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+        this.setFieldValue(newName, 'VAR');
+    }
+  },
+  customContextMenu: Blockly.Blocks['variable'].customContextMenu
+};
+
 // Gen Initialiser
+// https://github.com/google/blockly/blob/master/generators/javascript/variables.js
+Blockly.MicroAlg['initialiser'] = function(block) {
+  var value = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  var value_cleaned = value.toString().trim();
+  return '(Initialiser ' + this.getFieldValue('VAR') + ' ' + value_cleaned + ')';
+};
 
 // Bloc Initialiser@
 Blockly.Blocks['initialiser_pseudo_aleatoire'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Initialiser@');
-    this.setColour(250);
+    this.setHelpUrl(malg_url + '#sym-Initialiser@');
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField('Initialiser@');
     this.setPreviousStatement(true);
@@ -470,11 +712,204 @@ Blockly.MicroAlg['initialiser_pseudo_aleatoire'] = function(block) {
   return '(Initialiser@)';
 };
 
+// Bloc Liste
+Blockly.Blocks['liste'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Liste');
+    this.setColour(colour);
+    this.appendValueInput('ITEM0')
+        .appendField('Liste');
+    this.appendValueInput('ITEM1');
+    this.setInputsInline(true);
+    this.setOutput(true);
+    this.setMutator(new Blockly.Mutator(['nb_params_item']));
+    this.setTooltip('Construire une liste.');
+    this.itemCount_ = 2;
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('ITEM' + x);
+    }
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('ITEM' + x);
+      if (x == 0) {
+        input.appendField('Liste');
+      }
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Liste');
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock = Blockly.Block.obtain(workspace, 'nb_params_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = Blockly.Block.obtain(workspace, 'nb_params_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    // Disconnect all input blocks and remove all inputs.
+    if (this.itemCount_ == 0) {
+      this.removeInput('EMPTY');
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('ITEM' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('ITEM' + this.itemCount_);
+      if (this.itemCount_ == 0) {
+        input.appendField('Liste');
+      }
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Liste');
+    }
+  },
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('ITEM' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+// Gen Liste
+Blockly.MicroAlg['liste'] = function(block) {
+  var cmd = 'Liste';
+  var code;
+  if (block.itemCount_ == 0) {
+    code ='(' + cmd + ')';
+  } else if (block.itemCount_ == 1) {
+    var argument0 = Blockly.MicroAlg.statementToCode(block, 'ITEM0') || '""';
+    code = '(' + cmd + ' ' + argument0 + ')';
+  } else {
+    var args = [];
+    for (var n = 0; n < block.itemCount_; n++) {
+      args[n] = Blockly.MicroAlg.statementToCode(block, 'ITEM' + n) ||
+             Blockly.MicroAlg.INDENT + '""';
+    }
+    code = '(' + cmd + '\n' + args.join('\n') + '\n)';
+  }
+  return code;
+};
+
+// Bloc Longueur
+Blockly.Blocks['longueur'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Longueur');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Longueur');
+    this.setOutput(true, 'Number');
+    this.setTooltip('Retourne la longueur du texte ou de la liste.');
+  }
+};
+
+// Gen Longueur
+Blockly.MicroAlg['longueur'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Longueur)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Longueur ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Longueur\n' + arg + '\n)';
+  }
+};
+
+// Bloc Millisecondes
+// Gen Millisecondes
+
+// Bloc Nieme
+Blockly.Blocks['nieme'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Nieme');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Nieme');
+    this.appendValueInput('INDEX')
+        .setCheck('Number')
+    this.setOutput(true);
+    this.setTooltip('Retourne un certain élément du texte ou de la liste.');
+  }
+};
+
+// Gen Nieme
+Blockly.MicroAlg['nieme'] = function(block) {
+  var val = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  var idx = Blockly.MicroAlg.statementToCode(block, 'INDEX') || '';
+  if (val === '' && idx === '') return '(Nieme)';
+  var num_lines_val = val.split('\n').length;
+  var num_lines_idx = idx.split('\n').length;
+  if (num_lines_val == 1 && num_lines_idx == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Nieme ' + val.substring(Blockly.MicroAlg.INDENT.length) +
+                 ' ' + idx.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Nieme\n' + val + '\n' + idx + '\n)';
+  }
+};
+
+// Bloc Nieme@
+Blockly.Blocks['nieme@'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Nieme@');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Nieme@');
+    this.setOutput(true);
+    this.setTooltip('Retourne un élément du texte ou de la liste au harard.');
+  }
+};
+
+// Gen Nieme@
+Blockly.MicroAlg['nieme@'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Nieme@)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Nieme@ ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Nieme@\n' + arg + '\n)';
+  }
+};
+
 // Bloc Nombre
 Blockly.Blocks['nombre'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Nombre');
-    this.setColour(80);
+    this.setHelpUrl(malg_url + '#sym-Nombre');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Nombre');
     this.setOutput(true, 'Number');
@@ -495,12 +930,171 @@ Blockly.MicroAlg['nombre'] = function(block) {
   }
 };
 
+// Bloc Non
+Blockly.Blocks['non'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Non');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Non');
+    this.setOutput(true, 'Boolean');
+    this.setTooltip('Retourne la valeur contraire du booléen.');
+  }
+};
+
+// Gen Non
+Blockly.MicroAlg['non'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Non)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Non ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Non\n' + arg + '\n)';
+  }
+};
+
+// Bloc Ou
+Blockly.Blocks['ou'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Ou');
+    this.setColour(colour);
+    this.appendValueInput('BOOL0')
+        .appendField('Ou');
+    this.appendValueInput('BOOL1');
+    this.setOutput(true, 'Boolean');
+    this.setMutator(new Blockly.Mutator(['nb_params_item']));
+    this.setTooltip('Retourne Vrai si tous les arguments sont vrais.');
+    this.itemCount_ = 2;
+  },
+  mutationToDom: function() {
+    var container = document.createElement('mutation');
+    container.setAttribute('items', this.itemCount_);
+    return container;
+  },
+  domToMutation: function(xmlElement) {
+    for (var x = 0; x < this.itemCount_; x++) {
+      this.removeInput('BOOL' + x);
+    }
+    this.itemCount_ = parseInt(xmlElement.getAttribute('items'), 10);
+    for (var x = 0; x < this.itemCount_; x++) {
+      var input = this.appendValueInput('BOOL' + x);
+      if (x == 0) {
+        input.appendField('Ou');
+      }
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Ou');
+    }
+  },
+  decompose: function(workspace) {
+    var containerBlock = Blockly.Block.obtain(workspace, 'nb_params_container');
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
+    for (var x = 0; x < this.itemCount_; x++) {
+      var itemBlock = Blockly.Block.obtain(workspace, 'nb_params_item');
+      itemBlock.initSvg();
+      connection.connect(itemBlock.previousConnection);
+      connection = itemBlock.nextConnection;
+    }
+    return containerBlock;
+  },
+  compose: function(containerBlock) {
+    // Disconnect all input blocks and remove all inputs.
+    if (this.itemCount_ == 0) {
+      this.removeInput('EMPTY');
+    } else {
+      for (var x = this.itemCount_ - 1; x >= 0; x--) {
+        this.removeInput('BOOL' + x);
+      }
+    }
+    this.itemCount_ = 0;
+    // Rebuild the block's inputs.
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    while (itemBlock) {
+      var input = this.appendValueInput('BOOL' + this.itemCount_);
+      if (this.itemCount_ == 0) {
+        input.appendField('Ou');
+      }
+      // Reconnect any child blocks.
+      if (itemBlock.valueConnection_) {
+        input.connection.connect(itemBlock.valueConnection_);
+      }
+      this.itemCount_++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+    if (this.itemCount_ == 0) {
+      this.appendDummyInput('EMPTY')
+          .appendField('Ou');
+    }
+  },
+  saveConnections: function(containerBlock) {
+    var itemBlock = containerBlock.getInputTargetBlock('STACK');
+    var x = 0;
+    while (itemBlock) {
+      var input = this.getInput('BOOL' + x);
+      itemBlock.valueConnection_ = input && input.connection.targetConnection;
+      x++;
+      itemBlock = itemBlock.nextConnection &&
+          itemBlock.nextConnection.targetBlock();
+    }
+  }
+};
+
+// Gen Ou
+Blockly.MicroAlg['ou'] = function(block) {
+  var cmd = 'Ou';
+  var code;
+  if (block.itemCount_ == 0) {
+    code ='(' + cmd + ')';
+  } else if (block.itemCount_ == 1) {
+    var argument0 = Blockly.MicroAlg.statementToCode(block, 'BOOL0') || 'Rien';
+    code = '(' + cmd + ' ' + argument0 + ')';
+  } else {
+    var args = [];
+    for (var n = 0; n < block.itemCount_; n++) {
+      args[n] = Blockly.MicroAlg.statementToCode(block, 'BOOL' + n) ||
+             Blockly.MicroAlg.INDENT + 'Rien';
+    }
+    code = '(' + cmd + '\n' + args.join('\n') + '\n)';
+  }
+  return code;
+};
+
+// Bloc Queue
+Blockly.Blocks['queue'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Queue');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Queue');
+    this.setOutput(true);
+    this.setTooltip('Retourne tout sauf la tête (c-à-d sauf le premier élément).');
+  }
+};
+
+// Gen Queue
+Blockly.MicroAlg['queue'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Queue)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Queue ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Queue\n' + arg + '\n)';
+  }
+};
+
 // Bloc Si
 // https://github.com/google/blockly/blob/master/blocks/logic.js#L34
 Blockly.Blocks['si'] = {
-    init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Si');
-    this.setColour(10);
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Si');
+    this.setColour(colour);
     this.appendValueInput('COND')
         .setCheck('Boolean')
         .appendField('Si');
@@ -584,27 +1178,27 @@ Blockly.Blocks['si'] = {
 
 // Conteneur pour le mutator de Si (Si… Alors…)
 Blockly.Blocks['si_alors_sinon_si'] = {
-    init: function() {
-        this.setColour(10);
-        this.appendDummyInput()
-            .appendField('Si…');
-        this.appendDummyInput()
-            .appendField('Alors…');
-        this.appendStatementInput('STACK');
-        this.setTooltip('Peut accueillir un bloc Sinon');
-        this.contextMenu = false;
-    }
+  init: function() {
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Si…');
+    this.appendDummyInput()
+        .appendField('Alors…');
+    this.appendStatementInput('STACK');
+    this.setTooltip('Peut accueillir un bloc Sinon');
+    this.contextMenu = false;
+  }
 };
 // Conteneur pour le mutator de Si (Sinon)
 Blockly.Blocks['si_alors_sinon_sinon'] = {
-    init: function() {
-        this.setColour(10);
-        this.appendDummyInput()
-            .appendField('Sinon');
-        this.setPreviousStatement(true);
-        this.setTooltip('Glisser pour ajouter un bloc Sinon');
-        this.contextMenu = false;
-    }
+  init: function() {
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Sinon');
+    this.setPreviousStatement(true);
+    this.setTooltip('Glisser pour ajouter un bloc Sinon');
+    this.contextMenu = false;
+  }
 };
 
 // Gen Si
@@ -625,13 +1219,62 @@ Blockly.MicroAlg['si'] = function(block) {
 };
 
 // Bloc Tant_que
+Blockly.Blocks['tant_que'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Tant_que');
+    this.setColour(colour);
+    this.appendValueInput('COND')
+        .setCheck('Boolean')
+        .appendField('Tant_que');
+    this.appendStatementInput('INSTR')
+        .appendField('Faire');
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Structure itérative');
+    },
+};
+
 // Gen Tant_que
+Blockly.MicroAlg['tant_que'] = function(block) {
+    var instr = Blockly.MicroAlg.statementToCode(block, 'INSTR') || '';
+    var cond = Blockly.MicroAlg.statementToCode(block, 'COND') || '';
+    instr = instr.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
+    var code = '(Tant_que ' + cond.trim() +
+               '\nFaire\n' + instr;
+    code += '\n)'
+    return code;
+};
+
+// Bloc Tete
+Blockly.Blocks['tete'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Tete');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Tete');
+    this.setOutput(true);
+    this.setTooltip('Retourne le premier élément d’un texte ou d’une liste.');
+  }
+};
+
+// Gen Tete
+Blockly.MicroAlg['tete'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Tete)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Tete ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Tete\n' + arg + '\n)';
+  }
+};
 
 // Bloc Texte
 Blockly.Blocks['texte'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Texte');
-    this.setColour(80);
+    this.setHelpUrl(malg_url + '#sym-Texte');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Texte');
     this.setOutput(true, 'String');
@@ -655,8 +1298,8 @@ Blockly.MicroAlg['texte'] = function(block) {
 // Bloc Type
 Blockly.Blocks['type'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Type');
-    this.setColour(20);
+    this.setHelpUrl(malg_url + '#sym-Type');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Type');
     this.setOutput(true, 'String');
@@ -678,15 +1321,38 @@ Blockly.MicroAlg['type'] = function(block) {
 };
 
 // Bloc Booleen?
+Blockly.Blocks['booleen?'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Booleen?');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Booleen?');
+    this.setOutput(true, 'Boolean');
+    this.setTooltip('Teste si une valeur est un booleen.');
+  }
+};
+
 // Gen Booleen?
+Blockly.MicroAlg['booleen?'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Booleen?)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Booleen? ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Booleen?\n' + arg + '\n)';
+  }
+};
+
 // Bloc Faux?
 // Gen Faux?
 
 // Bloc Nombre?
 Blockly.Blocks['nombre?'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Nombre?');
-    this.setColour(40);
+    this.setHelpUrl(malg_url + '#sym-Nombre?');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Nombre?');
     this.setOutput(true, 'Boolean');
@@ -710,8 +1376,8 @@ Blockly.MicroAlg['nombre?'] = function(block) {
 // Bloc Texte?
 Blockly.Blocks['texte?'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-Texte?');
-    this.setColour(40);
+    this.setHelpUrl(malg_url + '#sym-Texte?');
+    this.setColour(colour);
     this.appendValueInput('VALUE')
         .appendField('Texte?');
     this.setOutput(true, 'Boolean');
@@ -732,6 +1398,31 @@ Blockly.MicroAlg['texte?'] = function(block) {
   }
 };
 
+// Bloc Vide?
+Blockly.Blocks['vide?'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Vide?');
+    this.setColour(colour);
+    this.appendValueInput('VALUE')
+        .appendField('Vide?');
+    this.setOutput(true, 'Boolean');
+    this.setTooltip('Teste si un texte ou une liste est vide.');
+  }
+};
+
+// Gen Vide?
+Blockly.MicroAlg['vide?'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  if (arg === '') return '(Vide?)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Vide? ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Vide?\n' + arg + '\n)';
+  }
+};
+
 // Bloc Vrai?
 // Gen Vrai?
 
@@ -739,7 +1430,7 @@ Blockly.MicroAlg['texte?'] = function(block) {
 Blockly.Blocks['texte_litteral'] = {
   init: function() {
     this.setHelpUrl(malg_url + '#textesavecblockly');
-    this.setColour(160);
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField(this.newQuote_(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
@@ -768,7 +1459,7 @@ Blockly.MicroAlg['texte_litteral'] = function(block) {
 Blockly.Blocks['nombre_litteral'] = {
   init: function() {
     this.setHelpUrl(malg_url + '#nombresavecblockly');
-    this.setColour(230);
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput('0',
         Blockly.FieldTextInput.numberValidator), 'NUM');
@@ -791,7 +1482,7 @@ Blockly.Blocks['operations'] = {
          ['×', 'MULTIPLY'],
          ['÷', 'DIVIDE']];
     this.setHelpUrl(malg_url + '#oprationsavecblockly');
-    this.setColour(230);
+    this.setColour(colour);
     this.setOutput(true, 'Number');
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
@@ -809,6 +1500,8 @@ Blockly.Blocks['operations'] = {
         'MINUS'   : "Retourne le quotient des deux nombres.",
         'MULTIPLY': "Retourne la différence des deux nombres.",
         'DIVIDE'  : "Retourne le produit des deux nombres.",
+        'MOD'  : "Retourne le reste de la div. euclidienne des deux nombres.",
+        'POW'  : "Retourne le premier nombre à la puissance du deuxième.",
       };
       return TOOLTIPS[mode];
     });
@@ -821,7 +1514,9 @@ Blockly.MicroAlg['operations'] = function(block) {
     'ADD':      '+',
     'MINUS':    '-',
     'MULTIPLY': '*',
-    'DIVIDE':   '/'
+    'DIVIDE':   '/',
+    'MOD':      '%',
+    'POW':      '^',
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var inputA = Blockly.MicroAlg.statementToCode(block, 'A');
@@ -843,7 +1538,7 @@ Blockly.Blocks['comparaisons'] = {
          ['≤', 'INFEQ'],
          ['≥', 'SUPEQ']];
     this.setHelpUrl(malg_url + '#comparaisonsavecblockly');
-    this.setColour(200);
+    this.setColour(colour);
     this.setOutput(true, 'Boolean');
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(OPERATORS), 'COMP');
@@ -889,8 +1584,8 @@ Blockly.MicroAlg['comparaisons'] = function(block) {
 // Bloc Faux
 Blockly.Blocks['faux'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-faux');
-    this.setColour(0);
+    this.setHelpUrl(malg_url + '#sym-Faux');
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField('Faux');
     this.setOutput(true);
@@ -903,14 +1598,11 @@ Blockly.MicroAlg['faux'] = function(block) {
   return 'Faux';
 };
 
-// Bloc Rien
-// Gen Rien
-
 // Bloc Vrai
 Blockly.Blocks['vrai'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#cmd-vrai');
-    this.setColour(0);
+    this.setHelpUrl(malg_url + '#sym-Vrai');
+    this.setColour(colour);
     this.appendDummyInput()
         .appendField('Vrai');
     this.setOutput(true);
@@ -921,4 +1613,21 @@ Blockly.Blocks['vrai'] = {
 // Gen Vrai
 Blockly.MicroAlg['vrai'] = function(block) {
   return 'Vrai';
+};
+
+// Bloc Rien
+Blockly.Blocks['rien'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Rien');
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Rien');
+    this.setOutput(true);
+    this.setTooltip('Valeur n’ayant pas vraiment de valeur.');
+  }
+};
+
+// Gen Rien
+Blockly.MicroAlg['rien'] = function(block) {
+  return 'Rien';
 };
