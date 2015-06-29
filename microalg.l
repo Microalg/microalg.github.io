@@ -1,4 +1,4 @@
-(setq version "0.3.16")
+(setq version "0.3.17")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -11,11 +11,13 @@ Voir <http://microalg.info>.")
 (setq symboles '(
 "+" "-" "*" "/" "%" "**" "\^"
 "!!!" "=" "=/" "<" "<=" ">" ">=" "?"
+"1000Cosinus" "1000Sinus"
+"AV" "BC" "LC" "TD" "TG"
 "Affecter_a" "Afficher" "Aide" "Ajouter_a" "Alors"
 "Booleen?"
-"Concatener" "credit_iterations"
+"Cercle" "Concatener" "Contour" "credit_iterations"
 "Definir" "Demander"
-"En_position" "Entier@" "Et" "Exemples_de"
+"Ellipse" "En_position" "Entier@" "Epaisseur" "Et" "Exemples_de"
 "Faire"
 "Faux" "Faux?"
 "Initialiser" "Initialiser@"
@@ -24,10 +26,10 @@ Voir <http://microalg.info>.")
 "Nieme" "Nieme@" "Nombre" "Nombre?" "Non"
 "Ou"
 "Queue"
-"Retirer_de" "Retourner" "Rien"
+"Rectangle" "Remplissage" "Retirer_de" "Retourner" "Rien"
 "sequence_tirages@"
-"Si" "Sinon"
-"Tant_que" "Tester" "Tete" "Texte" "Texte?" "Type"
+"Segment" "Si" "Sinon"
+"Tant_que" "Tester" "Tete" "Texte" "Texte?" "Triangle" "Type"
 "Vide?" "Vrai" "Vrai?"
 ))
 
@@ -302,19 +304,32 @@ Si vous ne l’avez pas déjà fait, commencez par le
 
 # Concatener
 (put 'Concatener 'doc
-"Commande qui concatène les textes passés en paramètre.
+"Commande qui concatène les textes passés en paramètre (deux ou plus).
 
-    : (Concatener \"ici\" \" et là\")
-    -> \"ici et là\"
+    : (Concatener \"abra\" \"cadabra\")
+    -> \"abracadabra\"
+    : (Concatener \"bonjour \" \"tout \" \"le \" \"monde\")
+    -> \"bonjour tout le monde\"
 ")
 (put 'Concatener 'text "Commande `Concatener`.")
-(de Concatener @ (let (
-                       result (pack (rest))
-                      )
-                      (if result
-                          result
-                          ""
-                      )))
+(de Concatener !arg_lst
+  (let (!evaled_arg_lst (mapcar 'eval !arg_lst)
+        !error_prefix "`Concatener` : l’argument n°")
+       # Quelques vérifications :
+       (for (!arg_num . !arg) !arg_lst
+         (ifn (!inited !arg (car (nth !evaled_arg_lst !arg_num)))
+              (quit (pack !error_prefix !arg_num " n’est pas initialisé.") !arg)
+         )
+       )
+       # Le calcul :
+       (let (result (apply 'pack !evaled_arg_lst))
+            (if result
+                result
+                ""
+            )
+       )
+  )
+)
 
 # Gestion des variables
 (put 'Initialiser 'doc
@@ -441,7 +456,16 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
     salut  <--- là, c’est MicroAlg qui affiche.
     -> Rien
 
-On peut s’en servir pour marquer une pause dans un programme :
+Comme `Demander` retourne un texte, il est nécessaire de convertir la valeur
+avant de la stocker dans une variable. Exemple :
+
+    : (Initialiser x (Nombre (Demander)))
+    42   <--- Ici, c’est l’utilisateur qui tape.
+    -> Rien
+    : x
+    -> 42
+
+**Remarque** : On peut s’en servir pour marquer une pause dans un programme :
 
     (Afficher \"Pause, appuyez sur Entrée.\")
     (Demander)
@@ -1015,9 +1039,9 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_ET>.")
         (let (!evaled_arg (eval !arg)
               !error_prefix "`Et` : l’argument n°")
              (ifn (!inited !arg !evaled_arg)
-                  (quit (pack !error_prefix !arg_num " n’est pas initialisé." !arg)) )
+                  (quit (pack !error_prefix !arg_num " n’est pas initialisé.") !arg) )
              (ifn (!boolCheck !evaled_arg)
-                  (quit (pack !error_prefix !arg_num " doit être un booléen." !arg)) )
+                  (quit (pack !error_prefix !arg_num " doit être un booléen.") !arg) )
         )
     )
     # Le calcul :
@@ -1039,9 +1063,9 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
         (let (!evaled_arg (eval !arg)
               !error_prefix "`Ou` : l’argument n°")
              (ifn (!inited !arg !evaled_arg)
-                  (quit (pack !error_prefix !arg_num " n’est pas initialisé." !arg)) )
+                  (quit (pack !error_prefix !arg_num " n’est pas initialisé.") !arg) )
              (ifn (!boolCheck !evaled_arg)
-                  (quit (pack !error_prefix !arg_num " doit être un booléen." !arg)) )
+                  (quit (pack !error_prefix !arg_num " doit être un booléen.") !arg) )
         )
     )
     # Le calcul :
@@ -1314,7 +1338,7 @@ Voir la commande `Exemples_de`.")
 
 # Prédicats
 (put 'Vrai? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est `Vrai`,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est `Vrai`,
 et `Faux` sinon.
 
     : (Vrai? Vrai)
@@ -1325,7 +1349,7 @@ et `Faux` sinon.
 (put 'Vrai? 'text "Prédicat `Vrai?`.")
 (de Vrai? (x) (if (!boolM2P (= x Vrai)) Vrai Faux))
 (put 'Faux? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est `Faux`,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est `Faux`,
 et `Faux` sinon.
 
     : (Faux? Faux)
@@ -1336,7 +1360,7 @@ et `Faux` sinon.
 (put 'Faux? 'text "Prédicat `Faux?`.")
 (de Faux? (x) (if (!boolM2P (= x Faux)) Vrai Faux))
 (put 'Texte? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est du texte,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est du texte,
 et `Faux` sinon.
 
     : (Texte? 42)
@@ -1367,7 +1391,7 @@ et `Faux` sinon.
   )
 )
 (put 'Nombre? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est un nombre,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est un nombre,
 et `Faux` sinon.
 
     : (Nombre? \"42\")
@@ -1378,7 +1402,7 @@ et `Faux` sinon.
 (put 'Nombre? 'text "Prédicat `Nombre?`.")
 (de Nombre? (x) (if (num? x) Vrai Faux))
 (put 'Booleen? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est un booleen,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est un booleen,
 et `Faux` sinon.
 
     : (Booleen? Faux)
@@ -1389,7 +1413,7 @@ et `Faux` sinon.
 (put 'Booleen? 'text "Prédicat `Booleen?`.")
 (de Booleen? (x) (if (or (== Vrai x) (== Faux x)) Vrai Faux))
 (put 'Liste? 'doc
-"Prédicat retournant `Vrai` si la valeur de son argument est une liste,
+"**Abandonnée dans 0.4.** Prédicat retournant `Vrai` si la valeur de son argument est une liste,
 et `Faux` sinon.
 
     : (Liste? (Liste 1 3 5 7))
@@ -1551,6 +1575,7 @@ Cette commande s’utilise surtout en calculant la différence entre deux appels
 le premier étant stocké dans une variable.
 
 ")
+(put 'Millisecondes 'text "Commande `Millisecondes`.")
 (de Millisecondes (!rien_ici)
   (if !rien_ici (quit "`Millisecondes` ne prend pas de paramètre."))
   (/ (usec) 1000) )
@@ -1567,3 +1592,265 @@ le premier étant stocké dans une variable.
         (pack "L’instruction `(/MicroAlg)` est une instruction fantôme.  ^J"
               "Merci de la supprimer, elle ne sert que pour la galerie  ^J"
               "(<http://galerie.microalg.info>).") ) )
+
+# Processing
+(de !processing (cmd)
+  (cond
+    ((not (<> *EMUENV "browser"))
+       (js:eval
+         (pack "processing_sketches[cst.context.processing_elt].interact('"
+               cmd "');")) )
+    ((not *EMUENV)
+       (let? Sock (connect "127.0.0.1" 12345)
+         (out Sock (prinl cmd))
+         (close Sock) ) )
+    (T (quit "Impossible d’utiliser la sortie graphique avec `malg-njs` ou `malg-rjs`."))
+  )
+)
+(put 'RAZ 'doc
+"Dans la sortie graphique, efface l’écran et repositionne la tortue.
+
+Exemple : `(RAZ)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'RAZ 'text "Commande `RAZ`.")
+(de RAZ ()
+  (!processing "RAZ")
+  Rien
+)
+(put 'Contour 'doc
+"Dans la sortie graphique, permet de choisir la couleur du contour des tracés.
+
+Exemple : `(Contour (Liste 255 0 0))` ou `(Contour (Liste 255 0 0 127))`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#couleurs>.")
+(put 'Contour 'text "Commande `Contour`.")
+(de Contour (couleur)
+  (!processing (pack "Contour "
+                     (Nieme couleur 1)
+                     " " (Nieme couleur 2)
+                     " " (Nieme couleur 3)
+                     (Si (= (Longueur couleur) 4)
+                      Alors (pack " " (Nieme couleur 4))
+                      Sinon "")
+  ))
+  Rien
+)
+(put 'Remplissage 'doc
+"Dans la sortie graphique, permet de choisir la couleur du remplissage des tracés.
+
+Exemple : `(Remplissage (Liste 255 0 0))` ou `(Remplissage (Liste 255 0 0 127))`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#couleurs>.")
+(put 'Remplissage 'text "Commande `Remplissage`.")
+(de Remplissage (couleur)
+  (!processing (pack "Remplissage "
+                     (Nieme couleur 1)
+                     " " (Nieme couleur 2)
+                     " " (Nieme couleur 3)
+                     (Si (= (Longueur couleur) 4)
+                      Alors (pack " " (Nieme couleur 4))
+                      Sinon "")
+  ))
+  Rien
+)
+(put 'Epaisseur 'doc
+"Dans la sortie graphique, permet de choisir l’épaisseur des tracés, en pixels.
+
+Exemple : `(Epaisseur 5)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Epaisseur 'text "Commande `Epaisseur`.")
+(de Epaisseur (epaisseur)
+  (!processing (pack "Epaisseur " epaisseur))
+  Rien
+)
+(put 'Segment 'doc
+"Dans la sortie graphique, trace un segment.
+
+Les deux paramètres sont les listes des coordonnées des deux extrémités
+du segment.
+
+Exemple : `(Segment (Liste 300 300) (Liste 450 600))`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Segment 'text "Commande `Segment`.")
+(de Segment (point1 point2)
+  (!processing (pack "Segment " (Nieme point1 1) " " (Nieme point1 2) " "
+                                (Nieme point2 1) " " (Nieme point2 2)))
+  Rien
+)
+(put 'Cercle 'doc
+"Dans la sortie graphique, trace un cercle.
+
+Le premier paramètre est la liste des coordonnées du centre du cercle,  
+le second paramètre est le rayon du cercle.
+
+Exemple : `(Cercle (Liste 300 300) 100)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Cercle 'text "Commande `Cercle`.")
+(de Cercle (centre rayon)
+  (!processing (pack "Cercle " (Nieme centre 1) " " (Nieme centre 2)
+                     " " (* 2 rayon)))
+  Rien
+)
+(put 'Ellipse 'doc
+"Dans la sortie graphique, trace une ellipse.
+
+Le premier paramètre est la liste des coordonnées du centre de l’ellipse,  
+le deuxième paramètre est le rayon horizontal, le troisième le rayon vertical.
+
+Exemple : `(Ellipse (Liste 300 300) 200 100)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Ellipse 'text "Commande `Ellipse`.")
+(de Ellipse (centre rayon1 rayon2)
+  (!processing (pack "Ellipse " (Nieme centre 1) " " (Nieme centre 2)
+                     " " (* 2 rayon1) " " (* 2 rayon2)))
+  Rien
+)
+(put 'Rectangle 'doc
+"Dans la sortie graphique, trace un rectangle.
+
+Les deux paramètres sont les listes des coordonnées des deux coins du rectangle.
+
+Exemple : `(Rectangle (Liste 300 300) (Liste 450 600))`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Rectangle 'text "Commande `Rectangle`.")
+(de Rectangle (point1 point2)
+  (!processing (pack "Rectangle " (Nieme point1 1) " " (Nieme point1 2) " "
+                                  (Nieme point2 1) " " (Nieme point2 2)))
+  Rien
+)
+(put 'Triangle 'doc
+"Dans la sortie graphique, trace un triangle.
+
+Les trois paramètres sont les listes des coordonnées des sommets du triangle.
+
+Exemple : `(Triangle (Liste 200 300) (Liste 400 300) (Liste 300 400))`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Triangle 'text "Commande `Triangle`.")
+(de Triangle (point1 point2 point3)
+  (!processing (pack "Triangle " (Nieme point1 1) " " (Nieme point1 2) " "
+                                 (Nieme point2 1) " " (Nieme point2 2) " "
+                                 (Nieme point3 1) " " (Nieme point3 2)))
+  Rien
+)
+
+# Tortue
+(put 'AV 'doc
+"Dans la sortie graphique, fait avancer la tortue.
+
+Le paramètre est le nombre de pixels que la tortue parcourt.
+
+Exemple : `(AV 100)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#tortue>.")
+(put 'AV 'text "Commande `AV` (avance).")
+(de AV (longueur)
+  (!processing (pack "AV " longueur))
+  Rien
+)
+(put 'TD 'doc
+"Dans la sortie graphique, fait tourner la tortue vers la droite.
+
+Le paramètre est l’angle de rotation en degrés.
+
+Exemple : `(TD 45)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#tortue>.")
+(put 'TD 'text "Commande `TD` (tourne à droite).")
+(de TD (angle)
+  (!processing (pack "TD " angle))
+  Rien
+)
+(put 'TG 'doc
+"Dans la sortie graphique, fait tourner la tortue vers la gauche.
+
+Le paramètre est l’angle de rotation en degrés.
+
+Exemple : `(TG 45)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#tortue>.")
+(put 'TG 'text "Commande `TG` (tourne à gauche).")
+(de TG (angle)
+  (!processing (pack "TG " angle))
+  Rien
+)
+(put 'BC 'doc
+"Dans la sortie graphique, baisse le crayon de la tortue.
+
+Exemple : `(BC)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#tortue>.")
+(put 'BC 'text "Commande `BC` (baisse crayon).")
+(de BC ()
+  (!processing "BC")
+  Rien
+)
+(put 'LC 'doc
+"Dans la sortie graphique, lève le crayon de la tortue.
+
+Exemple : `(LC)`
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>
+et <http://microalg.info/doc.html#tortue>.")
+(put 'LC 'text "Commande `LC` (lève crayon).")
+(de LC ()
+  (!processing "LC")
+  Rien
+)
+
+# Fonctions numériques
+(setq !valeurs_trigo '(
+  1000 999 999 998 997 996 994 992 990 987 984 981 978 974 970 965 961 956 951
+   945 939 933 927 920 913 906 898 891 882 874 866 857 848 838 829 819 809 798
+   788 777 766 754 743 731 719 707 694 681 669 656 642 629 615 601 587 573 559
+   544 529 515 500 484 469 453 438 422 406 390 374 358 342 325 309 292 275 258
+   241 224 207 190 173 156 139 121 104 87 69 52 34 17 0
+))
+(put '1000Cosinus 'doc
+"Retourne un entier proche de 1000 fois le cosinus de l’angle donné en paramètre.
+
+L’angle doit être fourni en degrés.
+
+    : (1000Cosinus 30)
+    -> 866
+")
+(put '1000Cosinus 'text "Commande `1000Cosinus`.")
+(de 1000Cosinus (!angle)
+  (cond
+    ((lt0 !angle) (1000Cosinus (- !angle)))
+    ((gt0 (- !angle 360)) (1000Cosinus (% !angle 360)))
+    ((gt0 (- !angle 180)) (- (1000Cosinus (- !angle 180))))
+    ((gt0 (- !angle 90)) (- (1000Sinus (- !angle 90))))
+    (T (car (nth !valeurs_trigo (+ !angle 1))))
+  )
+)
+(put '1000Sinus 'doc
+"Retourne un entier proche de 1000 fois le sinus de l’angle donné en paramètre.
+
+L’angle doit être fourni en degrés.
+
+    : (1000Sinus 30)
+    -> 500
+")
+(put '1000Sinus 'text "Commande `1000Sinus`.")
+(de 1000Sinus (!angle)
+  (cond
+    ((lt0 !angle) (- (1000Sinus (- !angle))))
+    ((gt0 (- !angle 360)) (1000Sinus (% !angle 360)))
+    ((gt0 (- !angle 180)) (- (1000Sinus (- !angle 180))))
+    ((gt0 (- !angle 90)) (1000Cosinus (- !angle 90)))
+    (T (car (nth !valeurs_trigo (- 91 !angle))))
+  )
+)

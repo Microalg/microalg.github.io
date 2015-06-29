@@ -50,6 +50,7 @@ Aller directement à :
     * [SciTE](#scite)
     * [Vim](#vim)
     * [Blockly](#blockly)
+    * [Sortie graphique](#sortiegraphique) et [Tortue](#tortue) (merci Processing)
 * [Remerciements](#remerciements)
 
 ## Avertissement
@@ -298,6 +299,10 @@ valeur ou de la commande qui est parfois fournie :
     * Vous avez ouvert deux parenthèses de suite.
     * Il y a une parenthèse en trop devant `X`.
 * Il manque le deuxième paramètre : l’indice.
+* Impossible d’utiliser la sortie graphique avec `malg-njs` ou `malg-rjs`.
+    * Il faut configurer SciTE pour qu’il utilise `malg-j` (voire `malg` si
+      vous avez pu l’installer). Cliquer sur **View** puis **Parameters** et
+      indiquer par exemple `malg-j`.  Voir [cette section](#horsnavigateur).
 * Indice négatif ou nul.
 * Indice non entier.
 * Indice trop grand.
@@ -392,14 +397,6 @@ Voici les directions que le projet va prendre :
 
 * Finir d’implémenter le jeu d’instructions de base.
     * Il manque la lecture/écriture depuis/dans un fichier.
-* Implémenter [une tortue](http://profgra.org/lycee/memento_des_tortues.html)
-    * en restant dans l’esprit du jeu d’instructions minimal :
-        * BC, LC
-        * AV,
-        * TG (laisser l’utilisateur implémenter TD)
-    * dans au moins deux des trois versions de MicroAlg :
-        * web d’abord ;
-        * Java ensuite.
 * Finir de coder les derniers blocs pour
   <a href="https://blockly-demo.appspot.com/static/apps/index.html"
   class="offi">Blockly</a>.
@@ -579,8 +576,7 @@ En résumé :
 
 MicroAlg s’intègre à d’autres systèmes. Pour l’instant, à part l’intégration
 avec des éditeurs de texte, MicroAlg s’intègre uniquement avec Blockly,
-mais il est prévu de travailler sur Processing et ProcessingJS, Mario, NetLogo,
-GeoGebra, GeoTortue…
+mais il est prévu de travailler sur Mario, NetLogo, GeoGebra, GeoTortue…
 
 ### SciTE
 
@@ -720,6 +716,123 @@ Voir aussi les commandes 
 [`=`](#sym-=), [`=/`](#sym-=/), [`<`](#sym-<), [`>`](#sym-\>), [`<=`](#sym-<=)
 et [`>=`](#sym->=).
 
+## Sortie graphique
+
+Pour sa sortie graphique, MicroAlg utilise
+<a href="http://processing.org/" class="offi">Processing</a> et
+<a href="http://processingjs.org/" class="offi">Processing.js</a>.
+
+**Attention** : Pour l’instant, les programmes qui permettent une sortie
+graphique ne peuvent pas être codés avec les blocs de Blockly.
+
+### Mise en place de la sortie graphique
+
+Pour l’installation de Processing sur votre plateforme, se reporter à
+[cette page](https://github.com/Microalg/microalg/blob/latest/INSTALL.md).
+Cette installation est nécessaire uniquement si vous utilisez MicroAlg avec
+l’éditeur de texte SciTE.
+Processing n’a pas besoin d’être installé si vous utilisez la galerie, et est
+fourni dans l’archive si vous installez MicroAlg sur votre site.
+
+Pour faire apparaître la fenêtre graphique :
+
+* Sur la galerie, ajouter `"processing": true` à la configuration de votre
+  échantillon (voir
+  [cette page](http://galerie.microalg.info/microalg:config_echantillons)).
+* Si vous utilisez MicroAlg avec l’éditeur de texte SciTE, lancer
+    * `start_processing.bat` (Windows)
+    * `start_processing.sh` (le reste)
+* Si vous avez installé MicroAlg sur votre site, ajouter `processing: true` à
+  l’appel de `inject_microalg_editor_in`.
+
+### Utilisation des commandes graphiques
+
+Vous pourriez avoir besoin d’avoir lu la section précédente :
+[mise en place de Processing](#miseenplacedelasortiegraphique).
+
+Avant de lire cette partie, assurez-vous d’avoir suivi le
+[tutoriel graphique](tuto_graphique.html). Si vous avez besoin de lire la
+documentation d’une commande précise, une liste des symboles prédéfinis est
+disponible [ici](#listedessymbolesprdfinis).
+
+**Attention** : les nombres flottants ne sont pas disponibles si vous
+lancez les commandes avec SciTE configuré sur `malg` ou `malg-j`.
+
+#### Généralités
+
+La fenêtre graphique est un carré de 600 pixels de côté. L’origine des
+coordonnées est dans le coin en bas à gauche.
+
+Les commandes dédiées à la sortie graphique sont :
+
+* formes géométriques
+    * `Segment`
+    * `Cercle` (et non `Disque` par soucis de cohérence avec les autres formes
+      qui n’ont pas de nom pour les formes correspondantes pleines)
+    * `Ellipse`
+    * `Rectangle`
+    * `Triangle`
+* couleurs
+    * `Contour`
+    * `Remplissage`
+* épaisseur
+    * `Epaisseur` (sans accent sur le E)
+* pour la tortue : `BC` `LC` `AV` `TD` `TG` (voir plus loin la
+  [section tortue](#tortue))
+* remise à zéro : `RAZ`
+
+Elles sont chacunes documentées en profondeur dans la
+[liste des symboles prédéfinis](#listedessymbolesprdfinis).
+
+#### Couleurs
+
+Les deux commandes qui permettent de gérer les couleurs sont `Contour` et
+`Remplissage`, à qui on passe une couleur en paramètre. À partir de la ligne
+où une de ces commandes est utilisée, toutes les formes seront dessinées avec
+les couleurs choisies, jusqu’à un autre appel à `Contour` ou à `Remplissage`.
+
+Une couleur est une liste de trois ou quatre entiers pouvant aller de 0 à 255.
+Les trois premiers correspondent au système <a class="wp"
+href="https://fr.wikipedia.org/wiki/Rouge_vert_bleu">système RVB</a>, et
+le quatrième correspond au <a class="wp"
+href="https://fr.wikipedia.org/wiki/Canal_alpha">canal alpha</a> (opacité). 
+En résumé :
+
+* le premier entier définit la quantité de rouge,
+* le deuxième de vert,
+* le troisième de bleu,
+* le quatrième (facultatif) définit l’opacité de la couleur. Une opacité de
+  zéro rendra la couleur totalement transparente.
+
+Quelques exemples :
+
+* Le vert pur s’écrira `(Liste 0 255 0)`.
+* Le rouge pur semi-transparent s’écrira `(Liste 255 0 0 127)`
+
+#### Épaisseur
+
+L’épaisseur du tracé est gérée avec la commande `Epaisseur` (sans accent) à qui
+on passe un entier en paramètre. C’est le nombre de pixel de la largeur des
+traits.  À partir de la ligne cette commande est utilisée, toutes les formes
+seront dessinées avec l’épaisseur choisie, jusqu’à un autre appel à `Epaisseur`.
+
+## Tortue
+
+L’affichage de la tortue est bien sûr graphique. Il est donc indispensable
+d’avoir lu la section sur la [mise en place](#miseenplacedelasortiegraphique)
+de la sortie graphique pour pouvoir utiliser la tortue.
+
+Les commandes sont :
+
+* `AV` pour avancer la tortue d’un certain nombre de pixels,
+* `TD` et `TG` pour faire tourner la tortue sur elle-même (angle en degrés),
+* `LC` et `BC` pour lever et baisser le crayon (la tortue ne laissera pas de
+  trace si son crayon est levé),
+* `RAZ` pour effacer le dessin et repositionner la tortue au centre et vers le
+  haut.
+
+Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
+
 ## Remerciements
 
 <p id="testeurs">Relecteurs, testeurs et commentateurs :</p>
@@ -750,9 +863,11 @@ et [`>=`](#sym->=).
 * [Jean-François Cauche](https://secouezlecours.wordpress.com/) pour ses
   encouragements, pour son accueil sur son blog et pour un de ses articles, qui
   m’a inspiré la commande `...`.
-* Bérenger Recoules (voir son [blog](https://berengerrecoules.wordpress.com/)
-  et son [portfolio](http://b2renger.github.io/)) pour ses idées autour de
-  l’intégration de Processing.
+* Bérenger Recoules ([blog](https://berengerrecoules.wordpress.com/)
+  [portfolio](http://b2renger.github.io/)) pour ses idées autour du travail
+  avec Processing.
+* Flo Carré pour ses remarques sur l’opacité dans le tuto graphique.
+* Florence Cousin pour la découverte du bug où le rayon était en fait le diamètre.
 
 <p id="modeles">Modèles et contre-modèles :</p>
 
@@ -832,7 +947,7 @@ nom digne de ce nom.</p>
                 var dt = $('<dt/>').appendTo(dl);
                 var span = $('<span/>').appendTo(dt);
                 $('<a/>').attr("href", "#sym-" + sym).html(sym).appendTo(span);
-                var sym_doc = EMULISP_CORE.eval("(get '" + sym + " 'doc)");
+                var sym_doc = EMULISP_CORE.eval("(get '" + sym + " 'doc)").toString();
                 sym_doc = cleanTransient(sym_doc);
                 sym_doc = new Showdown.converter().makeHtml(sym_doc);
                 $("<dd/>").html(sym_doc).appendTo(dl);
@@ -844,17 +959,6 @@ nom digne de ce nom.</p>
                 upClass: 'navbar-show',
                 downClass: 'navbar-hide'
             });
-        </script>
-        <script type="text/javascript">
-            var $_Tawk_API={},$_Tawk_LoadStart=new Date();
-            (function(){
-                var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-                s1.async=true;
-                s1.src='https://embed.tawk.to/5583e0d1cea5d22b4acfee51/default';
-                s1.charset='UTF-8';
-                s1.setAttribute('crossorigin','*');
-                s0.parentNode.insertBefore(s1,s0);
-            })();
         </script>
     </body>
 </html>

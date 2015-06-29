@@ -60,7 +60,7 @@ function stdPrint(text, state) {
 function stdPrompt() {
     // Since the prompt appears in the little usual modal window, we need
     // to show the user the last thing displayed (it should be a question).
-    var last_line_displayed = cleanTransient(EMULISP_CORE.eval('*LastStdOut'));
+    var last_line_displayed = cleanTransient(EMULISP_CORE.eval('*LastStdOut').toString());
     if (last_line_displayed == "NIL") last_line_displayed = "?";
     var user_input = window.prompt(last_line_displayed);
     if (user_input !== null) return user_input;
@@ -130,11 +130,16 @@ function ide_action(editor_elt, store) {
     // Compute the target HTML elt.
     var elt_id = editor_elt.attr('id').slice(0, -('-malg-editor'.length));
     var display_target_id = elt_id + '-displaytarget';
+    var processing_id = elt_id + '-processing';
     // Init the state and load it with MicroAlg.
     EMULISP_CORE.init();
     EMULISP_CORE.eval(microalg_l_src);
     // Custom state for a custom display in the page.
-    EMULISP_CORE.currentState().context = {type: 'editor', display_elt: display_target_id};
+    EMULISP_CORE.currentState().context = {
+        type: 'editor',
+        display_elt: display_target_id,
+        processing_elt: processing_id,
+        };
     // Process src.
     var src = editor_elt.val();
     // The editor is in a hiddable div,
@@ -166,9 +171,13 @@ according to `config` which may have these keys :
   empty if not provided,
 * `localStorage` is a boolean telling to remember last program if possible,  
   false if not provided,
-* `blockly` is a boolean telling to display code as blocks,  
+* `blockly` is a boolean telling to also display code as blocks,  
   false if not provided,
-* `blockly_only` is a boolean telling to not display the textual editor,  
+* `blockly_only` is a boolean telling to not display the textual editor but
+  only blocks,  
+  false if not provided,
+* `processing` is a boolean telling to load processing.js in the page and
+  to display a processing window,  
   false if not provided,
 
 */
@@ -177,6 +186,7 @@ function inject_microalg_editor_in(elt_id, config) {
     var editor_id = elt_id + '-malg-editor';
     var display_target_id = elt_id + '-displaytarget';
     var blockly_id = elt_id + '-blockly';
+    var processing_id = elt_id + '-processing';
     var src = '';
     var blockly_src = '';
     // According to config.localStorage, load source code (if any) from local
@@ -197,7 +207,10 @@ function inject_microalg_editor_in(elt_id, config) {
     }
     if (config.blockly || config.blockly_only) {
         // Le source doit être sur une ligne pour passer dans le js généré:
-        blockly_src = src.replace(/(\r\n|\n|\r)/gm, "");
+        blockly_src = src.replace(/(\r\n|\n|\r)/gm, "")
+        // On contre-échappe les backslashes car ce code sera inséré dans
+        // une iframe.
+                         .replace(/\\/g, "\\\\");
     }
     // Build the html and bind to ide_action.
     var script_container = $('#' + elt_id);
@@ -215,6 +228,33 @@ function inject_microalg_editor_in(elt_id, config) {
                 'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' + config.localStorage + ')" />' +
         '<div class="malg-error"></div>' +
         '<div id="' + display_target_id + '" class="malg-display">&nbsp;</div>';
+    if (config.processing) {
+        if (typeof Processing == "undefined") {
+            script_string += '<script src="' + root_path + 'web/processing-1.4.15.min.js"></script>';
+        }
+        script_string = script_string +
+        '<div style="text-align:center;">' +
+        '    <canvas id="' + processing_id + '"' +
+        '            class="malg-sketch"' +
+        '            data-processing-sources="' + root_path + 'pde/microalg/microalg.pde">' +
+        '    </canvas>' +
+        '</div>' + "\n" +
+        '<script>' + "\n" +
+        '    if (typeof processing_sketches == "undefined") processing_sketches = {};' + "\n" +
+        '    if (typeof processing_tIds == "undefined") processing_tIds = {};' + "\n" +
+        '    processing_tIds["' + processing_id + '"] = 0;' + "\n" +
+        '    $(document).ready(function() {' + "\n" +
+        '        if (!processing_sketches["' + processing_id + '"]) {' + "\n" +
+        '            processing_tIds["' + processing_id + '"] = setInterval(function() {' + "\n" +
+        '                processing_sketches["' + processing_id + '"] = Processing.getInstanceById("' + processing_id + '");' + "\n" +
+        '                if (processing_sketches["' + processing_id + '"]) {' + "\n" +
+        '                    clearInterval(processing_tIds["' + processing_id + '"]);' + "\n" +
+        '                }' + "\n" +
+        '            }, 500);' + "\n" +
+        '        }' + "\n" +
+        '    });' + "\n" +
+        '</script>' + "\n";
+    }
     script_container.html(script_string);
     if (config.blockly || config.blockly_only) {
         // Injection de HTML dans une iframe car besoin de plusieurs Blockly.
@@ -325,7 +365,7 @@ function repl_action(repl_elt) {
     var src = repl_content.slice(EMULISP_CORE.currentState().old_src.length,
                                  repl_content.length);
     try {
-        result = EMULISP_CORE.eval(src);
+        result = EMULISP_CORE.eval(src).toString();
     } catch(e) {
         if (e.message == "Function 'bye' not supported") {
             // Destroy the textarea (parent.parent is because of parenedit).
@@ -370,7 +410,7 @@ function inject_microalg_jrepl_in(elt_id, msg) {
             // Fetch the relevant state.
             EMULISP_CORE.init(emulisp_states[elt_id]);
             try {
-                var result = EMULISP_CORE.eval(command);
+                var result = EMULISP_CORE.eval(command).toString();
                 if (result != '""') {
                     term.echo('-> ' + cleanTransient(result.toString()));
                 }
@@ -415,13 +455,13 @@ function inject_microalg_jrepl_in(elt_id, msg) {
 function malg2blockly(src) {
     EMULISP_CORE.init();
     EMULISP_CORE.eval(microalg_export_src);
-    var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")");
+    var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")").toString();
     EMULISP_CORE.eval(microalg_export_blockly_src);
-    var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + source_protegee + ")");
+    var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + source_protegee + ")").toString();
     // Le car pour récupérer l’unique élément de la liste finale.
-    var xml = cleanTransient(EMULISP_CORE.eval('(pack (car ' + avec_des_next + ')'));
+    var xml = EMULISP_CORE.eval('(pack (car ' + avec_des_next + ')').toString();
     xml = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="programme"><value name="VALUE">' +
-          xml +
+          xml.slice(1,-1).replace(/\\"/g, '"') +
           '</value></block></xml>';
     EMULISP_CORE.init();
     EMULISP_CORE.eval(microalg_l_src);

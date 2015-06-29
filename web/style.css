@@ -5,7 +5,7 @@ body.microalg {
     color: black;
     background-color: #D1D1D1;
 }
-.microalg p {
+.microalg p, li {
     line-height: 1.3em;
 }
 .microalg a:link {color:#337;}
@@ -84,6 +84,9 @@ body.microalg {
     margin: 0px;
     margin-left: 3px;
 }
+.malg-sketch {
+    border: solid 1px;
+}
 .microalg .terminal, .microalg .cmd {
     width: 93%;
     margin: 0px auto;
@@ -136,6 +139,9 @@ a.email:after {
     padding: 1em;
     z-index: 120;
     background-color: #eee;
+}
+.microalg dt {
+    padding-top: 2em;
 }
 .microalg dt span {
     font-family: 'Courier New', Courier, monospace;

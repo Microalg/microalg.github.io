@@ -1227,7 +1227,9 @@
     <code>Tant_que</code>, mais dans l’autre sens : d’abord
     <code>Tant_que</code>, et ensuite <code>Faire</code>.</p>
     <p>C’est le cas par exemple si l’on veut répéter une action un certain
-    nombre de fois. Ainsi, l’utilisateur peut répéter l’action zéro fois :</p>
+    nombre de fois. Ainsi l’utilisateur peut, s’il le souhaite, répéter
+    l’action zéro fois, ce qui n’était pas possible avec `Faire`. Essayez le
+    programme suivant trois fois, en répondant 2, puis 1, puis 0 :</p>
     <div id="script-tq-affichage"></div>
     <script>inject_microalg_editor_in('script-tq-affichage', {
      src:
@@ -1531,7 +1533,7 @@
     <div id="script-somme"></div>
     <script>inject_microalg_editor_in('script-somme', {
      src:
-        '(Definir (Somme liste valeur)\n' +
+        '(Definir (Somme liste)\n' +
         '    "Retourne la somme des valeurs de la `liste`."\n' +
         '    "auteur inconnu"\n' +
         '    (Initialiser resultat 42)\n' +
@@ -1603,10 +1605,10 @@
     <h2 id="fin">Fin</h2>
     <p>Voilà, c’est fini. Si désormais vous cherchez une information, allez
     voir directement la <a href="doc.html">documentation</a>.</p>
-    <p>Si ça vous a plu et que vous avez une envie de créer votre propre
-    tutoriel, il faut installer MicroAlg localement. Pour cela, chercher
-    « utilisation possible sans connexion » sur
-    <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.
+    <p>Si cela vous a plu et que vous avez envie de créer votre propre
+    tutoriel, vous pouvez utiliser <a href="http://galerie.microalg.info">la galerie</a>.
+    Pour mettre MicroAlg en place sur votre propre site, voir
+    <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.</p>
     <p>Si vous avez une remarque à faire, ou envie de contribuer, suivre les
     instructions de <a href="#contact">cette section</a>.</p>
     <p>Bonne continuation !</p>
@@ -1625,16 +1627,5 @@
             downClass: 'navbar-hide'
         });
     </script>
-<script type="text/javascript">
-var $_Tawk_API={},$_Tawk_LoadStart=new Date();
-(function(){
-var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-s1.async=true;
-s1.src='https://embed.tawk.to/5583e0d1cea5d22b4acfee51/default';
-s1.charset='UTF-8';
-s1.setAttribute('crossorigin','*');
-s0.parentNode.insertBefore(s1,s0);
-})();
-</script>
 </body>
 </html>
