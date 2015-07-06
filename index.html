@@ -93,7 +93,7 @@
         </div>
         <p>Cliquer sur <code>OK</code> après avoir éventuellement modifié le code.<br>
         Il est aussi possible de programmer avec des blocs ou des briques (voir
-        <a href="#script-un-de-plus">plus bas sur cette page</a>).</p>
+        <a href="#blocs">plus bas sur cette page</a>).</p>
         <h2 id="caracs">Principales caractéristiques</h2>
         <ul>
         <li>Une <a href="doc.html#syntaxe">syntaxe</a> simplissime et universelle,
@@ -109,9 +109,18 @@
         <li>Une <a href="http://galerie.microalg.info">galerie</a> permettant
             aux enseignants de construire des documents et aux apprenants de
             publier leur travail.</li>
-        <li>La possibilité de programmer <a href="#script-un-de-plus">en déplaçant des blocs</a>,
+        <li>La possibilité de programmer en déplaçant
+            <a href="doc.html#blockly">des blocs</a> (ou briques),
             sachant que les commandes utilisés avec la programmation textuelle
-            ou par blocs sont exactement les mêmes.</li>
+            ou par blocs sont exactement les mêmes. Voir
+            <a href="#blocs">la démo plus bas sur cette page</a>
+            ou <a href="tuto_blocs.html">le tutoriel par blocs</a>.</li>
+        <li>Une <a href="doc.html#sortiegraphique">sortie graphique</a>
+            permettant de dessiner des formes géométrique. Voir
+            <a href="#algues">les algues</a> ou
+            <a href="#tortue">la tortue</a>
+            plus bas sur cette page, ou même
+            <a href="tuto_graphique.html">le tutoriel graphique</a>.</li>
         <li>Une <a href="doc.html#scite">intégration avec l’éditeur de texte
             SciTE</a> très complète (une touche pour exécuter, coloration des
             parenthèses, aide en ligne sur MicroAlg, auto-complétion,
@@ -185,7 +194,7 @@
         documents pédagogiques ou d’autres interfaces. Voir pour cela
         <a href="doc.html#architecture">la section « architecture »</a> de la
         documentation.</p>
-        <h2>Blocs</h2>
+        <h2 id="blocs">Blocs</h2>
         <div class="microalg">
         <div id="script-un-de-plus"></div>
         <script>inject_microalg_editor_in('script-un-de-plus', {
@@ -200,6 +209,64 @@
             '    )\n' +
             ')'});
         </script>
+        <h2>Sortie visuelle</h2>
+        <h3 id="algues">Algues</h3>
+        <p>Les algues peuvent mettre plusieurs secondes à s’afficher. À
+        chaque appui sur <code>OK</code>, une série différente sera générée.<p>
+        <div class="microalg">
+        <div id="script-algues"></div>
+        <script>inject_microalg_editor_in('script-algues', {
+         processing: true,
+         src:
+            '(RAZ)\n' +
+            '(Initialiser@)\n' +
+            '(Epaisseur 2)\n' +
+            '(Remplissage (Liste 255 255 255))\n' +
+            '(Initialiser n 1)\n' +
+            '(Initialiser x 0)\n' +
+            '(Tant_que (<= n 5)\n' +
+            ' Faire\n' +
+            '    (Affecter_a credit_iterations 300)\n' +
+            '    (Affecter_a x (+ (* n 50) 150))\n' +
+            '    (Initialiser y 200)\n' +
+            '    (Initialiser r 25)\n' +
+            '    (Initialiser decalage 0)\n' +
+            '    (Tant_que (>= r 4)\n' +
+            '     Faire\n' +
+            '        (Contour (Liste (Entier@ 0 255) (Entier@ 0 255) (Entier@ 0 255)))\n' +
+            '        (Cercle (Liste x y) r)\n' +
+            '        (Affecter_a decalage (+ decalage (Entier@ -1 1)))\n' +
+            '        (Si (< decalage -2) Alors\n' +
+            '            (Affecter_a decalage -2)\n' +
+            '        )\n' +
+            '        (Si (> decalage 2) Alors\n' +
+            '             (Affecter_a decalage -2)\n' +
+            '        )\n' +
+            '        (Affecter_a x (+ x decalage))\n' +
+            '        (Affecter_a y (+ y 2))\n' +
+            '        (Si (= 1 (Entier@ 1 6)) Alors\n' +
+            '            (Affecter_a r (- r 2))\n' +
+            '        )\n' +
+            '    )\n' +
+            '    (Affecter_a n (+ n 1))\n' +
+            ')'});
+        </script>
+        <h3 id="tortue">Tortue</h3>
+        <p>Appuyer plusieurs fois sur <code>OK</code> pour voir se dessiner
+        une étoile.</p>
+        <div id="script-tortue"></div>
+        <script>inject_microalg_editor_in('script-tortue', {
+         processing: true,
+         src:
+            '(AV 60)\n' +
+            '(TD 120)\n' +
+            '(AV 30)\n' +
+            '(LC)\n' +
+            '(AV 60)\n' +
+            '(TG 23)\n' +
+            '(BC)'});
+        </script>
+        </div>
         </div>
         </article>
       </div>
