@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>MicroAlg</title>
+  <meta name="description" content="Langage et environnements dédiés à l’algorithmique">
+  <meta name="author" content="Prof Gra">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="icon" href="visuels/logo_microalg.ico">
+</head>
+<body>
+  <div class="container">
+    <section class="header">
+      <h2 class="title">Les <strong>débutants en programmation</strong><br>
+      n’ont pas besoin d’<strong>un énorme camion</strong> toutes options.<br>
+      Ils veulent juste <strong>une simple trottinette</strong><br> qu’ils
+      comprennent tout de suite.</h2>
+      <div class="value-props row">
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/syntaxe.svg">
+          Des mots-clefs peu nombreux et en français. Des aides visuelles.
+        </div>
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/blocs.svg">
+          Des blocs ou briques à déplacer pour programmer.
+        </div>
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/integrations.svg">
+          Différentes interfaces possibles : web, consoles de
+          jeux, robots…
+        </div>
+      </div>
+    </section>
+    <div class="navbar-spacer"></div>
+    <nav class="navbar">
+      <div class="container">
+        <ul class="navbar-list">
+          <li class="navbar-item"><a class="navbar-link" href="#intro">Intro</a></li>
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#codeNavPopover">Code</a>
+            <div id="codeNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="#grid">Grid</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#typography">Typography</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#buttons">Buttons</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#forms">Forms</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#lists">Lists</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#code">Code</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#tables">Tables</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#queries">Queries</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#utilities">Utilities</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="navbar-item"><a class="navbar-link" href="#examples">Examples</a></li>
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#moreNavPopover">More</a>
+            <div id="moreNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton">On Github</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton#browser-support">Browsers</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton#license">License</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton#extensions">Extensions</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton/releases">Versions</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/dhg/Skeleton#colophon">Colophon</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="docs-section" id="intro">
+      <h6 class="docs-header">Is Skeleton for you?</h6>
+      <p>You should use Skeleton if you're embarking on a smaller project or just don't feel like you need all the utility of larger frameworks. Skeleton only styles a handful of standard HTML elements and includes a grid, but that's often more than enough to get started. In fact, <u>this site is built on Skeleton and has ~200 lines of custom CSS</u> (half of which is the docking navigation).</p>
+    </div>
+
+    <div class="docs-section" id="grid">
+      <h6 class="docs-header">The grid</h6>
+      <p>The grid is a <u>12-column fluid grid with a max width of 960px</u>, that shrinks with the browser/device at smaller sizes. The max width can be changed with one line of CSS and all columns will resize accordingly. The syntax is simple and it makes coding responsive much easier. Go ahead, resize the browser. </p>
+      <div class="example-grid docs-example">
+        <div class="row">
+          <div class="one column">One</div>
+          <div class="eleven columns">Eleven</div>
+        </div>
+        <div class="row">
+          <div class="two columns">Two</div>
+          <div class="ten columns">Ten</div>
+        </div>
+        <div class="row">
+          <div class="three columns">Three</div>
+          <div class="nine columns">Nine</div>
+        </div>
+        <div class="row">
+          <div class="four columns">Four</div>
+          <div class="eight columns">Eight</div>
+        </div>
+        <div class="row">
+          <div class="five columns">Five</div>
+          <div class="seven columns">Seven</div>
+        </div>
+        <div class="row">
+          <div class="six columns">Six</div>
+          <div class="six columns">Six</div>
+        </div>
+        <div class="row">
+          <div class="seven columns">Seven</div>
+          <div class="five columns">Five</div>
+        </div>
+        <div class="row">
+          <div class="eight columns">Eight</div>
+          <div class="four  columns">Four</div>
+        </div>
+        <div class="row">
+          <div class="nine columns">Nine</div>
+          <div class="three columns">Three</div>
+        </div>
+        <div class="row">
+          <div class="ten columns">Ten</div>
+          <div class="two columns">Two</div>
+        </div>
+        <div class="row">
+          <div class="eleven columns">Eleven</div>
+          <div class="one column">One</div>
+        </div>
+      </div>
+    </div>
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="js/site.js"></script>
+
+</body>
+</html>
