@@ -97,7 +97,7 @@
     top: 0;
     left: 0;
     background: #fff;
-    border: 1px solid #eee;
+    border: 1px solid #999;
     border-radius: 4px;
     top: 92%;
     left: -50%;
@@ -121,7 +121,7 @@
     margin-left: -10px; }
   .popover-item:first-child .popover-link:before {
     border-color: rgba(238, 238, 238, 0);
-    border-bottom-color: #eee;
+    border-bottom-color: #999;
     border-width: 11px;
     margin-left: -11px; }
   .popover-list {
@@ -136,7 +136,7 @@
     color: #222;
     display: block;
     padding: 8px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #999;
     text-decoration: none;
     text-transform: uppercase;
     font-size: 1.0rem;
