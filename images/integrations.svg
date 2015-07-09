@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="130px" height="70px" viewBox="0 0 130 70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <!-- web -->
-  <rect height="67" width="56" y="1" x="1" rx="3" stroke-width="2" stroke="#000000" fill="#aaa"/>
-  <rect height="53" width="48" y="4" x="5" stroke="#000000" fill="#fff"/>
-  <circle stroke-width="1" cy="62" cx="29" r="3" stroke="#000000" fill="#FFF"/>
+  <rect height="67" width="56" y="1" x="1" rx="3" stroke-width="2" stroke="#000" fill="#aaa"/>
+  <rect height="53" width="48" y="4" x="5" stroke="#000" fill="#fff"/>
+  <circle stroke-width="1" cy="62" cx="29" r="3" stroke="#000" fill="#FFF"/>
   <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size= "9" y="13" x="22">www.</text>
   <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size="10" y="32" x="29">monsite</text>
   <text xml:space="preserve" text-anchor="middle" font-family="serif" font-size= "9" y="52" x="39">.info</text>
   <!-- console -->
-  <rect stroke-width="2" height="18" width="40" y="7" x="68" rx="5" ry="5" stroke="#000000" fill="#FFF"/>
-  <rect height="9" width="13.5" y="11" x="81" stroke="#000000" fill="#ccc"/>
-  <rect height="2" width="6" y="18" x="72" stroke="#000" fill="#000"/>
-  <rect height="6" width="2" y="16" x="74" stroke="#000" fill="#000"/>
-  <rect height="2" width="6" y="18" x="98" stroke="#000" fill="#000"/>
-  <rect height="6" width="2" y="16" x="100" stroke="#000" fill="#000"/>
+  <rect stroke-width="2" height="18" width="40" y="7" x="65" rx="5" ry="5" stroke="#000" fill="#FFF"/>
+  <rect height="9" width="13.5" y="11" x="78" stroke="#000" fill="#ccc"/>
+  <rect height="2" width="6" y="18" x="69" stroke="#000" fill="#000"/>
+  <rect height="6" width="2" y="16" x="71" stroke="#000" fill="#000"/>
+  <rect height="2" width="6" y="18" x="95" stroke="#000" fill="#000"/>
+  <rect height="6" width="2" y="16" x="97" stroke="#000" fill="#000"/>
   <!-- robot -->
-  <rect stroke-width="3" height="12" width="4" y="45" x="86" stroke="#000000" fill="#000"/>
-  <rect stroke-width="3" height="12" width="4" y="45" x="124" stroke="#000000" fill="#000"/>
-  <rect stroke-width="2" height="32" width="34" y="35" x="92" rx="5" ry="5" stroke="#000000" fill="#FFF"/>
-  <circle stroke-width="2" cy="45" cx="103" r="3" stroke="#000000" fill="#FFF"/>
-  <circle stroke-width="2" cy="45" cx="117" r="3" stroke="#000000" fill="#FFF"/>
-  <rect stroke-width="2" height="6" width="20" y="29" x="115" rx="5" stroke="#000000" fill="#000"/>
-  <rect stroke-width="2" height="16" width="6" y="19" x="122" stroke="#000000" fill="#000"/>
-  <circle stroke-width="2" cy="15" cx="125" r="6" stroke="#000000" fill="#FFF"/>
-  <rect stroke-width="2" height="6" width="20" y="55" x="100" stroke="#000000" fill="#FFF"/>
+  <rect stroke-width="3" height="12" width="3" y="45" x= "86" rx="2" stroke="#000" fill="#000"/>
+  <rect stroke-width="3" height="12" width="3" y="45" x="124" rx="2" stroke="#000" fill="#000"/>
+  <rect stroke-width="2" height="32" width="33" y="35" x="90" rx="5" ry="5" stroke="#000" fill="#FFF"/>
+  <circle stroke-width="2" cy="45" cx="100" r="3" stroke="#000" fill="#FFF"/>
+  <circle stroke-width="2" cy="45" cx="114" r="3" stroke="#000" fill="#FFF"/>
+  <rect stroke-width="2" height="10" width="2" y="25" x="115" stroke="#000" fill="#000"/>
+  <circle stroke-width="1" cy="19" cx="116" r="5" stroke="#000" fill="#FFF"/>
+  <circle stroke-width="1" cy="19" cx="116" r="3" stroke="#000" fill="#FFF"/>
+  <rect stroke-width="2" height="6" width="20" y="55" x="97" stroke="#000" fill="#FFF"/>
 </svg>
