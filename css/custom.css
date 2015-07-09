@@ -1,5 +1,11 @@
 .container {
   max-width: 800px; }
+#logo {
+  z-index: -1;
+  position: absolute;
+  left: 20%;
+  width: 60%;
+  opacity: 0.2; }
 .header {
   margin-top: 6rem;
   text-align: center; }
@@ -30,6 +36,8 @@
 
 /* Larger than phone */
 @media (min-width: 550px) {
+  #logo {
+    top: -3em; }
   .header {
     margin-top: 18rem; }
   .value-props {
@@ -43,6 +51,8 @@
 
 /* Larger than tablet */
 @media (min-width: 750px) {
+  #logo {
+    top: -7em; }
   /* Navbar */
   .navbar + .docs-section {
     border-top-width: 0; }
