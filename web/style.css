@@ -5,6 +5,9 @@ body.microalg {
     color: black;
     background-color: #D1D1D1;
 }
+.microalg ul {
+    list-style: outside;
+}
 .microalg p, li {
     line-height: 1.3em;
 }
