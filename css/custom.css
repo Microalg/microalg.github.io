@@ -110,10 +110,17 @@
     border: 1px solid #999;
     border-radius: 4px;
     top: 92%;
-    left: -50%;
     -webkit-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
        -moz-filter: drop-shadow(0 0 6px rgba(0,0,0,.1));
             filter: drop-shadow(0 0 6px rgba(0,0,0,.1)); }
+  #introNavPopover {
+    left: -70%; }
+  #docsNavPopover {
+    left: -60%; }
+  #vidsNavPopover {
+    left: -25%; }
+  #exNavPopover {
+    left: -10%; }
   .popover-item:first-child .popover-link:after,
   .popover-item:first-child .popover-link:before {
     bottom: 100%;
