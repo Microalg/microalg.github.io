@@ -1,0 +1,52 @@
+table.comparaisons td * {
+  margin: 0;
+}
+
+table.comparaisons td {
+  border: 1px solid #557398;
+}
+
+table.comparaisons th {
+  font-weight: bold;
+  padding: 5px;
+}
+
+table.comparaisons tr th,
+table.comparaisons tr td {
+    text-align: center;
+}
+table.comparaisons tr td.col-title {
+    text-align: right;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+table.comparaisons tr td {
+    text-align: center;
+}
+abbr {
+    cursor: help;
+}
+.comp-v {
+    background-color: #0c4;
+}
+.comp--{
+    background-color: #fe4;
+}
+.comp-x {
+    background-color: #f33;
+}
+.comp- {
+    background-color: #EBEFF4;
+}
+table.legende tbody {
+    border: none;
+}
+table.legende td {
+    border: none;
+    padding-right: 1em;
+    padding-left: 1em;
+}
+table.legende td:first-child {
+    text-align: center;
+    border: 1px solid #557398;
+}
