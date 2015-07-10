@@ -1,310 +1,396 @@
-<!doctype html>
-<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
-<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
-<html>
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-
-  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
-
   <title>MicroAlg</title>
-  <meta name="description" content="Langage et environnements dédiés à l’algorithmique.">
-
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-
-    <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, langage, environnement" />
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script src="emulisp/int.js" type="text/javascript"></script>
-    <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="web/style.css" />
-    <script type="text/javascript" src="web/ide_injections.js"></script>
-    <script type="text/javascript" src="web/parenedit.js"></script>
-    <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
-    <script type="text/javascript" src="web/showdown.js"></script>
-    <link rel="icon" href="visuels/logo_microalg.ico" />
-    <script src="web/tipofthemoment.js"></script>
-    <link type="text/css" href="web/tipofthemoment.css" rel="stylesheet" />
+  <meta name="description" content="Langage et environnements dédiés à l’algorithmique">
+  <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, langage, environnement, college, lycee" />
+  <meta name="author" content="Prof Gra">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" type="text/css" href="web/style.css" />
+  <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
+  <link type="text/css" href="web/tipofthemoment.css" rel="stylesheet" />
+  <link rel="icon" href="visuels/logo_microalg.ico" />
 </head>
-
 <body>
-  <div class="wrapper">
-    <div id="logo"><img src="images/logo_microalg.svg" alt="Logo MicroAlg"></div>
-    <header>
-      <h1 class="title">Micro&nbsp;Alg</h1>
-    </header>
-    <div id="container">
-      <p class="tagline">
-        Langage et environnements dédiés à l’algorithmique.</p>
-      <div id="main" role="main">
-        <div class="link-bar">
-        <div class="inner">
-          <a href="tuto_blocs.html" title="Pour apprendre ou essayer MicroAlg en ligne">Tuto interactif</a> &mdash;
-          <a href="http://galerie.microalg.info" title="Pour explorer ou publier">Galerie</a> &mdash;
-          <a href="doc.html" title="La référence">Doc</a> &mdash;
-          <a href="http://qr.microalg.info" title="La foire aux questions">Questions/Réponses</a> &mdash;
-          <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md" title="Sur sa machine ou sur son site">Installer</a> &mdash;
-          <a href="https://github.com/Microalg/Microalg" title="QG du développement de MicroAlg">GitHub</a> &mdash;
-          <a href="https://twitter.com/search?f=realtime&q=%23MicroAlg%20from%3Amicroalg&src=typd" title="via Twitter">News</a>
+  <div class="container">
+    <img id="logo" alt="logo" src="images/logo_microalg.svg" />
+    <section class="header">
+      <h2 class="title">Les <strong>débutants en programmation</strong><br>
+      n’ont pas besoin d’<strong>un énorme camion</strong> toutes options.<br>
+      Ils veulent juste <strong>une simple trottinette</strong><br> qu’ils
+      comprennent tout de suite.</h2>
+      <p class="u-pull-right">John Maeda, lors d’une
+      <a href="http://www.nytimes.com/1999/07/27/science/a-conversation-with-john-maeda-when-mit-artist-shouts-his-painting-listens.html">interview</a>.</p>
+      <div class="value-props row">
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/syntaxe.svg">
+          Des mots-clefs peu nombreux et en français. Des aides visuelles.
         </div>
-        <span class="blc"></span><span class="trc"></span>
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/blocs.svg">
+          Des blocs ou briques à déplacer pour programmer.
         </div>
-        <article class="markdown-body">
-        <blockquote>
-        <p>Les débutants en programmation n’ont pas besoin d’un énorme camion
-        toutes options. Ils veulent juste une simple trottinette qu’ils
-        comprennent tout de suite.</p>
-        <div class="right">
-        <a href="http://www.nytimes.com/1999/07/27/science/a-conversation-with-john-maeda-when-mit-artist-shouts-his-painting-listens.html">John Maeda</a>
+        <div class="four columns value-prop">
+          <img class="value-img" src="images/integrations.svg">
+          Différentes interfaces possibles : web, consoles de
+          jeux, robots…
         </div>
-        </blockquote>
-        <p><strong><em>MicroAlg</em></strong> est un langage de programmation
-        <strong>en français</strong> dédié à l’algorithmique et à son
-        enseignement. <strong>Simple</strong> (des parenthèses et des guillemets
-        pour seuls caractères spéciaux), elle offre un cadre <strong>rigoureux</strong> pour
-        l’apprentissage des concepts les plus importants de
-        <a href="http://fr.wikipedia.org/wiki/Algorithmique" class="wp">l’algorithmique</a> et de la
-        <a href="http://fr.wikipedia.org/wiki/Programmation_imp%C3%A9rative" class="wp">programmation impérative</a>.</p>
-        <h2>Jeunesse</h2>
-        <p>Encore assez jeune, son développement a seulement commencé fin mars
-        2014. Elle est tout de même déjà utilisable, même si elle possède
-        encore <a href="doc.html#limitations">quelques limitations</a>. Un
-        brouillon de rapport d’utilisation pour l’année scolaire 2014-2015 est
-        disponible <a href="http://microalg.info/rapport_2014-2015.html">ici</a>.</p>
-        <p>Le projet est jeune, mais toute demande de fonctionnalité sera
-        étudiée. N’hésitez pas à en proposer
-        <a href="mailto:microalg.info@gmail.com">par email</a>. Aussi, les
-        <a href="doc.html#contribuer">contributeurs de tous horizons</a>
-        seront les bienvenus ! Vous pouvez aider ! Même en tant que simple
-        testeur ! En effet, ce sont vos critiques et vos idées qui donneront à
-        MicroAlg sa forme la plus harmonieuse.</p>
-        <h2>Dans le navigateur</h2>
-        <p>Une des forces de MicroAlg est qu’elle est utilisable
-        <strong>dans un navigateur</strong>. En voici la preuve :</p>
-        <div class="microalg">
+      </div>
+    </section>
+    <div class="navbar-spacer"></div>
+    <nav class="navbar">
+      <div class="container">
+        <ul class="navbar-list">
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#introNavPopover">Intro</a>
+            <div id="introNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="#quoi">Qu’est-ce ?</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#qui">Pour qui ?</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#caracs">Caractéristiques</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#jeunesse">Jeunesse</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#contact">Contact</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#docsNavPopover">Docs</a>
+            <div id="docsNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">Installation</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="doc.html#syntaxe">Syntaxe</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="doc.html#listedessymbolesprdfinis">Liste des symboles</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="doc.html#limitations">Limitations</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="doc.html#erreursfrquentes">Erreurs fréquentes</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="doc.html">Toute la doc<a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#vidsNavPopover">Videos</a>
+            <div id="vidsNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="#video-galerie">Galerie</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#video-scite">Éditeur</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li class="navbar-item">
+            <a class="navbar-link" href="#" data-popover="#exNavPopover">Exemples</a>
+            <div id="exNavPopover" class="popover">
+              <ul class="popover-list">
+                <li class="popover-item">
+                  <a class="popover-link" href="#exemple-blocs">Blocs</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#exemple-algues">Algues</a>
+                </li>
+                <li class="popover-item">
+                  <a class="popover-link" href="#exemple-tortue">Tortue</a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="docs-section" id="quoi">
+      <h6 class="docs-header">Qu’est-ce que MicroAlg ?</h6>
+      <p><strong><em>MicroAlg</em></strong> est un langage de programmation
+      <strong>en français</strong> dédié à l’algorithmique et à son
+      enseignement. <strong>Simple</strong> (des parenthèses et des guillemets
+      pour seuls caractères spéciaux), elle offre un cadre
+      <strong>rigoureux</strong> pour l’apprentissage des concepts les plus
+      importants de
+      <a href="http://fr.wikipedia.org/wiki/Algorithmique" class="wp">l’algorithmique</a> et de la
+      <a href="http://fr.wikipedia.org/wiki/Programmation_imp%C3%A9rative" class="wp">programmation impérative</a>.</p>
+      <p>Une des forces de MicroAlg est qu’elle est utilisable
+      <strong>dans un navigateur</strong>. En voici la preuve :</p>
+      <div class="microalg">
         <div id="script-si-majeur-mineur"></div>
-        <script>inject_microalg_editor_in('script-si-majeur-mineur', {src:
-            '(Afficher "Quel âge as-tu ?")\n' +
-            '(Si (< (Nombre (Demander)) 18)\n' +
-            ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
-            ' Sinon (Afficher "Tu prétends être majeur.")\n' +
-            ')'});
-        </script>
-        </div>
-        <p>Cliquer sur <code>OK</code> après avoir éventuellement modifié le code.<br>
-        Il est aussi possible de programmer avec des blocs ou des briques (voir
-        <a href="#blocs">plus bas sur cette page</a>).</p>
-        <h2 id="caracs">Principales caractéristiques</h2>
-        <ul>
-        <li>Une <a href="doc.html#syntaxe">syntaxe</a> simplissime et universelle,
-            qui s’appuie sur la notation polonaise<br>
-            <code>(commande argument1 argument2 …)</code>.<br>
-            Le revers de la médaille étant le fait que <code>2x+1</code> doit être écrit<br>
-            <code>(+ (* 2 x) 1)</code>,<br>
-            notation que certains considèrent comme très intéressante.</li>
-        <li>Des <a href="doc.html#listedessymbolesprdfinis">mots-clés en
-            français</a> et en nombre réduit.</li>
-        <li>Différentes <a href="doc.html#architecture">plateformes d’exécution</a>,
-            dont Javascript (donc le navigateur), Java et C.</li>
-        <li>Une <a href="http://galerie.microalg.info">galerie</a> permettant
-            aux enseignants de construire des documents et aux apprenants de
-            publier leur travail.
-            Voir <a href="#video-galerie">la video explicative</a>.</li>
-        <li>La possibilité de programmer en déplaçant
-            <a href="doc.html#blockly">des blocs</a> (ou briques),
-            sachant que les commandes utilisées avec la programmation textuelle
-            ou par blocs sont exactement les mêmes. Voir
-            <a href="#blocs">la démo plus bas sur cette page</a>
-            ou <a href="tuto_blocs.html">le tutoriel par blocs</a>.</li>
-        <li>Une <a href="doc.html#sortiegraphique">sortie graphique</a>
-            permettant de dessiner des formes géométrique. Voir
-            <a href="#algues">les algues</a> ou
-            <a href="#tortue">la tortue</a>
-            plus bas sur cette page, ou même
-            <a href="tuto_graphique.html">le tutoriel graphique</a>.</li>
-        <li>Une <a href="doc.html#scite">intégration avec l’éditeur de texte
-            SciTE</a> très complète (une touche pour exécuter, coloration des
-            parenthèses, aide en ligne sur MicroAlg, auto-complétion,
-            abbréviations…).
-            Voir <a href="#video-scite">la video explicative</a>.</li>
-        <li>De quoi <a href="http://galerie.microalg.info/profgra:tests:exemples_testables">spécifier
-            et vérifier</a> des jeux de test depuis le langage.</li>
-        <li>Un mécanisme <a href="http://galerie.microalg.info/profgra:tests:credit_iterations">
-            limitant les boucles infinies</a>.</li>
-        <li>Des tirages pseudo-aléatoires
-            <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
-               class="wp">reproductibles</a>
-            (voir la documentation de la commande
-            <a href="doc.html#sym-Initialiser@"><code>Initialiser@</code></a>).</li>
-        <li>Une <a href="doc.html#feuillederoute">feuille de route</a>
-            ambitieuse…</li>
-        </ul>
-        <p>Autres petits « trucs » à savoir ou rappels :</p>
-        <div id="tip"></div>
-        <p>Le mieux pour se faire un avis sur le langage est de suivre
-        <a href="tuto_blocs.html">le tutoriel</a>.
-        <h2>Interfaces</h2>
-        <p><em>MicroAlg</em> s’interface avec:</p>
-        <ul>
-            <li>l’éditeur <a href="http://www.scintilla.org/SciTE.html" class="offi">SciTE</a>
-                pour pouvoir travailler avec des fichiers (voir les
-                <a href="doc.html#scite">instructions pour l’utilisation</a>) ;</li>
-            <li><a href="doc.html#blockly">Blockly</a>,
-                pour pouvoir programmer avec des blocs, comme un puzzle
-                (voir <a href="#script-un-de-plus">plus bas sur cette page</a>
-                ou <a href="tuto_blocs.html">le tutoriel interactif</a>) ;</li>
-            <li>n’importe quel site web, via Javascript, ce qui permet de
-                produire facilement des documents incluant des échantillons
-                interactifs, comme <a href="tuto.html">le tutoriel</a> ou la
-                <a href="http://galerie.microalg.info">la galerie</a>.</li>
-        </ul>
-        <iframe id="video-galerie" width="630" height="472" frameborder="0"
-            src="https://www.youtube.com/embed/087ZcOumd5w" allowfullscreen>
-        </iframe>
-        <iframe id="video-scite" width="630" height="472" frameborder="0"
-            src="https://www.youtube.com/embed/lFMzzvZgvo4" allowfullscreen>
-        </iframe>
-        <p><em>MicroAlg</em> s’interfacera avec :</p>
-        <ul>
-            <li><a href="http://www.geogebra.org/cms/fr/" class="offi">GeoGebra</a>, pour
-                manipuler des courbes, des figures géométriques dynamiques, et
-                même une tortue afin d’imiter une partie du célèbre langage
-                <a href="http://fr.wikipedia.org/wiki/Logo_%28langage%29" class="wp">Logo</a> ;</li>
-            <li>d’autres outils de visualisation des résultats, comme
-                <a href="http://processing.org/" class="offi">Processing</a> et
-                <a href="http://processingjs.org/" class="offi">Processing JS</a>,
-                des moteurs de jeu, des moteurs de simulation du monde physique…</li>
-            <li>du matériel ou des robots, comme par exemple :
-                <a href="https://play.google.com/store/apps/details?id=info.microalg.android"
-                   style="float:right;">
-                  <img alt="Dispo sur Google Play."
-                       src="https://developer.android.com/images/brand/fr_generic_rgb_wo_45.png" />
-                </a>
-                <ul>
-                    <li><a href="http://www.librecalc.com/" class="offi">LibreCalc</a>,
-                        une calculatrice libre en cours de développement ;</li>
-                    <li>les <a href="http://fr.wikipedia.org/wiki/Lego_Mindstorms" class="wp">LEGO Mindstorms</a> ;</li>
-                    <li>la mini-console de jeux <a href="http://gamebuino.com/" class="offi">GAMEBUINO</a> ;</li>
-                    <li>le système <a href="http://fr.wikipedia.org/wiki/Android" class="wp">Android</a>,
-                        pour lequel il y a déjà
-                        <a href="https://play.google.com/store/apps/details?id=info.microalg.android"
-                           target="_blank">un embryon d’application</a> ;</li>
-                    <li>insérez votre suggestion ici ! (ou plutôt
-                        <a href="mailto:profgra.org@gmail.com">par email</a>).</li>
-                </ul>
-            </li>
-        </ul>
-        <p>Sa bidouillabilité (<a href="http://fr.wikipedia.org/wiki/Bidouillabilit%C3%A9" class="wp">au sens noble !</a>)
-        permet à d’autres enseignants et/ou développeurs de créer d’autres
-        documents pédagogiques ou d’autres interfaces. Voir pour cela
-        <a href="doc.html#architecture">la section « architecture »</a> de la
-        documentation.</p>
-        <h2 id="blocs">Blocs</h2>
-        <div class="microalg">
-        <div id="script-un-de-plus"></div>
-        <script>inject_microalg_editor_in('script-un-de-plus', {
-         blockly: true,
-         src:
-            '(!!! "Bouger les blocs pour voir le code se mettre à jour.")\n' +
-            '(Afficher "Veuillez entrer un nombre.")\n' +
-            '(Afficher\n' +
-            '    (Concatener\n' +
-            '        "Un de plus: "\n' +
-            '        (Texte (+ 1 (Nombre (Demander))))\n' +
-            '    )\n' +
-            ')'});
-        </script>
-        <h2>Sortie visuelle</h2>
-        <h3 id="algues">Algues</h3>
-        <p>Les algues peuvent mettre plusieurs secondes à s’afficher. À
-        chaque appui sur <code>OK</code>, une série différente sera générée.<p>
-        <div class="microalg">
-        <div id="script-algues"></div>
-        <script>inject_microalg_editor_in('script-algues', {
-         processing: true,
-         src:
-            '(RAZ)\n' +
-            '(Initialiser@)\n' +
-            '(Epaisseur 2)\n' +
-            '(Remplissage (Liste 255 255 255))\n' +
-            '(Initialiser n 1)\n' +
-            '(Initialiser x 0)\n' +
-            '(Tant_que (<= n 5)\n' +
-            ' Faire\n' +
-            '    (Affecter_a credit_iterations 300)\n' +
-            '    (Affecter_a x (+ (* n 50) 150))\n' +
-            '    (Initialiser y 200)\n' +
-            '    (Initialiser r 25)\n' +
-            '    (Initialiser decalage 0)\n' +
-            '    (Tant_que (>= r 4)\n' +
-            '     Faire\n' +
-            '        (Contour (Liste (Entier@ 0 255) (Entier@ 0 255) (Entier@ 0 255)))\n' +
-            '        (Cercle (Liste x y) r)\n' +
-            '        (Affecter_a decalage (+ decalage (Entier@ -1 1)))\n' +
-            '        (Si (< decalage -2) Alors\n' +
-            '            (Affecter_a decalage -2)\n' +
-            '        )\n' +
-            '        (Si (> decalage 2) Alors\n' +
-            '             (Affecter_a decalage -2)\n' +
-            '        )\n' +
-            '        (Affecter_a x (+ x decalage))\n' +
-            '        (Affecter_a y (+ y 2))\n' +
-            '        (Si (= 1 (Entier@ 1 6)) Alors\n' +
-            '            (Affecter_a r (- r 2))\n' +
-            '        )\n' +
-            '    )\n' +
-            '    (Affecter_a n (+ n 1))\n' +
-            ')'});
-        </script>
-        <h3 id="tortue">Tortue</h3>
-        <p>Appuyer plusieurs fois sur <code>OK</code> pour voir se dessiner
-        une étoile.</p>
-        <div id="script-tortue"></div>
-        <script>inject_microalg_editor_in('script-tortue', {
-         processing: true,
-         src:
-            '(AV 60)\n' +
-            '(TD 120)\n' +
-            '(AV 30)\n' +
-            '(LC)\n' +
-            '(AV 60)\n' +
-            '(TG 23)\n' +
-            '(BC)'});
-        </script>
-        </div>
-        </div>
-        </article>
       </div>
     </div>
-    <footer>
-      <div class="owner">
 
+    <div class="docs-section" id="qui">
+      <h6 class="docs-header">À qui s’adresse MicroAlg ?</h6>
+      <p>Le langage en lui-même s’adresse à des enseignants, ou même d’autres
+      personnes, qui voudraient intégrer à leur pratique un langage de
+      programmation simple.</p>
+      <p>De plus, ce site propose <a href="tuto_blocs.html">des tutoriels</a>
+      pour apprendre le langage. Ils permettent à n’importe qui d’apprendre
+      les bases de l’algorithmique (un niveau minimum de lecture et de patience
+      étant requis). Si les tutoriels ne vous conviennent pas, vous pouvez
+      créer vos propres pages dans la
+      <a href="http://galerie.microalg.info">galerie</a>,
+      voire intégrer MicroAlg à votre propre site en suivant les
+      <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">instructions d’installation</a>.</p>
+    </div>
+
+    <div class="docs-section" id="caracs">
+      <h6 class="docs-header">Principales caractéristiques</h6>
+      <ul>
+      <li>Une <a href="doc.html#syntaxe">syntaxe</a> simplissime et universelle,
+          qui s’appuie sur la notation polonaise
+          <code>(commande argument1 argument2 …)</code>.<br>
+          Le revers de la médaille étant le fait que <code>2x+1</code> doit
+          être écrit <code>(+ (* 2 x) 1)</code>,<br>
+          notation que certains considèrent comme très intéressante.</li>
+      <li>Des <a href="doc.html#listedessymbolesprdfinis">mots-clés</a> en
+          français et en nombre réduit.</li>
+      <li>La possibilité de programmer en déplaçant
+          <a href="doc.html#blockly">des blocs</a> (ou briques),
+          sachant que les commandes utilisées avec la programmation textuelle
+          ou par blocs sont exactement les mêmes. Voir
+          <a href="#exemple-blocs">la démo plus bas sur cette page</a>
+          ou <a href="tuto_blocs.html">le tutoriel par blocs</a>.</li>
+      <li>Différentes <a href="doc.html#architecture">plateformes d’exécution</a>,
+          dont Javascript (donc le navigateur), Java et C.</li>
+      <li>Une <a href="http://galerie.microalg.info">galerie</a> permettant
+          aux enseignants de construire des documents et aux apprenants de
+          publier leur travail.</li>
+      <li>Une <a href="doc.html#sortiegraphique">sortie graphique</a>
+          permettant de dessiner des formes géométrique. Voir
+          <a href="#exemple-algues">les algues</a> ou
+          <a href="#exemple-tortue">la tortue</a>
+          plus bas sur cette page, ou même
+          <a href="tuto_graphique.html">le tutoriel graphique</a>.</li>
+      <li>Une <a href="doc.html#scite">intégration avec l’éditeur de texte
+          SciTE</a> très complète (une touche pour exécuter, coloration des
+          parenthèses, aide en ligne sur MicroAlg, auto-complétion,
+          abbréviations…).</li>
+      <li>De quoi <a href="http://galerie.microalg.info/profgra:tests:exemples_testables">spécifier
+          et vérifier</a> des jeux de test depuis le langage.</li>
+      <li>Un mécanisme <a href="http://galerie.microalg.info/profgra:tests:credit_iterations">
+          limitant les boucles infinies</a>.</li>
+      <li>Des tirages pseudo-aléatoires
+          <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
+             class="wp">reproductibles</a>
+          (voir la documentation de la commande
+          <a href="doc.html#sym-Initialiser@"><code>Initialiser@</code></a>).</li>
+      <li>Une <a href="doc.html#feuillederoute">feuille de route</a>
+          ambitieuse…</li>
+      </ul>
+      <p>Autres petits « trucs » à savoir ou rappels :</p>
+      <div id="tip"></div>
+    </div>
+
+    <div class="docs-section" id="jeunesse">
+      <h6 class="docs-header">Jeunesse</h6>
+      <p>MicroAlg est encore assez jeune, son développement ayant seulement
+      commencé fin mars 2014. Elle est tout de même déjà utilisable, même si
+      elle possède encore
+      <a href="doc.html#limitations">quelques limitations</a>.
+      Un brouillon de rapport d’utilisation pour l’année scolaire 2014-2015 est
+      disponible <a href="http://microalg.info/rapport_2014-2015.html">ici</a>.</p>
+      <p>Le projet est jeune, mais toute demande de fonctionnalité sera
+      étudiée. N’hésitez pas à en proposer
+      <a href="mailto:microalg.info@gmail.com">par email</a>. Aussi, les
+      <a href="doc.html#contribuer">contributeurs de tous horizons</a>
+      seront les bienvenus ! Vous pouvez aider ! Même en tant que simple
+      testeur ! En effet, ce sont vos critiques et vos idées qui donneront à
+      MicroAlg sa forme la plus harmonieuse.</p>
+    </div>
+
+    <div class="docs-section" id="contact">
+      <h6 class="docs-header">Contact</h6>
       <p>
-      Microalg a un compte Twitter&nbsp;: <a target="_blank" href="https://twitter.com/microalg">@microalg</a><br />
-      et une adresse email&nbsp;: <a href="mailto:microalg.info@gmail.com">microalg.info@gmail.com</a>.<br />
-      Son créateur aussi&nbsp;: <a target="_blank" href="https://twitter.com/profgraorg">@profgraorg</a>
-      et <a href="mailto:profgra.org@gmail.com">profgra.org@gmail.com</a>.<br />
-      Pour une liste des changements de ce site, consulter <a href="https://github.com/Microalg/microalg.github.io/commits/master">cette page</a>.
-      <!-- https://api.github.com/repos/Microalg/microalg.github.io/commits?sha=master -->
+      Microalg a un compte Twitter&nbsp;:
+      <a target="_blank" href="https://twitter.com/microalg">@microalg</a>
+      et une adresse email&nbsp;:
+      <a href="mailto:microalg.info@gmail.com">microalg.info@gmail.com</a>.
+      <br>
+      Son créateur aussi&nbsp;:
+      <a target="_blank" href="https://twitter.com/profgraorg">@profgraorg</a>
+      et <a href="mailto:profgra.org@gmail.com">profgra.org@gmail.com</a>.
       </p>
+    </div>
 
+    <div class="docs-section" id="videos">
+      <h6 class="docs-header">Vidéos</h6>
+      <div class="row">
+        <div class="six columns">
+          <iframe id="video-galerie" frameborder="1" allowfullscreen
+             src="https://www.youtube.com/embed/087ZcOumd5w">
+          </iframe>
+        </div>
+        <div class="six columns">
+          <p><strong>Présentation de la galerie</strong>. D’une part,
+          parcourir la galerie est intéressant car elle propose des contenus
+          divers et variés. Et d’autre part, elle permet à des enseignants
+          ou des apprenants de publier des contenus. Cette vidéo explique,
+          entre autres choses, comment créer une page.</p>
+        </div>
       </div>
-      <div class="creds">
-          <small>Thème basé sur le travail de <a href="https://twitter.com/jonrohan/">Jon Rohan</a><br/>
-          pour un thème de <a href="http://pages.github.com/">GitHub Pages</a><br/></small>
+      <div class="row">
+        <div class="six columns">
+          <iframe id="video-scite" frameborder="1" allowfullscreen
+             src="https://www.youtube.com/embed/lFMzzvZgvo4">
+          </iframe>
+        </div>
+        <div class="six columns">
+          <p><strong>Présentation de l’éditeur</strong>. MicroAlg a choisi
+          SciTE, un éditeur de texte simple mais puissant, pour taper du
+          code puis l’exécuter. Cette vidéo explique comment installer puis
+          utiliser cet éditeur.</p>
+        </div>
       </div>
-    </footer>
+    </div>
+
+    <div class="docs-section" id="exemple-blocs">
+      <h6 class="docs-header">Exemple : Blocs</h6>
+      <div class="microalg" id="script-un-de-plus"></div>
+    </div>
+    <div class="docs-section" id="exemple-algues">
+      <h6 class="docs-header">Exemple : Algues</h6>
+      <p>La génération des algues peut prendre quelques secondes.</p>
+      <div class="microalg" id="script-algues"></div>
+    </div>
+    <div class="docs-section" id="exemple-tortue">
+      <h6 class="docs-header">Exemple : Tortue</h6>
+      <p>Appuyer plusieurs fois sur <code>OK</code> pour voir se dessiner
+      une étoile.</p>
+      <div class="microalg" id="script-tortue"></div>
+    </div>
+
+    <div class="docs-section" id="infos">
+      <h6 class="docs-header">Infos sur ce site</h6>
+      <p>
+        Site maintenu par le créateur de MicroAlg&nbsp;:
+        <a target="_blank" href="https://twitter.com/profgraorg">@profgraorg</a>
+        et <a href="mailto:profgra.org@gmail.com">profgra.org@gmail.com</a>.
+        <br>
+        Pour une liste des changements de ce site, consulter <a href="https://github.com/Microalg/microalg.github.io/commits/master">cette page</a>.
+        <br>
+        Thème basé sur
+        <a target="_blank" href="http://getskeleton.com">Skeleton</a>.
+        <br>
+        Pièces de puzzle dessinées grâce à
+        <a target="_blank" href="https://github.com/Neon22/inkscape-jigsaw/">ce
+        plugin Inkscape</a>.
+      </p>
+    </div>
   </div>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="js/site.js"></script>
+  <script src="emulisp/int.js"></script>
+  <script src="emulisp/emulisp_core.js"></script>
+  <script src="web/ide_injections.js"></script>
+  <script src="web/parenedit.js"></script>
+  <script src="web/showdown.js"></script>
+  <script src="web/tipofthemoment.js"></script>
+
+  <script>inject_microalg_editor_in('script-si-majeur-mineur', {src:
+      '(Afficher "Quel âge as-tu ?")\n' +
+      '(Si (< (Nombre (Demander)) 18)\n' +
+      ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
+      ' Sinon (Afficher "Tu prétends être majeur.")\n' +
+      ')'});
+  </script>
+
+  <script>inject_microalg_editor_in('script-un-de-plus', {
+   blockly: true,
+   src:
+      '(!!! "Bouger les blocs pour voir le code se mettre à jour.")\n' +
+      '(Afficher "Veuillez entrer un nombre.")\n' +
+      '(Afficher\n' +
+      '    (Concatener\n' +
+      '        "Un de plus: "\n' +
+      '        (Texte (+ 1 (Nombre (Demander))))\n' +
+      '    )\n' +
+      ')'});
+  </script>
+  <script>inject_microalg_editor_in('script-tortue', {
+   processing: true,
+   src:
+      '(AV 60)\n' +
+      '(TD 120)\n' +
+      '(AV 30)\n' +
+      '(LC)\n' +
+      '(AV 60)\n' +
+      '(TG 23)\n' +
+      '(BC)'});
+  </script>
+
+  <script>inject_microalg_editor_in('script-algues', {
+   processing: true,
+   src:
+      '(RAZ)\n' +
+      '(Initialiser@)\n' +
+      '(Epaisseur 2)\n' +
+      '(Remplissage (Liste 255 255 255))\n' +
+      '(Initialiser n 1)\n' +
+      '(Initialiser x 0)\n' +
+      '(Tant_que (<= n 5)\n' +
+      ' Faire\n' +
+      '    (Affecter_a credit_iterations 300)\n' +
+      '    (Affecter_a x (+ (* n 50) 150))\n' +
+      '    (Initialiser y 200)\n' +
+      '    (Initialiser r 25)\n' +
+      '    (Initialiser decalage 0)\n' +
+      '    (Tant_que (>= r 4)\n' +
+      '     Faire\n' +
+      '        (Contour (Liste (Entier@ 0 255) (Entier@ 0 255) (Entier@ 0 255)))\n' +
+      '        (Cercle (Liste x y) r)\n' +
+      '        (Affecter_a decalage (+ decalage (Entier@ -1 1)))\n' +
+      '        (Si (< decalage -2) Alors\n' +
+      '            (Affecter_a decalage -2)\n' +
+      '        )\n' +
+      '        (Si (> decalage 2) Alors\n' +
+      '             (Affecter_a decalage -2)\n' +
+      '        )\n' +
+      '        (Affecter_a x (+ x decalage))\n' +
+      '        (Affecter_a y (+ y 2))\n' +
+      '        (Si (= 1 (Entier@ 1 6)) Alors\n' +
+      '            (Affecter_a r (- r 2))\n' +
+      '        )\n' +
+      '    )\n' +
+      '    (Affecter_a n (+ n 1))\n' +
+      ')'});
+  </script>
+
   <script type="text/javascript">
-      var $_Tawk_API={},$_Tawk_LoadStart=new Date();
-      (function(){
-          var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-          s1.async=true;
-          s1.src='https://embed.tawk.to/5583e0d1cea5d22b4acfee51/default';
-          s1.charset='UTF-8';
-          s1.setAttribute('crossorigin','*');
-          s0.parentNode.insertBefore(s1,s0);
-      })();
+    var $_Tawk_API={},$_Tawk_LoadStart=new Date();
+    (function(){
+      var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+      s1.async=true;
+      s1.src='https://embed.tawk.to/5583e0d1cea5d22b4acfee51/default';
+      s1.charset='UTF-8';
+      s1.setAttribute('crossorigin','*');
+      s0.parentNode.insertBefore(s1,s0);
+    })();
   </script>
 </body>
 </html>
