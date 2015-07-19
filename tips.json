@@ -6,6 +6,7 @@
 "Que ce soit dans un navigateur ou dans l’éditeur de fichiers, <code>CTRL</code>+<code>B</code> permet de compléter une abbréviation, comme <code>(A</code> pour <code>(Afficher</code>. Voir la liste des abbréviations <a href=\"http://microalg.info/doc.html#abbrviations\">ici</a>.",
 "MicroAlg se considère comme du pseudo-code exécutable.",
 "MicroAlg est fière d’être considérée comme un Lisp pour enfants.",
+"« MicroAlg est une invitation à visiter un univers. » -- Frédéric Drouillon (<a href=\"http://www.editions-eni.fr/livres/du-c-au-c-de-la-programmation-procedurale-a-l-objet-2ieme-edition/.3b73c22073b59260f1fe26fad4b8dfd9.html\">un livre</a>, <a href=\"http://www.editions-eni.fr/livres/allegro-5-programmation-de-jeux-en-c-ou-c/.9c142c2fe99964a514b61603f5060361.html\">un autre</a>)",
 "Une remarque&nbsp;? Une question&nbsp;? <a href=\"mailto:microalg.info@gmail.com\">Envoyez un email</a>&nbsp;!!!!",
 "Voilà, c’était le dernier truc à savoir."
 ]
