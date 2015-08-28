@@ -16,6 +16,8 @@
     <script type="text/javascript" src="web/parenedit.js"></script>
     <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
     <script src="web/showdown.js"></script>
+    <script src="web/svg-tree-drawer/svg-tree-drawer.js"></script>
+    <link href="web/css-ninja-tree/css-ninja-tree.css" rel="stylesheet"/>
     <script src="web/showup.js"></script>
     <link type="text/css" href="web/showup.css" rel="stylesheet" />
     <link rel="icon" href="visuels/logo_microalg.ico" />
@@ -217,7 +219,8 @@
     <div id="script-parens-seules"></div>
     <script>inject_microalg_editor_in('script-parens-seules', {
      src:
-        '(!!! "Remarque : ce programme est joli, mais il n’est pas valide.")\n' +
+        '(!!! "Remarque : Ce programme est joli, mais il n’est pas valide.")\n' +
+        '(!!! "           Ne pas chercher à comprendre le message d’erreur.")\n' +
         '((((((( )))))))\n' +
         '((((((( ) ) ) ) ) ) )\n' +
         '(((((((  )  )  )  )  )  )  )'
@@ -283,8 +286,8 @@
     });</script>
     <p>Notez que, comme en maths, les commandes qui sont
     « les plus à l’intérieur des parenthèses » seront exécutées en premier, en
-    commençant par la gauche (nous allons le vérifier dans la section
-    suivante).</p>
+    commençant par la gauche (nous allons le vérifier
+    <a href="#verif-exec-gauche-droite">plus loin</a>).</p>
 
     <h2 id="nbres-pseudo-aleatoires"><a href="#nbres-pseudo-aleatoires">: </a>Nombres pseudo-aléatoires</h2>
     <p>Il est possible d’obtenir un nombre entier
@@ -295,25 +298,44 @@
     <div id="script-nbres-pseudo-aleatoires"></div>
     <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires', {
      src:
-        '(Initialiser@)\n' +
         '(Afficher (Entier@ 1900 2015))'
     });</script>
     <p>Comment changer ce programme pour simuler un dé à six faces ?</p>
-    <p><strong>Note</strong> : sans la commande <code>Initialiser@</code>,
+    <p><strong>Utilisation avancée</strong> : si vous n’avez pas besoin de
+    <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
+    class="wp">reproductibilité</a> (le fait de pouvoir obtenir à nouveau
+    certaines séquences de tirages), vous pouvez passer directement à
+    <a href="#demander">la section suivante</a>).</p>
+    <p>Il est possible de contrôler les tirages de deux façons : avec la
+    commande <code>Initialiser@</code> et avec la variable spéciale
+    <code>sequence_tirages@</code>.</p>
+    <p>La commande <code>Initialiser@</code> permet de contrôler l’état
+    initial du générateur de nombres pseudo-aléatoires. Grâce à elle,
     un même programme donnera toujours les mêmes tirages. Ce n’est bien sûr pas
     souhaitable pour un jeu de hasard comme un jeu de cartes. Néanmoins, pour
-    certaines applications artistiques ou scientifiques, la
-    <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
-    class="wp">reproductibilité</a> (le fait de pouvoir garder certaines
-    séquences de tirages) peut être intéressante. On peut par exemple vouloir
+    certaines applications artistiques ou scientifiques, cette reproductibilité
+    peut être intéressante. On peut par exemple vouloir
     générer un même labyrinthe pour tous les joueurs, on peut vouloir vérifier
     si un programme est correct en comparant avec un autre que l’on sait être
     correct…</p>
     <p>Voici par exemple un programme qui affichera toujours les mêmes cinq
-    tirages (1975, 1946, 2005, 1940 et 1955) :</p>
+    tirages (1984, 1932, 1967, 2000 et 1957) :</p>
     <div id="script-nbres-pseudo-aleatoires-init"></div>
     <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-init', {
      src:
+        '(Initialiser@ 0)\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        ''
+    });</script>
+    <p>Celui-ci affichera toujours 1969, 1921, 1987, 1941 et 1950 :</p>
+    <div id="script-nbres-pseudo-aleatoires-init2"></div>
+    <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-init2', {
+     src:
+        '(Initialiser@ 1)\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
@@ -322,12 +344,15 @@
         ''
     });</script>
     <p>Il est même possible de fournir une séquence de nombres entiers qui
-    sera utilisée pour les tirages (les commandes
-    <code>Affecter_a</code> et <code>Liste</code> seront vues plus loin).</p>
+    sera utilisée pour les tirages, en boucle. Les commandes
+    <code>Affecter_a</code> et <code>Liste</code> seront vues plus loin.</p>
     <div id="script-nbres-pseudo-aleatoires-seq"></div>
     <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-seq', {
      src:
         '(Affecter_a sequence_tirages@ (Liste 1 3 5 7 9))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
         '(Afficher (Entier@ 1 10))\n' +
         '(Afficher (Entier@ 1 10))\n' +
         '(Afficher (Entier@ 1 10))\n' +
@@ -389,6 +414,7 @@
         '          )\n' +
         ')'
     });</script>
+    <div id="verif-exec-gauche-droite"></div>
     <p>Comme promis, une vérification que, pour des instructions situées au
     même niveau, l’exécution se fait bien de la gauche vers la droite ou du
     haut vers le bas :</p>
@@ -515,33 +541,25 @@
     <ul>
         <li><code>Type</code> qui retourne un texte en minuscule décrivant le
         type de la valeur,</li>
-        <li><code>Texte?</code> et <code>Nombre?</code>, qui nous
-        permettent de savoir si une valeur est d’un certain type,</li>
         <li><code>Texte</code> et <code>Nombre</code>, qui renvoient une
         nouvelle valeur, convertie avec le bon type.</li>
     </ul>
+    <p>Quelques exemples avec <code>Type</code> :</p>
     <div id="script-type"></div>
     <script>inject_microalg_editor_in('script-type', {
      src:
         '(Afficher (Type "Bonjour !"))\n' +
         '(Afficher (Type 12345))\n' +
+        '(Afficher (Type "12345"))\n' +
+        ''
+    });</script>
+    <p>Un exemple avec <code>Demander</code> :</p>
+    <div id="script-type-demander"></div>
+    <script>inject_microalg_editor_in('script-type-demander', {
+     src:
         '(Afficher "Veuillez taper n’importe quoi.")\n' +
         '(Afficher (Type (Demander)))\n' +
         ''
-    });</script>
-    <div id="script-texte"></div>
-    <script>inject_microalg_editor_in('script-texte', {
-     src:
-        '(Afficher (Texte? "2"))\n' +
-        '(Afficher (Texte? 2))\n' +
-        '(Afficher (Texte? (Texte 2)))'
-    });</script>
-    <div id="script-nombre"></div>
-    <script>inject_microalg_editor_in('script-nombre', {
-     src:
-        '(Afficher (Nombre? 2))\n' +
-        '(Afficher (Nombre? "2"))\n' +
-        '(Afficher (Nombre? (Nombre "2")))'
     });</script>
     <p>Pour demander un nombre avec lequel faire un calcul, il faut donc
     utiliser une combinaison de <code>Demander</code> et de
@@ -584,21 +602,24 @@
     avec le nombre que l’utilisateur a tapé ».</p>
 
     <h2 id="booleens"><a href="#booleens">: </a>Calculs avec des booléens</h2>
-    <p>Les commandes <code>Texte?</code> et <code>Nombre?</code> de la section
-     précédente sont particulières car :</p>
+    <p>Dans certaines situations, comme les jeux, on peut avoir besoin de
+    <em>comparer</em> des valeurs. Par exemple, on peut vouloir tester :</p>
     <ul>
-        <li>elles se terminent par <code>?</code>,</li>
-        <li>elles retournent des valeurs spéciales : <code>Vrai</code> ou
-            <code>Faux</code>.</li>
+        <li>si le mot ou le nombre à deviner est le bon ;</li>
+        <li>si le temps écoulé n’a pas dépassé une certaine valeur ;</li>
+        <li>…</li>
     </ul>
-    <p>Ces valeurs spéciales <code>Vrai</code> et <code>Faux</code> sont d’un
+    <p>Il y a donc dans MicroAlg des commandes qui retournent des valeurs
+    spéciales : <code>Vrai</code> ou <code>Faux</code>, pour répondre à ces
+    questions. Ces valeurs <code>Vrai</code> et <code>Faux</code> sont d’un
     type nouveau. Ce ne sont ni des nombres ni du texte, mais des
     <em>booléens</em> (de <a href="http://fr.wikipedia.org/wiki/George_Boole"
     class="wp">George Boole</a>).
-    Un booléen ne peut avoir qu’une de ces deux valeurs.</p>
+    Un booléen ne peut avoir qu’une de ces deux valeurs <code>Vrai</code> ou
+    <code>Faux</code>, contrairement aux nombres et au textes qui peuvent
+    prendre (quasiment) une infinité de valeurs différentes.</p>
     <p>Les commandes qui retournent un booléen sont appelées des
-     <em>prédicats</em>. Les seuls prédicats de MicroAlg qui ne se terminent
-     pas par <code>?</code> sont :</p>
+    <em>prédicats</em>. En voici quelques-uns :</p>
     <ul>
         <li><code>=</code>, qui teste l’égalité de deux valeurs (c’est-à-dire
             retourne <code>Vrai</code> si les deux valeurs sont égales,
@@ -652,10 +673,10 @@
         '(Afficher (=/ "salut" "bonjour"))\n' +
         ''
     });</script>
-    <p>À vous maintenant de tester les comparaisons entre nombres ! Il y a
-    quatre commandes : <code>&lt;</code>, <code>&lt;=</code>,
+    <p>À vous maintenant d’explorer les comparaisons entre nombres ! Il y a
+    quatre commandes à tester : <code>&lt;</code>, <code>&lt;=</code>,
     <code>&gt;</code> et <code>&gt;=</code>, mais aussi différentes
-    combinaisons de nombres possibles.</p>
+    combinaisons de nombres à essayer.</p>
     <div id="script-predicats-comparaisons"></div>
     <script>inject_microalg_editor_in('script-predicats-comparaisons', {
      src:
@@ -817,12 +838,14 @@
         ')'
     });</script>
     <p>Voici une application concrète d’une structure avec des <code>Si</code>
-    emboîtés :</p>
+    emboîtés (<code>Declarer</code> et <code>Affecter_a</code> seront vues
+    en détail un peu plus loin) :</p>
     <div id="script-si-emboites-appli"></div>
     <script>inject_microalg_editor_in('script-si-emboites-appli', {
      src:
+        '(Declarer nombre De_type "nombre")\n' +
         '(Afficher "Veuillez taper un nombre.")\n' +
-        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Affecter_a nbre (Nombre (Demander)))\n' +
         '(Si (>= nbre 0)\n' +
         ' Alors (Si (>= nbre 1000)\n' +
         '        Alors (Afficher "Ce nombre est positif et assez grand.")\n' +
@@ -869,20 +892,20 @@
     </ul>
     <p>Pour pouvoir utiliser une variable avec MicroAlg, il faut :</p>
     <ol>
-        <li>tout d’abord <em>l’initialiser</em>, c’est-à-dire lui donner une
-            valeur de départ du bon type, en utilisant la commande
-            <code>Initialiser</code>,</li>
-        <li>puis ensuite, si cette variable n’est pas une constante du
-            programme, lui <em>affecter</em> une autre valeur, peut-être
-            plusieurs fois au cours du programme.</li>
+        <li>tout d’abord la <em>déclarer</em>, c’est-à-dire annoncer qu’on veut
+            l’utiliser et qu’elle aura un certain type, en utilisant la commande
+            <code>Declarer</code>,</li>
+        <li>lui <em>affecter</em> une valeur, peut-être plusieurs fois au cours
+            du programme, en utilisant la commande <code>Affecter_a</code>,</li>
+        <li><em>accéder</em> à sa valeur, simplement en donnant son nom dans une
+            instruction.</li>
     </ol>
-    <p>La valeur stockée dans la variable est accessible simplement en donnant
-    son nom dans une instruction. Voici quelques exemples :</p>
+    <p>Voici quelques exemples :</p>
     <div id="script-variable-texte"></div>
     <script>inject_microalg_editor_in('script-variable-texte', {
      src:
         '(!!! "`nom` est le nom de l’utilisateur")\n' +
-        '(Initialiser nom "pas de nom")\n' +
+        '(Declarer nom De_type "texte")\n' +
         '(Afficher "Quel est votre nom ?")\n' +
         '(Affecter_a nom (Demander))\n' +
         '(Afficher\n' +
@@ -902,7 +925,8 @@
     <div id="script-variable-nombre"></div>
     <script>inject_microalg_editor_in('script-variable-nombre', {
      src:
-        '(Initialiser x 0)\n' +
+        '(!!! "x est le nombre fourni par l’utilisateur")\n' +
+        '(Declarer x De_type "nombre")\n' +
         '(Afficher "Donnez une valeur à x, SVP.")\n' +
         '(Affecter_a x (Nombre (Demander)))\n' +
         '(Afficher\n' +
@@ -914,42 +938,34 @@
         ')\n' +
         '(Afficher (* x x))'
     });</script>
-    <p>Attention, les commandes <code>Initialiser</code> et
+    <p><strong>Attention</strong>, les commandes <code>Declarer</code> et
     <code>Affecter_a</code> effectuent des vérifications :</p>
     <ul>
-        <li><code>Initialiser</code>
+        <li><code>Declarer</code>
             <ul>
-                <li>ne peut ré-initialiser une variable qu’avec une valeur du
-                même type,</li>
+                <li>ne peut pas déclarer une même variable deux fois,</li>
+                <li>le type fourni :
+                    <ul>
+                        <li>est un texte et doit donc être entre guillemets,</li>
+                        <li>doit être un type existant, comme
+                          <code>"texte"</code>, <code>"nombre"</code>,
+                          <code>"booleen"</code>…</li>
+                    </ul>
+                </li>
             </ul>
         </li>
         <li><code>Affecter_a</code>
             <ul>
                 <li>ne peut pas changer la valeur d’une variable si cette
-                variable n’a pas été initialisée auparavant,</li>
+                variable n’a pas été déclarée auparavant,</li>
                 <li>ne peut pas changer le type d’une variable (la nouvelle
                 valeur doit être du même type que l’ancienne valeur).</li>
             </ul>
         </li>
     </ul>
-    <p>Pour rappel, nous connaissons pour l’instant trois types :</p>
-    <ul>
-        <li><code>texte</code>,</li>
-        <li><code>nombre</code>,</li>
-        <li><code>booléen</code>,</li>
-    </ul>
-    <p>et nous avons vu des commandes permettent de vérifier le type de
-    certaines valeurs, et d’autres d’effectuer des conversions :</p>
-    <div id="script-types-rappels"></div>
-    <script>inject_microalg_editor_in('script-types-rappels', {
-     src:
-        '(Afficher (Texte? "Bonjour !"))\n' +
-        '(Afficher (Nombre? 12345))\n' +
-        '(Afficher (Booleen? Vrai))\n' +
-        '(Afficher (Texte? (Texte 12345)))\n' +
-        '(Afficher (Nombre? (Nombre "12345")))\n' +
-        ''
-    });</script>
+    <p><strong>Astuce</strong> : Il est possible de déclarer plusieurs
+    variables en une seule instruction :<br>
+    <code>(Declarer var1 var2 var3 ... De_type "le_type")</code></p>
     <p><strong>Remarque</strong> : Il n’est pas interdit d’utiliser la valeur
     d’une variable dans une instruction qui sera affectée à cette même
     variable. C’est même parfois utile en vue d’<em>accumuler</em> des
@@ -963,7 +979,8 @@
     <div id="script-accu-nombres-ex"></div>
     <script>inject_microalg_editor_in('script-accu-nombres-ex', {
      src:
-        '(Initialiser valeur 0)\n' +
+        '(Declarer valeur De_type "nombre")\n' +
+        '(Affecter_a valeur 0)\n' +
         '(Affecter_a valeur (+ valeur 1))\n' +
         '(Afficher valeur)\n' +
         ''
@@ -976,7 +993,8 @@
     <div id="script-accu-textes-ex"></div>
     <script>inject_microalg_editor_in('script-accu-textes-ex', {
      src:
-        '(Initialiser texte "Bonjour")\n' +
+        '(Declarer texte De_type "texte")\n' +
+        '(Affecter_a texte "Bonjour")\n' +
         '(Affecter_a texte (Concatener texte " !"))\n' +
         '(Afficher texte)\n' +
         ''
@@ -986,7 +1004,8 @@
     <div id="script-accu-nombres"></div>
     <script>inject_microalg_editor_in('script-accu-nombres', {
      src:
-        '(Initialiser somme 0)\n' +
+        '(Declarer somme De_type "nombre")\n' +
+        '(Affecter_a somme 0)\n' +
         '(Afficher "Veuillez taper un nombre SVP.")\n' +
         '(Affecter_a somme (+ somme (Nombre (Demander))))\n' +
         '(Afficher "Veuillez en taper un autre.")\n' +
@@ -1001,7 +1020,8 @@
     <div id="script-accu-textes"></div>
     <script>inject_microalg_editor_in('script-accu-textes', {
      src:
-        '(Initialiser mots " ")\n' +
+        '(Declarer mots De_type "texte")\n' +
+        '(Affecter_a mots "")\n' +
         '(Afficher "Veuillez taper un mot SVP.")\n' +
         '(Affecter_a mots (Concatener mots (Demander)))\n' +
         '(Affecter_a mots (Concatener mots " "))\n' +
@@ -1021,7 +1041,8 @@
     <script>inject_microalg_editor_in('script-si-emboites-appli2', {
      src:
         '(Afficher "Veuillez taper un nombre.")\n' +
-        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Declarer nbre De_type "nombre")\n' +
+        '(Affecter_a nbre (Nombre (Demander)))\n' +
         '(Si (>= nbre 0)\n' +
         '    Alors (Si (>= nbre 1000)\n' +
         '              Alors (Afficher "Ce nombre est positif et assez grand.")\n' +
@@ -1040,7 +1061,8 @@
     <script>inject_microalg_editor_in('script-intervalle', {
      src:
         '(Afficher "Veuillez taper un nombre.")\n' +
-        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Declarer nbre De_type "nombre")\n' +
+        '(Affecter_a nbre (Nombre (Demander)))\n' +
         '(Si (Et (>= nbre 1) (<= nbre 6))\n' +
         '    Alors (Afficher "Ce nombre est compris entre 1 et 6.")\n' +
         '    Sinon (Afficher "Ce nombre est n’est pas compris entre 1 et 6.")\n' +
@@ -1060,18 +1082,18 @@
     <div id="script-operations-logiques"></div>
     <script>inject_microalg_editor_in('script-operations-logiques', {
      src:
-        '(Afficher (Concatener "`(Non Faux)` donne : " (Non Faux)))\n' +
-        '(Afficher (Concatener "`(Non Vrai)` donne : " (Non Vrai)))\n' +
+        '(Afficher (Concatener "`(Non Faux)` donne : " (Texte (Non Faux))))\n' +
+        '(Afficher (Concatener "`(Non Vrai)` donne : " (Texte (Non Vrai))))\n' +
         '(Afficher "")\n' +
-        '(Afficher (Concatener "`(Et Faux Faux)` donne : " (Et Faux Faux)))\n' +
-        '(Afficher (Concatener "`(Et Faux Vrai)` donne : " (Et Faux Vrai)))\n' +
-        '(Afficher (Concatener "`(Et Vrai Faux)` donne : " (Et Vrai Faux)))\n' +
-        '(Afficher (Concatener "`(Et Vrai Vrai)` donne : " (Et Vrai Vrai)))\n' +
+        '(Afficher (Concatener "`(Et Faux Faux)` donne : " (Texte (Et Faux Faux))))\n' +
+        '(Afficher (Concatener "`(Et Faux Vrai)` donne : " (Texte (Et Faux Vrai))))\n' +
+        '(Afficher (Concatener "`(Et Vrai Faux)` donne : " (Texte (Et Vrai Faux))))\n' +
+        '(Afficher (Concatener "`(Et Vrai Vrai)` donne : " (Texte (Et Vrai Vrai))))\n' +
         '(Afficher "")\n' +
-        '(Afficher (Concatener "`(Ou Faux Faux)` donne : " (Ou Faux Faux)))\n' +
-        '(Afficher (Concatener "`(Ou Faux Vrai)` donne : " (Ou Faux Vrai)))\n' +
-        '(Afficher (Concatener "`(Ou Vrai Faux)` donne : " (Ou Vrai Faux)))\n' +
-        '(Afficher (Concatener "`(Ou Vrai Vrai)` donne : " (Ou Vrai Vrai)))\n' +
+        '(Afficher (Concatener "`(Ou Faux Faux)` donne : " (Texte (Ou Faux Faux))))\n' +
+        '(Afficher (Concatener "`(Ou Faux Vrai)` donne : " (Texte (Ou Faux Vrai))))\n' +
+        '(Afficher (Concatener "`(Ou Vrai Faux)` donne : " (Texte (Ou Vrai Faux))))\n' +
+        '(Afficher (Concatener "`(Ou Vrai Vrai)` donne : " (Texte (Ou Vrai Vrai))))\n' +
         ''
     });</script>
 
@@ -1090,7 +1112,8 @@
         '(Afficher (Vide? ""))\n' +
         '\n' +
         '(!!! "Cela fonctionne aussi avec une variable contenant du texte.")\n' +
-        '(Initialiser txt "bonjour")\n' +
+        '(Declarer txt De_type "texte")\n' +
+        '(Affecter_a txt "bonjour")\n' +
         '(Afficher (Longueur txt))\n' +
         '(Afficher (Vide? txt))\n' +
         '(Affecter_a txt "")\n' +
@@ -1112,7 +1135,8 @@
         '(!!! "Essayez de modifier le code ci-dessus pour qu’il génère une erreur.")\n' +
         '\n' +
         '(!!! "Cela fonctionne aussi avec une variable contenant du texte.")\n' +
-        '(Initialiser txt "bonjour")\n' +
+        '(Declarer txt De_type "texte")\n' +
+        '(Affecter_a txt "bonjour")\n' +
         '(Afficher (Nieme txt 4))\n' +
         ''
     });</script>
@@ -1123,7 +1147,6 @@
     <div id="script-nieme-aleatoire"></div>
     <script>inject_microalg_editor_in('script-nieme-aleatoire', {
      src:
-        '(Initialiser@)\n' +
         '(Afficher (Nieme@ "salut"))\n' +
         ''
     });</script>
@@ -1151,7 +1174,8 @@
     <div id="script-faire-tq"></div>
     <script>inject_microalg_editor_in('script-faire-tq', {
      src:
-        '(Initialiser valeur 3)\n' +
+        '(Declarer valeur De_type "nombre")\n' +
+        '(Affecter_a valeur 3)\n' +
         '(Faire (Afficher valeur)\n' +
         '       (Affecter_a valeur (- valeur 1))\n' +
         ' Tant_que (=/ valeur 0)\n' +
@@ -1193,8 +1217,9 @@
     <div id="script-accu-nombres-tq"></div>
     <script>inject_microalg_editor_in('script-accu-nombres-tq', {
      src:
-        '(Initialiser somme 0)\n' +
-        '(Initialiser valeur 0)\n' +
+        '(Declarer somme valeur De_type "nombre")\n' +
+        '(Affecter_a somme 0)\n' +
+        '(Affecter_a valeur 0)\n' +
         '(Faire (Afficher "Veuillez taper un nombre SVP, 0 pour arrêter.")\n' +
         '       (Affecter_a valeur (Nombre (Demander)))\n' +
         '       (Affecter_a somme (+ somme valeur))\n' +
@@ -1208,8 +1233,9 @@
     <div id="script-accu-textes-tq"></div>
     <script>inject_microalg_editor_in('script-accu-textes-tq', {
      src:
-        '(Initialiser mots " ")\n' +
-        '(Initialiser mot " ")\n' +
+        '(Declarer mots mot De_type "texte")\n' +
+        '(Affecter_a mots "")\n' +
+        '(Affecter_a mot "")\n' +
         '(Faire (Afficher "Veuillez taper un mot SVP, STOP pour arrêter.")\n' +
         '       (Affecter_a mot (Demander))\n' +
         '       (Affecter_a mots (Concatener mots " " mot))\n' +
@@ -1234,7 +1260,8 @@
     <div id="script-tq-affichage"></div>
     <script>inject_microalg_editor_in('script-tq-affichage', {
      src:
-        '(Initialiser repetitions 0)\n' +
+        '(Declarer repetitions De_type "nombre")\n' +
+        '(Affecter_a repetitions)\n' +
         '(Afficher "Combien de fois voulez-vous afficher « Bonjour ! » ?")\n' +
         '(Affecter_a repetitions (Nombre (Demander)))\n' +
         '(Tant_que (=/ repetitions 0)\n' +
@@ -1284,8 +1311,19 @@
     caractères (où chaque maillon est un caractère).</p>
     <p>Comme les chaînes de caractères (ce qu’on appelle ici parfois le
     <em>texte</em> en MicroAlg), les listes sont numérotées à partir de 1 et
-    peuvent être passées aux commandes <code>Longueur</code>, <code>Nieme</code>,
-    <code>Nieme@</code>, <code>Tete</code> et <code>Queue</code>.</p>
+    peuvent être passées aux commandes
+    <code>Longueur</code>,
+    <code>Concatener</code>,
+    <code>Nieme</code>,
+    <code>Nieme@</code>,
+    <code>Tete</code> et <code>Queue</code>.</p>
+    <p>Voici quelques exemples utilisant la commande <code>Longueur</code>. Vous
+    noterez que :</p>
+    <ul>
+    <li>des valeurs de n’importe type peuvent être « rangées » dans une liste ;</li>
+    <li>les valeurs peuvent être de types différents ;
+    <li>une liste peut contenir d’autres listes !</li>
+    </ul>
     <div id="script-cmds-longueur"></div>
     <script>inject_microalg_editor_in('script-cmds-longueur', {
      src:
@@ -1294,8 +1332,32 @@
         '(Afficher (Longueur (Liste Vrai Faux Faux Faux Vrai)))\n' +
         '(Afficher (Longueur (Liste)))\n' +
         '(Afficher (Longueur (Liste "Je suis le seul élément.")))\n' +
-        '(Afficher (Longueur (Liste (Liste 2 4 6) (Liste 3 5 7))))\n' +
         '(Afficher (Longueur (Liste Vrai "avantage" 42)))\n' +
+        '(Afficher (Longueur (Liste (Liste 2 4 6) (Liste 3 5 7))))\n' +
+        ''
+    });</script>
+    <p>Voici quelques exemples utilisant la commande <code>Concatener</code> :</p>
+    <div id="script-cmds-concatener"></div>
+    <script>inject_microalg_editor_in('script-cmds-concatener', {
+     src:
+        '(Afficher (Concatener (Liste 1 3 5) (Liste 7 9 11)))\n' +
+        '(Afficher (Concatener (Liste "s") (Liste "a" "l") (Liste "u" "t")))\n' +
+        '(Afficher (Concatener (Liste "Je suis le seul élément.")))\n' +
+        '(Afficher (Concatener (Liste 1 3 5) (Liste)))\n' +
+        '(Afficher (Concatener (Liste 1 3 5) (Liste) (Liste)))\n' +
+        '(Afficher (Concatener (Liste) (Liste 1 3 5)))\n' +
+        '(Afficher (Concatener (Liste) (Liste 1 3 5) (Liste)))\n' +
+        '(Afficher (Concatener (Liste)))\n' +
+        ''
+    });</script>
+    <p>Attention, si on ne lui passe pas d’argument, la commande
+    <code>Concatener</code> retourne plutôt un texte vide qu’une liste vide :</p>
+    <div id="script-concatener-sans-arg"></div>
+    <script>inject_microalg_editor_in('script-concatener-sans-arg', {
+     src:
+        '(Afficher "Avant.")\n' +
+        '(Afficher (Concatener))\n' +
+        '(Afficher "Après.")\n' +
         ''
     });</script>
     <p><strong>Rappel</strong> : <code>Nieme</code> se prononce
@@ -1317,7 +1379,6 @@
     <div id="script-cmds-nieme-aleatoire"></div>
     <script>inject_microalg_editor_in('script-cmds-nieme-aleatoire', {
      src:
-        '(Initialiser@)\n' +
         '(Afficher (Nieme@ (Liste 1 3 5 7 9 11)))\n' +
         '(Afficher (Nieme@ (Liste "banane" "pomme" "fraise")))\n' +
         '(Afficher (Nieme@ (Liste Vrai Faux Faux Faux Vrai)))\n' +
@@ -1336,7 +1397,8 @@
     <div id="script-parcours"></div>
     <script>inject_microalg_editor_in('script-parcours', {
      src:
-        '(Initialiser index 1)\n' +
+        '(Declarer index De_type "nombre")\n' +
+        '(Affecter_a index 1)\n' +
         '(Tant_que (<= index 3)\n' +
         ' Faire\n' +
         '    (Afficher (Nieme (Liste "banane" "pomme" "fraise") index))\n' +
@@ -1351,8 +1413,8 @@
     <p>Une liste peut être stockée dans une variable. Le type correspondant est
     <code>"liste"</code>, quel que soit le type des valeurs contenues dans la
     liste, comme on peut le voir ci-dessous :</p>
-    <div id="script-type"></div>
-    <script>inject_microalg_editor_in('script-type', {
+    <div id="script-type-liste"></div>
+    <script>inject_microalg_editor_in('script-type-liste', {
      src:
         '(Afficher (Type (Liste 1 3 5 7 9 11)))\n' +
         '(Afficher (Type (Liste "banane" "pomme" "fraise")))\n' +
@@ -1368,8 +1430,10 @@
     <div id="script-parcours-affectation"></div>
     <script>inject_microalg_editor_in('script-parcours-affectation', {
      src:
-        '(Initialiser ma_liste (Liste 1 4 9 16 25))\n' +
-        '(Initialiser index 1)\n' +
+        '(Declarer ma_liste De_type "liste")\n' +
+        '(Affecter_a ma_liste (Liste 1 4 9 16 25))\n' +
+        '(Declarer index De_type "nombre")\n' +
+        '(Affecter_a index 1)\n' +
         '(Tant_que (<= index (Longueur ma_liste))\n' +
         ' Faire\n' +
         '    (Afficher (Nieme ma_liste index))\n' +
@@ -1426,6 +1490,7 @@
     <div id="script-demandernbre"></div>
     <script>inject_microalg_editor_in('script-demandernbre', {
      src:
+        '(Declarer x De_type "nombre")\n' +
         '(Definir (DemanderNbre)\n' +
         '    "Retourne le nombre tapé par l’utilisateur, ou `Rien` si\n' +
         '     l’utilisateur n’a pas tapé un nombre."\n' +
@@ -1436,7 +1501,7 @@
         '(!!! "Vérifions la valeur, mais surtout le type de la valeur retournée :")\n' +
         '\n' +
         '(Afficher "Veuillez taper un nombre.")\n' +
-        '(Initialiser x (DemanderNbre))\n' +
+        '(Affecter_a x (DemanderNbre))\n' +
         '(Afficher x)\n' +
         '(Afficher (Type x))\n' +
         ''
@@ -1534,10 +1599,11 @@
     <div id="script-somme"></div>
     <script>inject_microalg_editor_in('script-somme', {
      src:
+        '(Declarer resultat De_type "nombre")\n' +
         '(Definir (Somme liste)\n' +
         '    "Retourne la somme des valeurs de la `liste`."\n' +
         '    "auteur inconnu"\n' +
-        '    (Initialiser resultat 42)\n' +
+        '    (Affecter_a resultat 42)\n' +
         '    (!!! "... ici du code ...")\n' +
         '    (Retourner resultat)\n' +
         ')\n' +
@@ -1554,10 +1620,11 @@
     <div id="script-trouver-position"></div>
     <script>inject_microalg_editor_in('script-trouver-position', {
      src:
+        '(Declarer resultat De_type "nombre")\n' +
         '(Definir (Trouver_dans liste valeur)\n' +
         '    "Retourne la position de la `valeur` dans la `liste`, 0 si non présente."\n' +
         '    "auteur inconnu"\n' +
-        '    (Initialiser resultat 42)\n' +
+        '    (Affecter_a resultat 42)\n' +
         '    (!!! "... ici du code ...")\n' +
         '    (Retourner resultat)\n' +
         ')\n' +
@@ -1574,10 +1641,11 @@
     <div id="script-max"></div>
     <script>inject_microalg_editor_in('script-max', {
      src:
+        '(Declarer resultat De_type "nombre")\n' +
         '(Definir (Maximum_dans liste)\n' +
         '    "Retourne la valeur maximale dans la `liste`."\n' +
         '    "auteur inconnu"\n' +
-        '    (Initialiser resultat 42)\n' +
+        '    (Affecter_a resultat 42)\n' +
         '    (!!! "... ici du code ...")\n' +
         '    (Retourner resultat)\n' +
         ')\n' +
@@ -1606,8 +1674,8 @@
     <h2 id="fin">Fin</h2>
     <p>Voilà, c’est fini. Si désormais vous cherchez une information, allez
     voir directement la <a href="doc.html">documentation</a>.</p>
-    <p>Si cela vous a plu et que vous avez envie de créer votre propre
-    tutoriel, vous pouvez utiliser <a href="http://galerie.microalg.info">la galerie</a>.
+    <p>Si vous avez envie de créer votre propre tutoriel, vous pouvez utiliser
+    <a href="http://galerie.microalg.info">la galerie</a>.
     Pour mettre MicroAlg en place sur votre propre site, voir
     <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.</p>
     <p>Si vous avez une remarque à faire, ou envie de contribuer, suivre les

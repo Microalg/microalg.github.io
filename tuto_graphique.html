@@ -16,6 +16,8 @@
     <script type="text/javascript" src="web/parenedit.js"></script>
     <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
     <script src="web/showdown.js"></script>
+    <script src="web/svg-tree-drawer/svg-tree-drawer.js"></script>
+    <link href="web/css-ninja-tree/css-ninja-tree.css" rel="stylesheet"/>
     <script src="web/showup.js"></script>
     <link type="text/css" href="web/showup.css" rel="stylesheet" />
     <link rel="icon" href="visuels/logo_microalg.ico" />
@@ -79,6 +81,7 @@
     <div id="script-cercle"></div>
     <script>inject_microalg_editor_in('script-cercle', {
      processing: true,
+     blockly:true,
      src:
         '(Cercle (Liste 300 300) 100)'
     });</script>
@@ -103,6 +106,7 @@
     <div id="script-deux-cercles"></div>
     <script>inject_microalg_editor_in('script-deux-cercles', {
      processing: true,
+     blockly:true,
      src:
         '(RAZ)\n' +
         '(Cercle (Liste 300 300) 100)\n' +
@@ -119,8 +123,10 @@
     <div id="script-des-cercles"></div>
     <script>inject_microalg_editor_in('script-des-cercles', {
      processing: true,
+     blockly:true,
      src:
-        '(Initialiser i 0)\n' +
+        '(Declarer i De_type "nombre")\n' +
+        '(Affecter_a i 0)\n' +
         '(Tant_que (<= i 250)\n' +
         ' Faire\n' +
         '    (Cercle (Liste (+ i 50) (+ i 50)) i)\n' +
@@ -137,6 +143,7 @@
     <div id="script-epaisseur"></div>
     <script>inject_microalg_editor_in('script-epaisseur', {
      processing: true,
+     blockly:true,
      src:
         '(Cercle (Liste 300 300) 100)\n' +
         '(Epaisseur 5)\n' +
@@ -148,8 +155,10 @@
     <div id="script-epaisseurs-algo"></div>
     <script>inject_microalg_editor_in('script-epaisseurs-algo', {
      processing: true,
+     blockly:true,
      src:
-        '(Initialiser i 1)\n' +
+        '(Declarer i De_type "nombre")\n' +
+        '(Affecter_a i 1)\n' +
         '(Tant_que (<= i 20)\n' +
         ' Faire\n' +
         '    (Epaisseur i)\n' +
@@ -179,6 +188,7 @@
     <div id="script-couleurs"></div>
     <script>inject_microalg_editor_in('script-couleurs', {
      processing: true,
+     blockly:true,
      src:
         '(Epaisseur 5)\n' +
         '(Contour (Liste 255 0 0))\n' +
@@ -192,6 +202,7 @@
     <div id="script-cercles-sans-alpha"></div>
     <script>inject_microalg_editor_in('script-cercles-sans-alpha', {
      processing: true,
+     blockly:true,
      src:
         '(RAZ)\n' +
         '(Remplissage (Liste 255 0 0))\n' +
@@ -208,6 +219,7 @@
     <div id="script-cercles-avec-alpha"></div>
     <script>inject_microalg_editor_in('script-cercles-avec-alpha', {
      processing: true,
+     blockly:true,
      src:
         '(RAZ)\n' +
         '(Remplissage (Liste 255 0 0 127))\n' +
@@ -230,6 +242,7 @@
     <div id="script-deux-cercles-alpha"></div>
     <script>inject_microalg_editor_in('script-deux-cercles-alpha', {
      processing: true,
+     blockly:true,
      src:
         '(RAZ)\n' +
         '(Cercle (Liste 300 300) 100)\n' +
@@ -242,6 +255,7 @@
     <div id="script-deux-cercles-ordre"></div>
     <script>inject_microalg_editor_in('script-deux-cercles-ordre', {
      processing: true,
+     blockly:true,
      src:
         '(Remplissage (Liste 255 0 0))\n' +
         '(Cercle (Liste 300 300) 200)\n' +
@@ -256,7 +270,13 @@
     <div id="script-couleurs-algo"></div>
     <script>inject_microalg_editor_in('script-couleurs-algo', {
      processing: true,
+     // blockly:true, TODO: bloc Definir
      src:
+        '(Declarer r v b De_type "nombre")\n' +
+        '(Affecter_a r 0)\n' +
+        '(Affecter_a v 0)\n' +
+        '(Affecter_a b 0)\n' +
+        '\n' +
         '(Definir (Position rouge vert bleu)\n' +
         '    "Coordonnées du centre en fonction de la couleur."\n' +
         '    "ProfGra"\n' +
@@ -266,9 +286,6 @@
         '               ))\n' +
         ')\n' +
         '(Contour (Liste 0 0 0 0))\n' +
-        '(Initialiser r 0)\n' +
-        '(Initialiser v 0)\n' +
-        '(Initialiser b 0)\n' +
         '(Tant_que (<= r 255) Faire\n' +
         '    (Tant_que (<= v 255) Faire\n' +
         '        (Tant_que (<= b 255) Faire\n' +
@@ -290,6 +307,7 @@
     <div id="script-autres-formes"></div>
     <script>inject_microalg_editor_in('script-autres-formes', {
      processing: true,
+     blockly:true,
      src:
         '(RAZ)\n' +
         '(Cercle (Liste 200 400) 30)\n' +
@@ -339,6 +357,7 @@
     <div id="script-tortue"></div>
     <script>inject_microalg_editor_in('script-tortue', {
      processing: true,
+     blockly:true,
      src:
         '(AV 60)\n' +
         '(TD 120)\n' +
@@ -352,9 +371,12 @@
 
     <h2 id="fin">Fin</h2>
     <p>Voilà, c’est fini. Si désormais vous cherchez une information, allez
-    voir directement la <a href="doc.html">documentation</a>.</p>
-    <p>Si cela vous a plu et que vous avez envie de créer votre propre
-    tutoriel, vous pouvez utiliser <a href="http://galerie.microalg.info">la galerie</a>.
+    voir directement la <a href="doc.html">documentation</a>. Dans la galerie,
+    vous trouverez beaucoup d’exemples d’utilisation de ces commandes.
+    <a href="http://galerie.microalg.info/microalg:graphismes">Cette page</a>
+    en contient une liste.</p>
+    <p>Si vous avez envie de créer votre propre tutoriel, vous pouvez utiliser
+    <a href="http://galerie.microalg.info">la galerie</a>.
     Pour mettre MicroAlg en place sur votre propre site, voir
     <a href="https://github.com/Microalg/Microalg/blob/latest/INSTALL.md">cette page</a>.</p>
     <p>Si vous avez une remarque à faire, ou envie de contribuer, suivre les

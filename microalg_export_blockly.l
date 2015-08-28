@@ -10,15 +10,22 @@
   ))
 (de Variable inputs
   (let (nom_var (car inputs))
-    (if nom_var (pack "<block type=\"variable\"><field name=\"VAR\">"
-                               nom_var
-                               "</field></block>")
-                "<block type=\"texte_litteral\"><field name=\"TEXT\"></field></block>"
+    (cond
+      ((== 'valeur_utilisateur nom_var)
+        "<block type=\"valeur_utilisateur\"></block>")
+      ((== 'credit_iterations  nom_var)
+        "<block type=\"credit_iterations\"></block>")
+      ((== 'sequence_tirages@  nom_var)
+        "<block type=\"sequence_tirages\"></block>")
+      ((not nom_var)
+        "<block type=\"texte_litteral\"><field name=\"TEXT\"></field></block>")
+      (T
+        (pack "<block type=\"variable\"><field name=\"VAR\">" nom_var "</field></block>"))
     )
   )
 )
-# Attention, insertion_next ne plonge pas dans les instruction contenant des
-# blocs, comme Faire, Tant_que et Si. Ce genre d’instructions doivent utiliser
+# Attention, insertion_next ne plonge pas dans les instructions contenant des
+# blocs, comme Faire, Tant_que et Si. Ce genre d’instruction doit utiliser
 # insertion_next sur leurs blocs.
 (de insertion_next (src) (car (insertion_next_aux (reverse src))))
 (de insertion_next_aux (src)
@@ -64,6 +71,16 @@
          "</block>"))
 (de / (A B)
    (pack "<block type=\"operations\"><field name=\"OP\">DIVIDE</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de % (A B)
+   (pack "<block type=\"operations\"><field name=\"OP\">MOD</field>"
+         "<value name=\"A\">" A "</value>"
+         "<value name=\"B\">" B "</value>"
+         "</block>"))
+(de ^ (A B)
+   (pack "<block type=\"operations\"><field name=\"OP\">POW</field>"
          "<value name=\"A\">" A "</value>"
          "<value name=\"B\">" B "</value>"
          "</block>"))
@@ -113,12 +130,6 @@
              "<value name=\"VALUE\">" !val "</value>"
              !next
              "</block>")))
-(de Booleen? (content)
-  (pack "<block type=\"booleen?\">"
-        "<value name=\"VALUE\">"
-        content
-        "</value>"
-        "</block>"))
 (de Concatener inputs
   (pack "<block type=\"concatener\">"
         "<mutation items=\"" (length inputs) "\"></mutation>"
@@ -127,8 +138,33 @@
                     (range 0 (dec (length inputs)))
                     inputs))
         "</block>"))
+(de Declarer arg_lst
+  (let (!splitted (split arg_lst 'De_type)
+        !vars (mapcar 'cadr (car !splitted))  # var name is in (Variable ...)
+        !type (caadr !splitted)
+        !next (last arg_lst))
+       (!declarer_rec !vars !type !next)
+  )
+)
+(de !declarer_rec (!vars !type !next)
+  (ifn !vars
+       (eval !next)
+       (let (!length_vars (length !vars))
+            (pack "<block type=\"declarer\">"
+                  "<field name=\"VAR\">" (car !vars) "</field>"
+                  "<value name=\"TYPE\">" (eval !type) "</value>"
+                  (if (and (<> 0 !length_vars) (<> 1 !length_vars) 2)  # len >= 2
+                      (pack "<next>" (!declarer_rec (cdr !vars) !type !next) "</next>")
+                      (!declarer_rec (cdr !vars) !type !next)
+                  )
+                  "</block>")
+       )
+  )
+)
 (de Demander ()
   "<block type=\"demander\"></block>")
+(de Demander_un_nombre ()
+  "<block type=\"demander_un_nombre\"></block>")
 (de Entier@ (MIN MAX)
   (pack "<block type=\"entier_pseudo_aleatoire\">"
         "<value name=\"MIN\">" MIN "</value>"
@@ -150,17 +186,9 @@
              "<value name=\"COND\">" (eval !cond) "</value>"
              (eval !next)
              "</block>") ))
-(de Initialiser inputs
-  (let (!var (cadr (car inputs))  # var name is in (Variable ...)
-        !val (eval (cadr inputs))
-        !next (eval (caddr inputs)))
-       (pack "<block type=\"initialiser\">"
-             "<field name=\"VAR\">" !var "</field>"
-             "<value name=\"VALUE\">" !val "</value>"
-             !next
-             "</block>")))
-(de Initialiser@ (next)
+(de Initialiser@ (etat next)
   (pack "<block type=\"initialiser_pseudo_aleatoire\">"
+        "<value name=\"ETAT\">" etat "</value>"
         next
         "</block>"))
 (de Liste inputs
@@ -177,6 +205,8 @@
         content
         "</value>"
         "</block>"))
+(de Millisecondes ()
+  "<block type=\"millisecondes\"></block>")
 (de Nieme (value index)
   (pack "<block type=\"nieme\">"
         "<value name=\"VALUE\">"
@@ -194,12 +224,6 @@
         "</block>"))
 (de Nombre (content)
   (pack "<block type=\"nombre\">"
-        "<value name=\"VALUE\">"
-        content
-        "</value>"
-        "</block>"))
-(de Nombre? (content)
-  (pack "<block type=\"nombre?\">"
         "<value name=\"VALUE\">"
         content
         "</value>"
@@ -266,12 +290,6 @@
         content
         "</value>"
         "</block>"))
-(de Texte? (content)
-  (pack "<block type=\"texte?\">"
-        "<value name=\"VALUE\">"
-        content
-        "</value>"
-        "</block>"))
 (de Type (content)
   (pack "<block type=\"type\">"
         "<value name=\"VALUE\">"
@@ -288,3 +306,226 @@
   "<block type=\"vrai\"></block>")
 (de Faux ()
   "<block type=\"faux\"></block>")
+(de RAZ (next)
+  (pack "<block type=\"raz\">"
+        next
+        "</block>"))
+(de Cercle inputs
+  (let (origine (car inputs)
+        orig_x (eval (cadr origine))
+        orig_y (eval (caddr origine))
+        r (eval (cadr inputs))
+        next (eval (caddr inputs)))
+       (pack "<block type=\"cercle\">"
+             "<value name=\"ORIG_X\">"
+             orig_x
+             "</value>"
+             "<value name=\"ORIG_Y\">"
+             orig_y
+             "</value>"
+             "<value name=\"R\">"
+             r
+             "</value>"
+             next
+             "</block>")))
+(de Contour inputs
+  (let (couleur (cdar inputs)  # cadr: extraire RVBA de '((Liste R V B A))
+        r (eval (car   couleur))
+        v (eval (cadr  couleur))
+        b (eval (caddr couleur))
+        a (eval (cadddr couleur))
+        next (eval (cadr inputs)))
+       (pack "<block type=\"contour" (if a "-alpha") "\">"
+             "<value name=\"R\">"
+             r
+             "</value>"
+             "<value name=\"V\">"
+             v
+             "</value>"
+             "<value name=\"B\">"
+             b
+             "</value>"
+             (if a (pack "<value name=\"A\">" a "</value>"))
+             next
+             "</block>")))
+(de Ellipse inputs
+  (let (origine (car inputs)
+        orig_x (eval (cadr origine))
+        orig_y (eval (caddr origine))
+        r1 (eval (cadr inputs))
+        r2 (eval (caddr inputs))
+        next (eval (cadddr inputs)))
+       (pack "<block type=\"ellipse\">"
+             "<value name=\"ORIG_X\">"
+             orig_x
+             "</value>"
+             "<value name=\"ORIG_Y\">"
+             orig_y
+             "</value>"
+             "<value name=\"R1\">"
+             r1
+             "</value>"
+             "<value name=\"R2\">"
+             r2
+             "</value>"
+             next
+             "</block>")))
+(de Epaisseur (e next)
+  (pack "<block type=\"epaisseur\">"
+        "<value name=\"E\">"
+        e
+        "</value>"
+        next
+        "</block>"))
+(de Rectangle inputs
+  (let (p1 (car inputs)
+        p2 (cadr inputs)
+        x1 (eval (cadr  p1))
+        y1 (eval (caddr p1))
+        x2 (eval (cadr  p2))
+        y2 (eval (caddr p2))
+        next (eval (caddr inputs)))
+       (pack "<block type=\"rectangle\">"
+             "<value name=\"X1\">"
+             x1
+             "</value>"
+             "<value name=\"Y1\">"
+             y1
+             "</value>"
+             "<value name=\"X2\">"
+             x2
+             "</value>"
+             "<value name=\"Y2\">"
+             y2
+             "</value>"
+             next
+             "</block>")))
+(de Remplissage inputs
+  (let (couleur (cdar inputs)  # cadr: extraire RVBA de '((Liste R V B A))
+        r (eval (car   couleur))
+        v (eval (cadr  couleur))
+        b (eval (caddr couleur))
+        a (eval (cadddr couleur))
+        next (eval (cadr inputs)))
+       (pack "<block type=\"remplissage" (if a "-alpha") "\">"
+             "<value name=\"R\">"
+             r
+             "</value>"
+             "<value name=\"V\">"
+             v
+             "</value>"
+             "<value name=\"B\">"
+             b
+             "</value>"
+             (if a (pack "<value name=\"A\">" a "</value>"))
+             next
+             "</block>")))
+(de Segment inputs
+  (let (p1 (car inputs)
+        p2 (cadr inputs)
+        x1 (eval (cadr  p1))
+        y1 (eval (caddr p1))
+        x2 (eval (cadr  p2))
+        y2 (eval (caddr p2))
+        next (eval (caddr inputs)))
+       (pack "<block type=\"segment\">"
+             "<value name=\"X1\">"
+             x1
+             "</value>"
+             "<value name=\"Y1\">"
+             y1
+             "</value>"
+             "<value name=\"X2\">"
+             x2
+             "</value>"
+             "<value name=\"Y2\">"
+             y2
+             "</value>"
+             next
+             "</block>")))
+(de Triangle inputs
+  (let (p1 (car inputs)
+        p2 (cadr inputs)
+        p3 (caddr inputs)
+        x1 (eval (cadr  p1))
+        y1 (eval (caddr p1))
+        x2 (eval (cadr  p2))
+        y2 (eval (caddr p2))
+        x3 (eval (cadr  p3))
+        y3 (eval (caddr p3))
+        next (eval (cadddr inputs)))
+       (pack "<block type=\"triangle\">"
+             "<value name=\"X1\">"
+             x1
+             "</value>"
+             "<value name=\"Y1\">"
+             y1
+             "</value>"
+             "<value name=\"X2\">"
+             x2
+             "</value>"
+             "<value name=\"Y2\">"
+             y2
+             "</value>"
+             "<value name=\"X3\">"
+             x3
+             "</value>"
+             "<value name=\"Y3\">"
+             y3
+             "</value>"
+             next
+             "</block>")))
+(de AV (content next)
+  (pack "<block type=\"av\">"
+        "<value name=\"VALUE\">"
+        content
+        "</value>"
+        next
+        "</block>"))
+(de BC (next)
+  (pack "<block type=\"bc\">"
+        next
+        "</block>"))
+(de LC (next)
+  (pack "<block type=\"lc\">"
+        next
+        "</block>"))
+(de !T (inputs type)
+  (let (inputs_num (length inputs))
+       (cond
+         ((not (<> 2 inputs_num))  # 2 args
+            (let (content (eval (car inputs))
+                  next    (eval (cadr inputs)))
+                 (pack "<block type=\"t" type "\">"
+                       "<value name=\"VALUE\">"
+                       content
+                       "</value>"
+                       next
+                       "</block>")))
+         ((not (<> 1 inputs_num))  # 1 arg
+            (if (== 'Next (caar inputs))
+                (let (next (eval (car inputs)))
+                     (pack "<block type=\"t" type "90\">"
+                           next
+                           "</block>"))
+                (let (content (eval (car inputs)))
+                     (pack "<block type=\"t" type "\">"
+                           "<value name=\"VALUE\">"
+                           content
+                           "</value>"
+                           "</block>"))))
+         (T  # 0 arg
+            (pack "<block type=\"t" type "90\"></block>"))
+       )
+  )
+)
+(de TD inputs (!T inputs "d"))
+(de TG inputs (!T inputs "g"))
+
+(de !sans_bloc (cmd next)
+  (pack "<block type=\"commentaire\"><field name=\"COMZ\">"
+        "La commande `" cmd "` n’a pas de bloc."
+        "</field>"
+        next
+        "</block>"))
+

@@ -16,6 +16,8 @@
     <script type="text/javascript" src="web/parenedit.js"></script>
     <link type="text/css" href="web/parenedit.css" rel="stylesheet" />
     <script src="web/showdown.js"></script>
+    <script src="web/svg-tree-drawer/svg-tree-drawer.js"></script>
+    <link href="web/css-ninja-tree/css-ninja-tree.css" rel="stylesheet"/>
     <script src="web/showup.js"></script>
     <link type="text/css" href="web/showup.css" rel="stylesheet" />
     <script type="text/javascript" src="web/blockly/blockly_compressed.js"></script>
@@ -191,26 +193,33 @@
     <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires', {
      blockly_only: true,
      src:
-        '(Initialiser@)\n' +
         '(Afficher (Entier@ 1900 2015))'
     });</script>
     <p>Comment changer ce programme pour simuler un dé à six faces ?</p>
-    <p><strong>Note</strong> : sans la commande <code>Initialiser@</code>,
+    <p><strong>Utilisation avancée</strong> : si vous n’avez pas besoin de
+    <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
+    class="wp">reproductibilité</a> (le fait de pouvoir obtenir à nouveau
+    certaines séquences de tirages), vous pouvez passer directement à
+    <a href="#demander">la section suivante</a>).</p>
+    <p>Il est possible de contrôler les tirages de deux façons : avec la
+    commande <code>Initialiser@</code> et avec la variable spéciale
+    <code>sequence_tirages@</code>.</p>
+    <p>La commande <code>Initialiser@</code> permet de contrôler l’état
+    initial du générateur de nombres pseudo-aléatoires. Grâce à elle,
     un même programme donnera toujours les mêmes tirages. Ce n’est bien sûr pas
     souhaitable pour un jeu de hasard comme un jeu de cartes. Néanmoins, pour
-    certaines applications artistiques ou scientifiques, la
-    <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
-    class="wp">reproductibilité</a> (le fait de pouvoir garder certaines
-    séquences de tirages) peut être intéressante. On peut par exemple vouloir
+    certaines applications artistiques ou scientifiques, cette reproductibilité
+    peut être intéressante. On peut par exemple vouloir
     générer un même labyrinthe pour tous les joueurs, on peut vouloir vérifier
     si un programme est correct en comparant avec un autre que l’on sait être
     correct…</p>
     <p>Voici par exemple un programme qui affichera toujours les mêmes cinq
-    tirages (1975, 1946, 2005, 1940 et 1955) :</p>
+    tirages (1984, 1932, 1967, 2000 et 1957) :</p>
     <div id="script-nbres-pseudo-aleatoires-init"></div>
     <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-init', {
      blockly_only: true,
      src:
+        '(Initialiser@ 0)\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
         '(Afficher (Entier@ 1900 2015))\n' +
@@ -218,7 +227,37 @@
         '(Afficher (Entier@ 1900 2015))\n' +
         ''
     });</script>
-    <!-- TODO: sequence_tirages@ -->
+    <p>Celui-ci affichera toujours 1969, 1921, 1987, 1941 et 1950 :</p>
+    <div id="script-nbres-pseudo-aleatoires-init2"></div>
+    <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-init2', {
+     blockly_only: true,
+     src:
+        '(Initialiser@ 1)\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        '(Afficher (Entier@ 1900 2015))\n' +
+        ''
+    });</script>
+    <p>Il est même possible de fournir une séquence de nombres entiers qui
+    sera utilisée pour les tirages, en boucle. Les commandes
+    <code>Affecter_a</code> et <code>Liste</code> seront vues plus loin.</p>
+    <div id="script-nbres-pseudo-aleatoires-seq"></div>
+    <script>inject_microalg_editor_in('script-nbres-pseudo-aleatoires-seq', {
+     blockly_only: true,
+     src:
+        '(Affecter_a sequence_tirages@ (Liste 1 3 5 7 9))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        '(Afficher (Entier@ 1 10))\n' +
+        ''
+    });</script>
 
     <h2 id="demander"><a href="#demander">: </a>Demander à l’utilisateur</h2>
     <p>Plutôt que de demander une valeur pseudo-aléatoire à l’ordinateur, il est
@@ -271,9 +310,15 @@
 
     <h2 id="calculs-nombres"><a href="#calculs-nombres">: </a>Calculs avec des nombres</h2>
     <p>MicroAlg sait effectuer des calculs. Il faut juste savoir que :</p>
-    <ol><li>il n’y a un seul bloc pour les quatre opérations de base +, -, × et
-        ÷ ;</li>
-        <li>l’opération apparaît sur la gauche du bloc.</li>
+    <ol><li>il n’y a un seul bloc pour les quatre opérations de base ;</li>
+        <li>le nom du résultat de l’opération apparaît sur le bloc :</li>
+        <ul>
+            <li><em>Somme</em> pour +,</li>
+            <li><em>Différence</em> pour -,</li>
+            <li><em>Produit</em> pour ×,</li>
+            <li><em>Quotient</em> pour ÷</li>
+        </ul>
+        <li>l’opération apparaît sur la gauche du bloc et non entre les nombres.</li>
     </ol>
     <p>Pour chaque exemple ci-dessous, essayer de deviner ce que va afficher
     MicroAlg, puis vérifier en cliquant sur <code>OK</code>.</p>
@@ -289,7 +334,7 @@
      blockly_only: true,
      src:
         '(!!! "Une expression peut prendre la place d’un nombre.")\n' +
-        '(!!! "Ici le deuxième 2 a été remplacé par (+ 1 1) :")\n' +
+        '(!!! "Ici le deuxième 2 a été remplacé par (Somme 1 1) :")\n' +
         '(Afficher (+ 2 (+ 1 1)))'
     });</script>
     <br>
@@ -314,9 +359,8 @@
         '(Afficher (* -1 (+ 2 2)))\n' +
         ''
     });</script>
-    <p>Autres exemples avec <code>+</code>, <code>-</code>, <code>*</code> et
-    <code>/</code> (papier crayon ou calculatrice autorisés si vous n’êtes pas
-    fort en calcul mental).</p>
+    <p>Autres exemples avec les opérations (papier crayon ou calculatrice
+    autorisés si vous n’êtes pas fort en calcul mental).</p>
     <div id="script-calc1"></div>
     <script>inject_microalg_editor_in('script-calc1', {
      blockly_only: true,
@@ -348,9 +392,8 @@
     <p>La commande <code>Demander</code> renvoie du texte, celui tapé par
     l’utilisateur. Même s’il n’est constitué que de chiffres, MicroAlg le
     considère comme étant du texte.</p>
-    <p>Le problème ici est que les opérations <code>+</code>, <code>-</code>,
-    <code>*</code> et <code>/</code> ne travaillent qu'avec des nombres et non
-    avec du texte. En voici la preuve (le programme génère une erreur) :</p>
+    <p>Le problème ici est que les opérations ne travaillent qu'avec des nombres
+    et non avec du texte. En voici la preuve (le programme génère une erreur) :</p>
     <div id="script-un-plus-un"></div>
     <script>inject_microalg_editor_in('script-un-plus-un', {
      blockly_only: true,
@@ -379,37 +422,27 @@
     <ul>
         <li><code>Type</code> qui retourne un texte en minuscule décrivant le
         type de la valeur,</li>
-        <li><code>Texte?</code> et <code>Nombre?</code>, qui nous
-        permettent de savoir si une valeur est d’un certain type,</li>
         <li><code>Texte</code> et <code>Nombre</code>, qui renvoient une
         nouvelle valeur, convertie avec le bon type.</li>
     </ul>
+    <p>Quelques exemples avec <code>Type</code> :</p>
     <div id="script-type"></div>
     <script>inject_microalg_editor_in('script-type', {
      blockly_only: true,
      src:
         '(Afficher (Type "Bonjour !"))\n' +
         '(Afficher (Type 12345))\n' +
+        '(Afficher (Type "12345"))\n' +
+        ''
+    });</script>
+    <p>Un exemple avec <code>Demander</code> :</p>
+    <div id="script-type-demander"></div>
+    <script>inject_microalg_editor_in('script-type-demander', {
+     blockly_only: true,
+     src:
         '(Afficher "Veuillez taper n’importe quoi.")\n' +
         '(Afficher (Type (Demander)))\n' +
         ''
-    });</script>
-    <div id="script-texte"></div>
-    <script>inject_microalg_editor_in('script-texte', {
-     blockly_only: true,
-     src:
-        '(Afficher (Texte? "2"))\n' +
-        '(Afficher (Texte? 2))\n' +
-        '(Afficher (Texte? (Texte 2)))'
-    });</script>
-    <br>
-    <div id="script-nombre"></div>
-    <script>inject_microalg_editor_in('script-nombre', {
-     blockly_only: true,
-     src:
-        '(Afficher (Nombre? 2))\n' +
-        '(Afficher (Nombre? "2"))\n' +
-        '(Afficher (Nombre? (Nombre "2")))'
     });</script>
     <p>Pour demander un nombre avec lequel faire un calcul, il faut donc
     utiliser une combinaison de <code>Demander</code> et de
@@ -454,21 +487,24 @@
     avec le nombre que l’utilisateur a tapé ».</p>
 
     <h2 id="booleens"><a href="#booleens">: </a>Calculs avec des booléens</h2>
-    <p>Les commandes <code>Texte?</code> et <code>Nombre?</code> de la section
-     précédente sont particulières car :</p>
+    <p>Dans certaines situations, comme les jeux, on peut avoir besoin de
+    <em>comparer</em> des valeurs. Par exemple, on peut vouloir tester :</p>
     <ul>
-        <li>elles se terminent par <code>?</code>,</li>
-        <li>elles retournent des valeurs spéciales : <code>Vrai</code> ou
-            <code>Faux</code>.</li>
+        <li>si le mot ou le nombre à deviner est le bon ;</li>
+        <li>si le temps écoulé n’a pas dépassé une certaine valeur ;</li>
+        <li>…</li>
     </ul>
-    <p>Ces valeurs spéciales <code>Vrai</code> et <code>Faux</code> sont d’un
+    <p>Il y a donc dans MicroAlg des commandes qui retournent des valeurs
+    spéciales : <code>Vrai</code> ou <code>Faux</code>, pour répondre à ces
+    questions. Ces valeurs <code>Vrai</code> et <code>Faux</code> sont d’un
     type nouveau. Ce ne sont ni des nombres ni du texte, mais des
     <em>booléens</em> (de <a href="http://fr.wikipedia.org/wiki/George_Boole"
     class="wp">George Boole</a>).
-    Un booléen ne peut avoir qu’une de ces deux valeurs.</p>
+    Un booléen ne peut avoir qu’une de ces deux valeurs <code>Vrai</code> ou
+    <code>Faux</code>, contrairement aux nombres et au textes qui peuvent
+    prendre (quasiment) une infinité de valeurs différentes.</p>
     <p>Les commandes qui retournent un booléen sont appelées des
-     <em>prédicats</em>. Les seuls prédicats de MicroAlg qui ne se terminent
-     pas par <code>?</code> sont :</p>
+    <em>prédicats</em>. En voici quelques-uns :</p>
     <ul>
         <li><code>=</code>, qui teste l’égalité de deux valeurs (c’est-à-dire
             retourne <code>Vrai</code> si les deux valeurs sont égales,
@@ -523,10 +559,10 @@
         '(Afficher (=/ "salut" "bonjour"))\n' +
         ''
     });</script>
-    <p>À vous maintenant de tester les comparaisons entre nombres ! Il y a
-    quatre commandes : <code>&lt;</code>, <code>&lt;=</code>,
+    <p>À vous maintenant d’explorer les comparaisons entre nombres ! Il y a
+    quatre commandes à tester : <code>&lt;</code>, <code>&lt;=</code>,
     <code>&gt;</code> et <code>&gt;=</code>, mais aussi différentes
-    combinaisons de nombres possibles.</p>
+    combinaisons de nombres à essayer.</p>
     <div id="script-predicats-comparaisons"></div>
     <script>inject_microalg_editor_in('script-predicats-comparaisons', {
      blockly_only: true,
@@ -695,13 +731,15 @@ Sinon commande-1-si-faux
     });</script>
     <!--
     <p>Voici une application concrète d’une structure avec des <code>Si</code>
-    emboîtés :</p>
+    emboîtés (<code>Declarer</code> et <code>Affecter_a</code> seront vues
+    en détail un peu plus loin) :</p>
     <div id="script-si-emboites-appli"></div>
     <script>inject_microalg_editor_in('script-si-emboites-appli', {
      blockly_only: true,
      src:
+        '(Declarer nombre De_type "nombre")\n' +
         '(Afficher "Veuillez taper un nombre.")\n' +
-        '(Initialiser nbre (Nombre (Demander)))\n' +
+        '(Affecter_a nbre (Nombre (Demander)))\n' +
         '(Si (>= nbre 0)\n' +
         ' Alors (Si (>= nbre 1000)\n' +
         '        Alors (Afficher "Ce nombre est positif et assez grand.")\n' +

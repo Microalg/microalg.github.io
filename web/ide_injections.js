@@ -10,12 +10,28 @@ var this_script_url = (function(scripts) {
 }());
 var this_script_path = 'web/ide_injections.js';
 var root_path = this_script_url.slice(0, -this_script_path.length);
-var microalg_l_src =
-    EMULISP_CORE.getFileSync(root_path + 'microalg.l');
-var microalg_export_src =
-    EMULISP_CORE.getFileSync(root_path + 'microalg_export.l');
-var microalg_export_blockly_src =
-    EMULISP_CORE.getFileSync(root_path + 'microalg_export_blockly.l');
+var lisp_srcs = {};
+function getLispSource(what) {
+    if (typeof lisp_srcs[what] == 'undefined') {
+        var file = {
+        '0.3.17':     'microalg-0.3.17.l',
+        'microalg':   'microalg.l',
+        'export':     'microalg_export.l',
+        'blockly':    'microalg_export_blockly.l',
+        'casio':      'microalg_export_casio.l',
+        'ti':         'microalg_export_ti.l',
+        'arbretxt':   'microalg_export_arbretxt.l',
+        'arbresvg':   'microalg_export_arbresvg.l',
+        'arbreninja': 'microalg_export_arbreninja.l'
+        }[what];
+        if (typeof file == 'undefined') {
+            alert("Lisp file unavailable: " + what);
+            return "";
+        }
+        lisp_srcs[what] = EMULISP_CORE.getFileSync(root_path + file);
+    }
+    return lisp_srcs[what];
+}
 
 // Editor states are stored with key = div id to print
 var emulisp_states = {};
@@ -35,6 +51,10 @@ function cleanTransient(text) {
 }
 
 function stdPrint(text, state) {
+    if (typeof state.context == 'undefined') {
+        console.log(text);
+        return;
+    }
     var target = $('#' + state.context.display_elt);
     text = cleanTransient(text);
     if (state.context.type == 'editor') {
@@ -62,46 +82,46 @@ function stdPrompt() {
     // to show the user the last thing displayed (it should be a question).
     var last_line_displayed = cleanTransient(EMULISP_CORE.eval('*LastStdOut').toString());
     if (last_line_displayed == "NIL") last_line_displayed = "?";
-    var user_input = window.prompt(last_line_displayed);
+    var user_input = window.prompt(last_line_displayed, '');
     if (user_input !== null) return user_input;
     else throw new Error("Commande `Demander` annulée.")
 }
 
-function onCtrl(elt, f) {
+function onCtrl(elt, f, config_64, presrc_b64) {
     elt.keydown(function (e) {
         if (e.ctrlKey) {
             if (e.keyCode == 10 || e.keyCode == 13) {
-                f(elt);
+                f(elt, config_64, presrc_b64);
             } else if (e.keyCode == 66) {
                 e.preventDefault();
                 // Voir aussi dans editeurs/scite/malg_abbrev.properties.
                 var abbrevs = {
-                  "(Af": "(Affecter_a |)",
+                  "(Af":  "(Affecter_a |)",
                   "(Afe": "(Affecter_a | En_position )",
-                  "(A": "(Afficher |)",
-                  "(Aj": "(Ajouter_a |)",
-                  "(Al": "(!!! \"Algo |\")\n(!!! \"Fin algo \")",
-                  "(At": "(Afficher \"|\")",
-                  "(Co": "(Concatener |)",
-                  "(D": "(Definir |\n    \"...\"\n    \"...\"\n    (Retourner )\n)",
-                  "(Dm": "(Demander)|",
-                  "(E": "(Exemples_de |\n    (Liste\n        (? )\n        (? )\n    )\n)",
-                  "(E@": "(Entie@ |)\n",
-                  "(F": "(Faire (|)\n       ()\n Tant_que ()\n)",
-                  "(I": "(Initialiser |)",
-                  "(I@":"(Initialiser@)\n|",
-                  "(Li": "(Liste |)",
-                  "(Lo": "(Longueur |)",
-                  "(M": "(Millisecondes)|",
-                  "(Ni": "(Nieme |)",
-                  "(N@": "(Nieme@ |)",
-                  "(No": "(Nombre |)",
-                  "(Rd": "(Retirer_de |)",
-                  "(R": "(Retourner |)",
-                  "(S": "(Si (|) Alors\n    ()\n)",
-                  "(Ss": "(Si (|)\n Alors ()\n Sinon ()\n)",
-                  "(Te": "(Tester |)",
-                  "(Tq": "(Tant_que (|) Faire\n    ()\n    ()\n)"
+                  "(A":   "(Afficher |)",
+                  "(Aj":  "(Ajouter_a |)",
+                  "(Al":  "(!!! \"Algo |\")\n(!!! \"Fin algo \")",
+                  "(At":  "(Afficher \"|\")",
+                  "(Co":  "(Concatener |)",
+                  "(D":   "(Definir |\n    \"...\"\n    \"...\"\n    (Retourner )\n)",
+                  "(De":  "(Declarer | De_type \"\")",
+                  "(Dm":  "(Demander)|",
+                  "(E":   "(Exemples_de |\n    (Liste\n        (? )\n        (? )\n    )\n)",
+                  "(E@":  "(Entie@ |)\n",
+                  "(F":   "(Faire (|)\n       ()\n Tant_que ()\n)",
+                  "(I@":  "(Initialiser@ |)\n",
+                  "(Li":  "(Liste |)",
+                  "(Lo":  "(Longueur |)",
+                  "(M":   "(Millisecondes)|",
+                  "(Ni":  "(Nieme |)",
+                  "(N@":  "(Nieme@ |)",
+                  "(No":  "(Nombre |)",
+                  "(Rd":  "(Retirer_de |)",
+                  "(R":   "(Retourner |)",
+                  "(S":   "(Si (|) Alors\n    ()\n)",
+                  "(Ss":  "(Si (|)\n Alors ()\n Sinon ()\n)",
+                  "(Te":  "(Tester |)",
+                  "(Tq":  "(Tant_que (|) Faire\n    ()\n    ()\n)"
                 };
                 // Grab content and split in 'before' and 'after' caret.
                 var src = elt.val();
@@ -126,28 +146,36 @@ function onCtrl(elt, f) {
     });
 }
 
-function ide_action(editor_elt, store) {
+function ide_action(editor_elt, config_64, presrc_b64) {
     // Compute the target HTML elt.
     var elt_id = editor_elt.attr('id').slice(0, -('-malg-editor'.length));
     var display_target_id = elt_id + '-displaytarget';
     var processing_id = elt_id + '-processing';
+    // Decode config_64.
+    var config = JSON.parse(atob(config_64));
     // Init the state and load it with MicroAlg.
     EMULISP_CORE.init();
-    EMULISP_CORE.eval(microalg_l_src);
+    var lisp_source = 'microalg';
+    if (config.version === '0.3.17') lisp_source = '0.3.17';
+    EMULISP_CORE.eval(getLispSource(lisp_source));
     // Custom state for a custom display in the page.
     EMULISP_CORE.currentState().context = {
         type: 'editor',
         display_elt: display_target_id,
         processing_elt: processing_id,
         };
-    // Process src.
-    var src = editor_elt.val();
+    // Prepare the display areas:
     // The editor is in a hiddable div,
     // createRichInput put the editor in a sub div,
     // that's why we use parent().parent().parent()
     var error_elt = editor_elt.parent().parent().parent().find('.malg-error').first();
     var display_elt = editor_elt.parent().parent().parent().find('.malg-display').first();
     display_elt.html('&nbsp;');
+    // Process pre src.
+    var presrc = atob(presrc_b64);
+    EMULISP_CORE.eval(presrc);
+    // Process src.
+    var src = editor_elt.val();
     try {
         error_elt.text('');
         EMULISP_CORE.eval(src);
@@ -156,7 +184,7 @@ function ide_action(editor_elt, store) {
         error_elt.html(e.message + ' <span class="malg-freq-error">' + link + '</span>');
     }
     EMULISP_CORE.eval('(setq *LastStdOut "?")');
-    if (store && typeof(Storage) !== "undefined") {
+    if (config.localStorage && typeof(Storage) !== "undefined") {
         var key = 'microalg_src_' + elt_id;
         localStorage[key] = src;
     }
@@ -169,6 +197,9 @@ according to `config` which may have these keys :
 
 * `src` is a string defining the content displayed at first load,  
   empty if not provided,
+* `version` is a string defining the version of microalg.l to load,
+  currently only "0.3.17" is available and, if not set, the default will be
+  the latest version of the microalg.l file,
 * `localStorage` is a boolean telling to remember last program if possible,  
   false if not provided,
 * `blockly` is a boolean telling to also display code as blocks,  
@@ -183,12 +214,15 @@ according to `config` which may have these keys :
 */
 function inject_microalg_editor_in(elt_id, config) {
     /* Some id suffix hacking. */
+    var export_id = elt_id + '-export';
     var editor_id = elt_id + '-malg-editor';
     var display_target_id = elt_id + '-displaytarget';
     var blockly_id = elt_id + '-blockly';
     var processing_id = elt_id + '-processing';
     var src = '';
     var blockly_src = '';
+    config.src = config.src.replace(/’/g, "'");
+    var config_64 = btoa(JSON.stringify(config));
     // According to config.localStorage, load source code (if any) from local
     // storage in the `src` var.
     if (config.localStorage) {
@@ -205,6 +239,11 @@ function inject_microalg_editor_in(elt_id, config) {
             src = config.src;
         }
     }
+    // Encode (b64) presrc if any.
+    var presrc_b64 = '';
+    if (config.presrc) {
+        presrc_b64 = btoa(config.presrc);
+    }
     if (config.blockly || config.blockly_only) {
         // Le source doit être sur une ligne pour passer dans le js généré:
         blockly_src = src.replace(/(\r\n|\n|\r)/gm, "")
@@ -217,15 +256,29 @@ function inject_microalg_editor_in(elt_id, config) {
     var hidden = config.blockly_only ? ' style="display:none;"' : '';
     var link_snippet =
         '<div class="link-snippet">' +
+        ((config.version === '0.3.17') ?
+         '<strong>⚠</strong> MicroAlg 0.3.17 ':'') +
+        '<select onchange="export_action(\'' + elt_id + '\', this);">' +
+        '<option>exporter</option>' +
+        '<option>Casio</option>' +
+        '<option>TI</option>' +
+        '<option>Arbre 1</option>' +
+        '<option>Arbre 2</option>' +
+        '<option>Arbre 3</option>' +
+        '</select> ' +
+        '<a target="_blank" title="Documentation" href="http://microalg.info/doc.html">doc</a> ' +
         '<a title="Lien vers cet extrait" href="#' + elt_id + '">∞</a></div>';
     var script_string =
         link_snippet +
+        '<div id="' + export_id + '"></div>' +
         ((config.blockly || config.blockly_only) ? '<div id="' + blockly_id + '"></div>' : '') +
         '<div ' + hidden + '><textarea id="' + editor_id + '" ' +
                                       'class="malg-editor" cols="80" rows="2"' +
                                       'spellcheck="false">' + src + '</textarea></div>' +
         '<input type="button" value="OK" class="malg-ok" ' +
-                'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' + config.localStorage + ')" />' +
+                'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' +
+                                     "'" + config_64 + "'" + ', ' +
+                                     "'" + presrc_b64 + "'" + ')" />' +
         '<div class="malg-error"></div>' +
         '<div id="' + display_target_id + '" class="malg-display">&nbsp;</div>';
     if (config.processing) {
@@ -255,25 +308,28 @@ function inject_microalg_editor_in(elt_id, config) {
         '    });' + "\n" +
         '</script>' + "\n";
     }
-    script_container.html(script_string);
+    script_container.html('<div class="microalg">' + script_string + '</div');
     if (config.blockly || config.blockly_only) {
         // Injection de HTML dans une iframe car besoin de plusieurs Blockly.
         // http://stackoverflow.com/questions/13214419/alternatives-to-iframe-srcdoc
         var toolbox_string =
                 '<xml id="' + elt_id + '-toolbox" style="display: none">' +
                 ' <category name="Valeurs">' +
-                '  <block type="variable"></block>' +
                 '  <block type="texte_litteral"></block>' +
                 '  <block type="nombre_litteral"></block>' +
+                '  <block type="valeur_utilisateur"></block>' +
+                '  <block type="variable"></block>' +
                 '  <block type="vrai"></block>' +
                 '  <block type="faux"></block>' +
                 '  <block type="liste"></block>' +
                 '  <block type="rien"></block>' +
+                '  <block type="credit_iterations"></block>' +
+                '  <block type="sequence_tirages"></block>' +
                 ' </category>' +
                 ' <category name="Cmdes sans retour">' +
                 '  <block type="commentaire"></block>' +
                 '  <block type="afficher"></block>' +
-                '  <block type="initialiser"></block>' +
+                '  <block type="declarer"></block>' +
                 '  <block type="affecter_a"></block>' +
                 '  <block type="initialiser_pseudo_aleatoire"></block>' +
                 '  <block type="si"></block>' +
@@ -283,6 +339,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 ' <category name="Cmdes avec retour">' +
                 '  <block type="concatener"></block>' +
                 '  <block type="demander"></block>' +
+                '  <block type="demander_un_nombre"></block>' +
                 '  <block type="operations"></block>' +
                 '  <block type="comparaisons"></block>' +
                 '  <block type="entier_pseudo_aleatoire"></block>' +
@@ -292,6 +349,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="nieme@"></block>' +
                 '  <block type="tete"></block>' +
                 '  <block type="queue"></block>' +
+                '  <block type="millisecondes"></block>' +
                 ' </category>' +
                 ' <category name="Types et conversions">' +
                 '  <block type="type"></block>' +
@@ -305,6 +363,28 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="et"></block>' +
                 '  <block type="ou"></block>' +
                 '  <block type="non"></block>' +
+                ' </category>' +
+                ' <category name="Cmdes graphiques">' +
+                '  <block type="raz"></block>' +
+                '  <block type="cercle"></block>' +
+                '  <block type="ellipse"></block>' +
+                '  <block type="rectangle"></block>' +
+                '  <block type="triangle"></block>' +
+                '  <block type="segment"></block>' +
+                '  <block type="epaisseur"></block>' +
+                '  <block type="contour"></block>' +
+                '  <block type="contour-alpha"></block>' +
+                '  <block type="remplissage"></block>' +
+                '  <block type="remplissage-alpha"></block>' +
+                ' </category>' +
+                ' <category name="Cmdes tortue">' +
+                '  <block type="av"></block>' +
+                '  <block type="td90"></block>' +
+                '  <block type="td"></block>' +
+                '  <block type="tg90"></block>' +
+                '  <block type="tg"></block>' +
+                '  <block type="bc"></block>' +
+                '  <block type="lc"></block>' +
                 ' </category>' +
                 '</xml>';
         var content = '<!DOCTYPE html>' +
@@ -354,7 +434,60 @@ function inject_microalg_editor_in(elt_id, config) {
     }
     var editor = $('#' + elt_id + '-malg-editor');
     createRichInput(editor);
-    onCtrl(editor, ide_action);
+    onCtrl(editor, ide_action, config_64, presrc_b64);
+}
+
+function export_action(elt_id, select) {
+    if (select.selectedIndex == 0) {
+        $('#' + elt_id + '-export').html('');
+        select.options[0].innerHTML = "exporter";
+    } else {
+        var langs = [undefined, 'casio', 'ti', 'arbretxt', 'arbresvg', 'arbreninja'];
+        var lang = langs[select.selectedIndex];
+        var src = $('#' + elt_id + '-malg-editor').val();
+        var exported_src = malg2other(lang, src);
+        var export_target = $('#' + elt_id + '-export');
+        if (lang == 'arbresvg') {
+            export_target.html($('<div/>', {id: elt_id + '-export-svg'}));
+            var tree = new TreeDrawer(elt_id + '-export-svg',
+                JSON.parse(exported_src));
+            tree.root.extended = false;
+            tree.draw();
+        } else {
+            export_target.html($('<div/>', {html: exported_src,
+                                            class: 'malg-export'}));
+        }
+        select.options[0].innerHTML = "pas d’export";
+    }
+}
+
+function malg2other(lang, src) {
+    EMULISP_CORE.init();
+    EMULISP_CORE.eval(getLispSource('export'));
+    EMULISP_CORE.eval(getLispSource(lang));
+    if (lang == 'arbretxt') {
+        var raw_tree = cleanTransient(EMULISP_CORE.eval('(arbretxt ' + src + ')').toString());
+        var colored = raw_tree.replace(/([│├└─])/g,'<span class="malg-guide">$1</span>');
+        return colored;
+    } else if (lang == 'arbresvg') {
+        var raw = EMULISP_CORE.eval('(arbresvg ' + src + ')').toString();
+        var clean = cleanTransient(raw);
+        var json_src = clean.replace(/&quot;/ig, '"');
+        return json_src;
+    } else if (lang == 'arbreninja') {
+        var raw = EMULISP_CORE.eval('(arbreninja ' + src + ')').toString();
+        var clean = cleanTransient(raw);
+        return clean;
+    } else {
+        var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")").toString();
+        // On récupère une liste d’instructions.
+        var source_preparee = '(pack ' + source_protegee.slice(1, -1) + ')';
+        var exported_src = cleanTransient(EMULISP_CORE.eval(source_preparee).toString());
+        EMULISP_CORE.init();
+        EMULISP_CORE.eval(getLispSource('microalg'));
+        exported_src = "Attention, fonctionnalité encore expérimentale !\n\n" + exported_src;
+        return exported_src;
+    }
 }
 
 function repl_action(repl_elt) {
@@ -388,7 +521,7 @@ function inject_microalg_repl_in(elt_id, msg) {
     var repl_id = elt_id + '-malg-repl';
     // Init the state and load it with MicroAlg.
     EMULISP_CORE.init();
-    EMULISP_CORE.eval(microalg_l_src);
+    EMULISP_CORE.eval(getLispSource('microalg'));
     // Custom state for a custom display in the REPL.
     EMULISP_CORE.currentState().context = {type: 'repl', display_elt: repl_id};
     emulisp_states[repl_id] = EMULISP_CORE.currentState();
@@ -400,7 +533,7 @@ function inject_microalg_repl_in(elt_id, msg) {
     repl_container.html(repl_string);
     var repl = $('#' + repl_id);
     createRichInput(repl);
-    onCtrl(repl, repl_action);
+    onCtrl(repl, repl_action, null);
     EMULISP_CORE.currentState().old_src = malg_prompt;
 }
 
@@ -439,7 +572,7 @@ function inject_microalg_jrepl_in(elt_id, msg) {
         onInit: function(term) {
             // Init the state and load it with MicroAlg.
             EMULISP_CORE.init();
-            EMULISP_CORE.eval(microalg_l_src);
+            EMULISP_CORE.eval(getLispSource('microalg'));
             // Custom state for a custom display in the REPL.
             EMULISP_CORE.currentState().context = {type: 'jrepl', term: term};
             emulisp_states[elt_id] = EMULISP_CORE.currentState();
@@ -454,9 +587,10 @@ function inject_microalg_jrepl_in(elt_id, msg) {
 
 function malg2blockly(src) {
     EMULISP_CORE.init();
-    EMULISP_CORE.eval(microalg_export_src);
+    EMULISP_CORE.eval(getLispSource('export'));
+
     var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")").toString();
-    EMULISP_CORE.eval(microalg_export_blockly_src);
+    EMULISP_CORE.eval(getLispSource('blockly'));
     var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + source_protegee + ")").toString();
     // Le car pour récupérer l’unique élément de la liste finale.
     var xml = EMULISP_CORE.eval('(pack (car ' + avec_des_next + ')').toString();
@@ -464,7 +598,7 @@ function malg2blockly(src) {
           xml.slice(1,-1).replace(/\\"/g, '"') +
           '</value></block></xml>';
     EMULISP_CORE.init();
-    EMULISP_CORE.eval(microalg_l_src);
+    EMULISP_CORE.eval(getLispSource('microalg'));
     return xml;
 }
 

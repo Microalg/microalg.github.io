@@ -44,6 +44,7 @@ Aller directement à :
 * [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
 * [Types](#types)
 * [Erreurs fréquentes](#erreursfrquentes)
+* [Export](#export)
 * [Feuille de route](#feuillederoute)
 * [Contribuer](#contribuer)
 * [Architecture](#architecture)
@@ -110,8 +111,13 @@ placer la commande `Retourner` à la toute fin de la commande à définir.
 
 *EN BREF*  
 Les nombres sont gérés différemments selon la façon dont vous utilisez
-MicroAlg. Par défaut cependant, que ce soit dans le navigateur ou après
-installation, MicroAlg travaille avec des
+MicroAlg.
+
+Dans une certaine configuration de l’éditeur de texte, il n’y a que des nombres
+entiers, pas de nombres à virgule.
+
+Par défaut cependant, que ce soit dans le navigateur ou dans la configuration
+par défaut de l’éditeur de texte, MicroAlg travaille avec des
 <a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres
 flottants</a>.
 
@@ -127,6 +133,22 @@ flottants</a>. C’est plutôt appréciable, sauf que dans les autres versions
 (voir la documentation officielle de PicoLisp sur les nombres :
 [ici](http://www.software-lab.de/doc/ref.html#number) et
 [là](http://www.software-lab.de/doc/ref.html#num-io)).
+
+### Boucles POUR
+
+Il n’y a pas de commande `Pour` en MicroAlg. Deux raisons à cela :
+
+1. C’est une façon de penser que l’être humain n’utilise que très rarement.
+   Rares sont les situations de la vie de tous les jours où notre cerveau
+   garde une trace du numéro de l’itération courante. Le `Tant_que` est
+   bien plus naturel.
+2. Ne pas inclure de commande `Pour` permet de simplifier grandement le
+   langage. D’une part, c’est déjà une commande en moins. Et d’autre part,
+   si la commande `Pour` devait exister, il faudrait spécifier **le nombre
+   de départ**, **l’incrément**, et **le nombre d’arrivée** (qui selon le
+   nombre de départ et l’incrément sera passé en revue *ou non*), ce qui
+   peut vite devenir inélégant. Un `Tant_que` muni d’un compteur est bien
+   plus explicite et totalement équivalent.
 
 ### Saisie utilisateur avec SciTE
 
@@ -155,10 +177,17 @@ en sorte que `(Demander)` attende l’utilisateur.
   un des *arguments* d’une *commande* peut être remplacé par une autre
   *instruction* :  
   `(Commande2 (Commande1 arg1 arg2 ...) arg3 ...)`  
-  Dans ce cas, c’est la commande qui est à l’intérieur qui est exécutée en
-  premier. Un environnement MicroAlg doit colorer les parenthèses selon leur
-  profondeur :
+  Un environnement MicroAlg doit colorer les parenthèses selon leur profondeur :
   <span class="paren_1">(</span> <span class="paren_2">(</span> <span class="paren_3">(</span> <span class="paren_4">(</span> <span class="paren_5">(</span> <span class="paren_6">(</span> <span class="paren_0">(</span> <span class="paren_0">)</span> <span class="paren_6">)</span> <span class="paren_5">)</span> <span class="paren_4">)</span> <span class="paren_3">)</span> <span class="paren_2">)</span> <span class="paren_1">)</span>.
+* L’ordre de traitement est un parcours en profondeur suffixe de l’arbre
+  défini par la position des parenthèses :
+    * Ce que l’on appelle *ordre d’apparition* désignera l’ordre de lecture
+      habituel : de gauche à droite puis de haut en bas.
+    * Les instructions sont traitées dans l’ordre de leur apparition.
+    * Chaque commande évalue si besoin ses arguments dans l’ordre de leur
+      apparition, avant même d’effectuer un quelconque traitement.
+    * Pour les commandes imbriquées, c’est donc la commande qui est à le plus à
+      l’intérieur qui est exécutée en premier.
 * Les symboles (noms de variables ou commandes) ne peuvent pas contenir les
   caractères suivants :  
   `"` `'` `(` `)` `,` `[` `]` `` ` `~` `{` `}`.  
@@ -201,13 +230,17 @@ suivre l’évolution d’une quantité.
 
 ### Conventions
 
-Le nom d’une commande :
-
-* ne contient pas d’accent ;
-* commence par une majuscule ;
-* le « tiret du 8 » ou « underscore » (`_`) en sépare les mots ;
-* se termine par `?` si la commande retourne un booléen (sauf pour
-  `=`, `=/`, `<`, `<=`, `>` et`>=`).
+* Les nom des commandes commencent par une majuscule, celui des variables par
+  une minuscule.
+* Si le nom d’un symbole comporte plusieurs mots, le séparateur est le « tiret
+  du 8 » ou « underscore » (`_`).
+* Les noms des symboles ne contiennent en général pas d’accent, mais certaines
+  commandes parmi les plus simples et fréquentes peuvent s’écrire avec des
+  lettres accentuées (sinon, réessayer sans accent). C’est le cas de :
+    * `Affecter_à`
+    * `Concaténer`
+    * `Déclarer`
+    * `Définir`
 
 ## Liste des symboles prédéfinis
 
@@ -277,6 +310,12 @@ valeur ou de la commande qui est parfois fournie :
     * Vous utilisez peut-être `Concatener`, mais il manque une parenthèse
       fermante. Le reste du programme est vu comme le reste des arguments à
       `Afficher`.
+* "type" -- Ce type n’existe pas.
+    * Le type `"type"` que vous fournissez n’existe pas. Il doit valoir
+      `"booleen"`, `"liste"`, `"nombre"`, `"rien"` ou `"texte"`.
+* Commande `Demander` annulée.
+    * Cette erreur apparaît si l’utilisateur annule sa réponse au lieu de la
+      valider. Dans ce cas le programme s’arrête.
 * Commande `Faire` sans mot-clé `Tant_que`.
     * `Tant_que` est peut-être mal orthographié, ou il manque peut-être le « _ »
       ou la majuscule.
@@ -307,7 +346,6 @@ valeur ou de la commande qui est parfois fournie :
 * Indice négatif ou nul.
 * Indice non entier.
 * Indice trop grand.
-* `Initialiser` prend 2 paramètres. Vous en donnez X.
 * java.lang.ClassCastException: PicoLisp$Symbol cannot be cast to PicoLisp$Number
     * Une commande qui concerne uniquement les nombres (comme `+`, `-`, `*`,
     `/`, `%` ou `**`) a été écrite avec autre chose qu’un nombre en argument
@@ -392,6 +430,44 @@ le signaler en :
   fichier qui précède ce message d’erreur, il s’arrête sans doute au premier
   espace rencontré.
 
+## Export
+
+Pour l’instant, cette fonctionnalité n’existe que dans l’interface web.
+
+### Limitations de l’export
+
+#### Limitations générales
+
+Suivant le type d’export, toutes les commandes MicroAlg peuvent ne pas être
+exportées. C’est par exemple le cas des commandes graphiques quand la cible est
+un langage de calculatrice.
+
+#### Limitations de l’export vers les langages des calculatrices
+
+* L’export ne concerne que les Casio et les Texas-Instrument.
+* `Demander` ne peut être utilisée qu’avec `Affecter_a`, pas
+  au sein d’un calcul. Seulement ces constructions sont exportables :
+    * `(Affecter_a VAR (Demander))`
+    * `(Affecter_a VAR (Nombre (Demander)))`
+* Puisque les calculatrices utilisent différentes familles de variables
+  suivant le type de valeur à stocker (contrairement à MicroAlg), les variables
+  seront préfixées brutalement par `Str` ou non, suivant qu’on a utilisé
+  `(Demander)` ou `(Nombre (Demander))`.
+* La commande `Declarer` s’exporte en un commentaire seulement.
+
+#### Précisions sur la visualisation sous forme d’arbre
+
+Pour représenter `(Commande arg1 arg2…)`, on considère que `Commande` est un
+nœud et que ses arguments sont les enfants de ce nœud. Par exemple,  
+`(Afficher (Concatener "du texte" "et encore du texte"))`  
+sera représenté par un arbre ayant cette structure :
+
+    Afficher
+    └─Concatener
+      ├─"du texte"
+      └─"et encore du texte"
+
+
 ## Feuille de route
 
 Voici les directions que le projet va prendre :
@@ -401,6 +477,8 @@ Voici les directions que le projet va prendre :
 * Finir de coder les derniers blocs pour
   <a href="https://blockly-demo.appspot.com/static/apps/index.html"
   class="offi">Blockly</a>.
+* Implémenter un système pour convertir des programmes écrits en MicroAlg
+  en programmes écrits Python, JS, C, PHP, C#, Pascal…
 
 À un niveau moins général, des rapports de bugs ou idées d’amélioration sont
 régulièrement [reportées sur Github](https://github.com/Microalg/Microalg/issues?state=open).
@@ -472,10 +550,17 @@ Pour cela, il y a plusieurs méthodes :
 * `pil`, `pil-j`, `pil-rjs` et `pil-njs` : les interpréteurs des
   implémentations de PicoLisp
 * `microalg.l` : le fichier définissant le langage MicroAlg
+* Processing(.js) : langage et plateforme de programmation visuelle et
+  sonore (voir les sites <a href="http://processing.org/" class="offi">processing.org</a>
+  et <a href="http://processingjs.org/" class="offi">processingjs.org</a>)
+* `.pde` (abréviation de `microalg.pde`) : le fichier convertissant les
+  commandes graphiques de MicroAlg en leur équivalent en Processing
 * `malg`, `malg-j`, `malg-rjs` et `malg-njs` : les interpréteurs de MicroAlg,
   correspondants aux implémentations de PicoLisp
 * « depuis éditeur » concerne par exemple [SciTE](doc.html#scite)
 * web IDE : interface permettant de manipuler MicroAlg depuis un navigateur
+* FEP : Fenêtre Externe Processing, la sortie graphique classique de
+  Processing en version Java
 
 ### Composants
 
@@ -508,6 +593,16 @@ Attention, `pil-j` n’est pas le nom officiel de l’exécutable d’Ersatz (c�
 `pil`). De plus, les versions officielles et semi-officielles d’EmuLisp n’ont
 pas de `pil-Xjs`. `pil-rjs` et `pil-njs` n’existent (pour l’instant) que dans
 MicroAlg.
+
+Concernant les commandes graphiques, `microalg.l` envoie des informations à
+`microalg.pde` :
+
+* via TCP/IP dans la version Java avec
+  [`connect`](http://www.software-lab.de/doc/refC.html#connect)
+  côté PicoLisp/Ersatz, et
+  [`Client`](https://processing.org/reference/libraries/net/Client.html)
+  et [`Server`](https://processing.org/reference/libraries/net/Server.html) côté Processing
+* via un bête `eval(interact(…` dans la version JavaScript
 
 ### Interpréteurs
 
@@ -617,11 +712,11 @@ donnera la suite.
     (Aj  ->  (Ajouter_a |)
     (Co  ->  (Concatener |)
     (D   ->  (Definir |...
+    (De  ->  (Declarer | De_type "")
     (Dm  ->  (Demander)
     (E   ->  (Exemples_de |...
     # Pour Faire, deux lignes vides pour aider à penser au compteur.
     (F   ->  (Faire (|)...
-    (I   ->  (Initialiser |)
     (Li  ->  (Liste |)
     (Lo  ->  (Longueur |)
     (Ni  ->  (Nieme |)
@@ -703,10 +798,21 @@ Voir aussi [cette section](#texte).
 #### Opérations avec Blockly
 
 Un même bloc permet d’obtenir différentes opérations. Pour choisir, cliquer sur
-le menu déroulant, qui contient par défaut l’opération `+`.
+le menu déroulant, qui contient par défaut l’opération `Somme`.
+
+**Attention** : c’est le nom du résultat des opérations qui est affiché dans le
+bloc et non le symbole de l’opération :
+
+* Somme pour +,
+* Différence pour -,
+* Produit pour ×,
+* Quotient pour ÷,
+* Reste pour %,
+* Puissance pour ^.
 
 Voir aussi les commandes 
-[`+`](#sym-+), [`-`](#sym--), [`*`](#sym-*) et [`/`](#sym-/).
+[`+`](#sym-+), [`-`](#sym--), [`*`](#sym-*), [`/`](#sym-/), [`%`](#sym-%) et
+[`^`](#sym-^).
 
 #### Comparaisons avec Blockly
 
@@ -716,6 +822,18 @@ le menu déroulant, qui contient par défaut la comparaison `=`.
 Voir aussi les commandes 
 [`=`](#sym-=), [`=/`](#sym-=/), [`<`](#sym-<), [`>`](#sym-\>), [`<=`](#sym-<=)
 et [`>=`](#sym->=).
+
+#### Blocs manquants
+
+Certaines commandes de langage MicroAlg n’ont pas encore de bloc.
+
+* `1000Cosinus` et `1000Sinus`, `Ajouter_a` et `Retirer_de` (à venir)
+* `Aide` (délicat car prend en paramètre des commandes avec ou sans retour)
+* `Definir` et `Retourner` (faisable mais il faut distinguer les commandes
+  retournant une valeur des autres)
+* `Exemples`, `?` et `Tester` (d’un niveau assez avancé pour considérer que les
+  utilisateur utiliseront du code textuel, ce qui est aussi le cas pour
+  `Definir` et `Retourner`)
 
 ## Sortie graphique
 
@@ -869,6 +987,11 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
   avec Processing.
 * Flo Carré pour ses remarques sur l’opacité dans le tuto graphique.
 * Florence Cousin pour la découverte du bug où le rayon était en fait le diamètre.
+* [Jean-Philippe Rouquès](https://www.librairiedialogues.fr/personne/jean-philippe-rouques/947072/)
+  pour son intérêt, ses relectures et ses suggestions pleines de bon sens.
+* Alix et Noham, tout juste sept ans au moment des premiers tests du tutoriel
+  de la tortue.
+* Mathis et Tiphaine, pour la deuxième vague des tests du tutoriel de la tortue.
 
 <p id="modeles">Modèles et contre-modèles :</p>
 
@@ -890,11 +1013,13 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 
 * **PicoLisp** et **Ersatz**, par Alexander Burger &mdash; [site officiel](http://picolisp.com)
 * **EmuLisp**, par Jon Kleiser &mdash; [GitHub](https://github.com/Grahack/EmuLisp)
+* **int.js**, par Roman Shtylman &mdash; [GitHub](https://github.com/defunctzombie/int/)
 * **jQuery**, par John Resig et la communauté &mdash; [site officiel](http://jquery.com/)
 * **jQuery-term**, par Jakub T. Jankiewicz &mdash; [site officiel](http://terminal.jcubic.pl/)
 * **parenedit**, &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
 * **Blockly**, par Neil Fraser et la communauté &mdash; [site officiel](http://code.google.com/p/blockly/)
 * **Scite**, par Neil Hodgson &mdash; [site officiel](http://www.scintilla.org/SciTE.html)
+* **svg-tree-drawer**, par Weston Ruter &mdash; [GitHub](https://github.com/westonruter/svg-tree-drawer/)
 
 <p id="annexes">Pour les parties annexes du site :</p>
 

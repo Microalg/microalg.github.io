@@ -2,11 +2,11 @@ html {
   font-size: 62.5%;
 }
 body.microalg {
-  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
-  line-height: 1.6;
-  font-weight: 400;
+    font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+    line-height: 1.6;
+    font-weight: 400;
     font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	max-width: 800px;
+    max-width: 800px;
     width: 95%;
     margin: 0px auto;
 }
@@ -56,6 +56,14 @@ body.microalg {
     width: 95%;
     margin: 0px auto;
 }
+.malg-export {
+    line-height: 1.2em;
+    font-family: monospace;
+    white-space: pre;
+}
+.malg-guide {
+	color: #ddd;
+}
 .malg-blockly-iframe {
     height: 350px;
     width: 100%;
@@ -102,14 +110,20 @@ body.microalg {
     background-color: white;
     font-family: 'Courier New', Courier, monospace;
 }
-.link-right {
+.microalg .link-right {
     text-align: right;
 }
-.link-snippet {
+.microalg .link-snippet {
     text-align: right;
 }
-.link-snippet a {
+.microalg .link-snippet a {
     text-decoration: none;
+	border-bottom: 0;
+	background-color: #eee;
+	padding: 0 .5em 0 .5em;
+}
+.microalg .link-snippet a:hover {
+	background-color: #ddd;
 }
 a.wp:after, a.offi:after, a.email:after {
     color: black;
