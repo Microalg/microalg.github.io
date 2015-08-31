@@ -1,4 +1,4 @@
-(setq version "0.4")
+(setq version "0.4.04")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -625,8 +625,16 @@ avec les plus jeunes.")
     -> Rien
 ")
 (put 'Liste 'text "Commande `Liste`.")
-(de Liste @
-    (new '(+Liste) (rest)) )
+(de Liste !arg_lst
+  (let (!evaled_arg_lst (mapcar 'eval !arg_lst)
+        !error_prefix "`Liste` : l’argument n°")
+       # Variables initialisées ?
+       (for (!arg_num . !arg) !arg_lst
+         (ifn (!inited !arg (car (nth !evaled_arg_lst !arg_num)))
+              (quit (pack !error_prefix !arg_num " n’a pas été déclaré.") !arg)
+         )
+       )
+       (new '(+Liste) !evaled_arg_lst) ))
 
 # Manipulations de texte et de liste
 (put 'Longueur 'doc
