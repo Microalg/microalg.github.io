@@ -10,7 +10,6 @@
     <script>window.jQuery || document.write('<script src="web/jquery.min.js"><\/script>')</script>
     <script src="emulisp/int.js" type="text/javascript"></script>
     <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
-    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="web/style.css" />
     <script type="text/javascript" src="web/ide_injections.js"></script>
     <script type="text/javascript" src="web/parenedit.js"></script>
@@ -35,9 +34,9 @@
         <a href="#top">haut de page</a>
     </div>
     <h1 id="top">MicroAlg - Tutoriel par blocs</h1>
-    <p><a href="#variables">Commencer tout de suite</a>, sans
-    lire l’introduction.</p>
-    <p>Aller directement à :
+    <p>Cette page est la suite de <a href="tuto_blocs.html">celle-ci</a>.
+    Impossible de continuer si vous ne l’avez pas lue avant.</p>
+    <p><strong>Sur cette page</strong>, aller directement à :
     <a href="#variables">Variables</a>,
     <a href="#operations-logiques">Opérations logiques</a>,
     <a href="#manipulation-de-texte">Manipulation de texte</a>,
@@ -50,10 +49,18 @@
     <a href="#taper-du-code">Taper du code</a>,
     <a href="#contact">Contact</a>.
     </p>
-
-    <h2 id="questce">Qu’est-ce ?</h2>
-    <p>Cette page est la suite de <a href="tuto_blocs.html">celle-ci</a>.
-    Impossible de continuer si vous ne l’avez pas lue avant.</p>
+    <p><strong>Sur la page précédente</strong>, aller directement à :
+    <a href="tuto_blocs.html#prise-en-main-et-affichage">Prise en main et affichage</a>,
+    <a href="tuto_blocs.html#commentaires">Commentaires</a>,
+    <a href="tuto_blocs.html#texte-et-concatenation">Texte et concaténation</a>,
+    <a href="tuto_blocs.html#repeter">Répéter</a>,
+    <a href="tuto_blocs.html#nbres-pseudo-aleatoires">Nombres pseudo-aléatoires</a>,
+    <a href="tuto_blocs.html#demander">Demander à l’utilisateur</a>,
+    <a href="tuto_blocs.html#calculs-nombres">Calculs avec des nombres</a>,
+    <a href="tuto_blocs.html#calculs-nombres-demandes">Calculs avec des nombres demandés à l’utilisateur</a>,
+    <a href="tuto_blocs.html#booleens">Booléens</a>,
+    <a href="tuto_blocs.html#si">Si</a>.
+    </p>
 
     <h2 id="contact">Contact</h2>
     <p>En cas de problème, ne pas hésiter à poser une question dans
@@ -124,6 +131,20 @@
         '    )\n' +
         ')\n' +
         '(Afficher (* x x))'
+    });</script>
+    <p><strong>Exercice</strong> : Dans le programme suivant, on veut demander
+    afficher un certain nombre de fois un texte que l’utilisateur va choisir.
+    Malheureusement, le programme ne fonctionne pas comme prévu, l’utilisateur
+    ne devrait écrire qu’une seule fois le mot à afficher. Corrigez ce
+    programme.</p>
+    <div id="script-variable-repeter"></div>
+    <script>inject_microalg_editor_in('script-variable-repeter', {
+     src:
+        '(Afficher "Tapez d’abord un nombre, Entrée, puis le texte à répéter.")\n' +
+        '(Repeter (Nombre (Demander)) Fois\n' +
+        '    (Afficher (Demander))\n' +
+        ')\n' +
+        ''
     });</script>
     <p>Dans le dernier programme, on remarque que le symbole de la
     multiplication <code>×</code> ressemble à la lettre <code>x</code>.
@@ -544,6 +565,7 @@
     <p>Voici quelques exemples utilisant la commande <code>Concatener</code> :</p>
     <div id="script-cmds-concatener"></div>
     <script>inject_microalg_editor_in('script-cmds-concatener', {
+     blockly_only: true,
      src:
         '(Afficher (Concatener (Liste 1 3 5) (Liste 7 9 11)))\n' +
         '(Afficher (Concatener (Liste "s") (Liste "a" "l") (Liste "u" "t")))\n' +
@@ -559,6 +581,7 @@
     <code>Concatener</code> retourne plutôt un texte vide qu’une liste vide :</p>
     <div id="script-concatener-sans-arg"></div>
     <script>inject_microalg_editor_in('script-concatener-sans-arg', {
+     blockly_only: true,
      src:
         '(Afficher "Avant.")\n' +
         '(Afficher (Concatener))\n' +

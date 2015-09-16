@@ -24,6 +24,14 @@
     )
   )
 )
+(de !num? (x)
+  (and (== 'Litteral (car x)) (num? (cadr x)))
+)
+(de !bytehexapad (x)
+  (if (<> 2 (length x))
+      (pack "0" x)
+      x ))
+
 # Attention, insertion_next ne plonge pas dans les instructions contenant des
 # blocs, comme Faire, Tant_que et Si. Ce genre d’instruction doit utiliser
 # insertion_next sur leurs blocs.
@@ -152,7 +160,7 @@
        (let (!length_vars (length !vars))
             (pack "<block type=\"declarer\">"
                   "<field name=\"VAR\">" (car !vars) "</field>"
-                  "<value name=\"TYPE\">" (eval !type) "</value>"
+                  "<field name=\"TYPE\">" (eval !type) "</field>"
                   (if (and (<> 0 !length_vars) (<> 1 !length_vars) 2)  # len >= 2
                       (pack "<next>" (!declarer_rec (cdr !vars) !type !next) "</next>")
                       (!declarer_rec (cdr !vars) !type !next)
@@ -245,6 +253,16 @@
         content
         "</value>"
         "</block>"))
+(de Repeter inputs
+  (let (!repet  (car inputs)
+        !corps (cddr inputs)
+        # !next est le dernier de la liste inputs, si son car vaut Next.
+        !next (let !last (last inputs) (if (= (car !last) 'Next) !last)))
+       (pack "<block type=\"repeter\">"
+             "<value name=\"REPET\">" (eval !repet) "</value>"
+             "<statement name=\"INSTR\">" (eval (insertion_next !corps)) "</statement>"
+             (eval !next)
+             "</block>") ))
 (de Si inputs
   (let (condition (car inputs)
         kw_alors  (cadr inputs)
@@ -330,24 +348,33 @@
              "</block>")))
 (de Contour inputs
   (let (couleur (cdar inputs)  # cadr: extraire RVBA de '((Liste R V B A))
-        r (eval (car   couleur))
-        v (eval (cadr  couleur))
-        b (eval (caddr couleur))
-        a (eval (cadddr couleur))
+        r (car    couleur)
+        v (cadr   couleur)
+        b (caddr  couleur)
+        a (cadddr couleur)  # Ces quatre valeurs de la forme (Litteral X).
         next (eval (cadr inputs)))
-       (pack "<block type=\"contour" (if a "-alpha") "\">"
-             "<value name=\"R\">"
-             r
-             "</value>"
-             "<value name=\"V\">"
-             v
-             "</value>"
-             "<value name=\"B\">"
-             b
-             "</value>"
-             (if a (pack "<value name=\"A\">" a "</value>"))
-             next
-             "</block>")))
+       (if (and (not a) (!num? r) (!num? v) (!num? b))
+           (pack "<block type=\"contour-p\">"
+                 "<field name=\"COULEUR\">"
+                 "#" (!bytehexapad (hex (cadr r)))
+                     (!bytehexapad (hex (cadr v)))
+                     (!bytehexapad (hex (cadr b)))
+                 "</field>"
+                 next
+                 "</block>")
+           (pack "<block type=\"contour" (if a "-alpha") "\">"
+                 "<value name=\"R\">"
+                 (eval r)
+                 "</value>"
+                 "<value name=\"V\">"
+                 (eval v)
+                 "</value>"
+                 "<value name=\"B\">"
+                 (eval b)
+                 "</value>"
+                 (if a (pack "<value name=\"A\">" (eval a) "</value>"))
+                 next
+                 "</block>"))))
 (de Ellipse inputs
   (let (origine (car inputs)
         orig_x (eval (cadr origine))
@@ -402,24 +429,33 @@
              "</block>")))
 (de Remplissage inputs
   (let (couleur (cdar inputs)  # cadr: extraire RVBA de '((Liste R V B A))
-        r (eval (car   couleur))
-        v (eval (cadr  couleur))
-        b (eval (caddr couleur))
-        a (eval (cadddr couleur))
+        r (car    couleur)
+        v (cadr   couleur)
+        b (caddr  couleur)
+        a (cadddr couleur)  # Ces quatre valeurs de la forme (Litteral X).
         next (eval (cadr inputs)))
-       (pack "<block type=\"remplissage" (if a "-alpha") "\">"
-             "<value name=\"R\">"
-             r
-             "</value>"
-             "<value name=\"V\">"
-             v
-             "</value>"
-             "<value name=\"B\">"
-             b
-             "</value>"
-             (if a (pack "<value name=\"A\">" a "</value>"))
-             next
-             "</block>")))
+       (if (and (not a) (!num? r) (!num? v) (!num? b))
+           (pack "<block type=\"remplissage-p\">"
+                 "<field name=\"COULEUR\">"
+                 "#" (!bytehexapad (hex (cadr r)))
+                     (!bytehexapad (hex (cadr v)))
+                     (!bytehexapad (hex (cadr b)))
+                 "</field>"
+                 next
+                 "</block>")
+           (pack "<block type=\"remplissage" (if a "-alpha") "\">"
+                 "<value name=\"R\">"
+                 (eval r)
+                 "</value>"
+                 "<value name=\"V\">"
+                 (eval v)
+                 "</value>"
+                 "<value name=\"B\">"
+                 (eval b)
+                 "</value>"
+                 (if a (pack "<value name=\"A\">" (eval a) "</value>"))
+                 next
+                 "</block>"))))
 (de Segment inputs
   (let (p1 (car inputs)
         p2 (cadr inputs)

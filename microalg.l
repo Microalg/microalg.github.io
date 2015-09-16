@@ -1,4 +1,4 @@
-(setq version "0.4.04")
+(setq version "0.4.05")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -17,14 +17,15 @@ Voir <http://microalg.info>.")
 "Cercle" "Concatener" "Contour" "credit_iterations"
 "Declarer" "Definir" "Demander" "Demander_un_nombre"
 "Ellipse" "En_position" "Entier@" "Epaisseur" "Et" "Exemples_de"
-"Faire" "Faux"
+"Faire" "Faux" "Fois"
+"Geler"
 "Initialiser@"
 "Liste" "Longueur"
 "Millisecondes"
 "Nieme" "Nieme@" "Nombre" "Non"
 "Ou"
 "Queue"
-"RAZ" "Rectangle" "Remplissage" "Retirer_de" "Retourner" "Rien"
+"RAZ" "Rectangle" "Remplissage" "Repeter" "Retirer_de" "Retourner" "Rien"
 "sequence_tirages@"
 "Segment" "Si" "Sinon"
 "Tant_que" "Tester" "Tete" "Texte" "Triangle" "Type"
@@ -791,16 +792,24 @@ Avec une liste :
 (put 'Ajouter_a 'text "Commande `Ajouter_a`.")
 (de Ajouter_a arg_lst
   (let (!sym (car arg_lst)
+        !type_du_sym (!type_sym !sym)
         !evaled_sym (eval !sym)
         !elt (eval (cadr arg_lst))
         !troize (caddr arg_lst))
        # Quelques vérifications
        (if !troize (quit "`Ajouter_a` n’a que deux paramètres."))
-       (ifn (!inited !sym !evaled_sym) (quit "`Ajouter_a` : la variable n’a pas été déclarée." !sym))
-       (if (!boolM2P (!texte? !sym))
+       (ifn (!inited !sym !evaled_sym)
+            (quit "`Ajouter_a` : la variable n’a pas été déclarée." !sym))
+       (if (and (<> !type_du_sym "texte") (<> !type_du_sym "liste"))
+           (quit (pack "`Ajouter_a` : la variable doit être de type "
+                       "\"texte\" ou \"liste\".")) )
+       (ifn (<> 'Rien !evaled_sym)
+            (quit (pack "`Ajouter_a` : la variable n’a pas été initialisée. "
+                        "Affectez-lui une valeur de type \"texte\" ou \"liste\".")) )
+       (ifn (<> "texte" !type_du_sym)
            (if (or (not (!boolM2P (!texte? !elt)))
                    (!boolM2P (> (!longueur !elt) 1)) )
-               (quit "On peut `Ajouter_a` un texte qu’un caractère." !elt) ))
+               (quit "On ne peut `Ajouter_a` un texte qu’un caractère." !elt) ))
        # Le calcul
        (cond
          ((!liste? !evaled_sym) (prog (push> !evaled_sym !elt) Rien))
@@ -1114,7 +1123,7 @@ Ou :
                      splitted  (split (cddr arg_lst) 'Sinon)
                      bloc_vrai (car splitted)
                      bloc_faux (cadr splitted))
-                    (if (<> Alors kw_alors) (quit "Mot-clef `Alors` manquant."))
+                    (if (<> Alors kw_alors) (quit "`Si` : Le mot-clef `Alors` doit être le deuxième argument."))
                     (if (!boolCheckM2P (eval condition) "La condition n’est pas un booléen.")
                         (run bloc_vrai)
                         (if (== NIL bloc_faux)
@@ -1277,6 +1286,50 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
                        Rien
                   )
 )
+(put 'Fois 'doc "Mot-clef intermédiaire pour la commande `Repeter`.")
+(setq Fois 'Fois)
+(put 'Repeter 'doc
+"Structure itérative de type « répéter ... fois : ... ».
+
+    (Repeter nombre Fois
+        instruction_1
+        instruction_2
+        ...
+    )
+
+Exemples :
+
+    : (Repeter 3 Fois (Afficher \"Bonjour.\"))
+    Bonjour.
+    Bonjour.
+    Bonjour.
+    -> Rien
+
+    : (Repeter 2 Fois (Afficher \"C’est…\") (Afficher \" …bien.\"))
+    C’est…
+     …bien.
+    C’est…
+     …bien.
+    -> Rien
+")
+(put 'Repeter 'text "Commande `Repeter`.")
+(de !repeter @
+  (let (!error_prefix "`Repeter` : "
+        !arg_lst (rest))
+       (if (<> 2 (index 'Fois !arg_lst))
+           (quit "`Repeter` : Le mot-clef `Fois` doit être en 2ème position.") )
+
+       (let (!nb_repetitions (eval (car !arg_lst))
+             !corps (cddr !arg_lst))
+            (ifn (num? !nb_repetitions)
+                 (quit "Le nombre de répétitions doit être de type \"nombre\".") )
+            (do !nb_repetitions (run !corps))
+       )
+       Rien
+  )
+)
+(de Repeter !arg_lst (apply '!repeter !arg_lst))
+(de Répéter !arg_lst (apply '!repeter !arg_lst))
 
 # Procédures utilisateur
 # Tout d’abord les générateurs d’initialisation
@@ -1949,4 +2002,18 @@ L’angle doit être fourni en degrés.
     ((gt0 (- !angle 90)) (1000Cosinus (- !angle 90)))
     (T (car (nth !valeurs_trigo (- 91 !angle))))
   )
+)
+
+(put 'Geler 'doc
+"Retourne l’argument qu’on lui passe, sans l’évaluer.
+
+    : (Geler x)
+    -> x
+")
+(put 'Geler 'text "Commande `Geler`.")
+(de Geler !arg_lst
+    (if (<> 1 (length !arg_lst))
+        (quit (pack "`Geler` : prend exactement un paramètre. "
+                    "Vous en donnez " (length !arg_lst) ".")) )
+    (car !arg_lst)
 )

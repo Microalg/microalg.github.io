@@ -13,7 +13,6 @@
         <link type="text/css" href="web/showup.css" rel="stylesheet" />
         <script src="emulisp/int.js" type="text/javascript"></script>
         <script src="emulisp/emulisp_core.js" type="text/javascript"></script>
-        <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
         <link rel="stylesheet" type="text/css" href="web/style.css" />
         <script type="text/javascript" src="web/ide_injections.js"></script>
         <link rel="stylesheet" type="text/css" href="web/parenedit.css" />
@@ -241,6 +240,7 @@ suivre l’évolution d’une quantité.
     * `Concaténer`
     * `Déclarer`
     * `Définir`
+    * `Répéter`
 
 ## Liste des symboles prédéfinis
 
@@ -721,8 +721,9 @@ donnera la suite.
     (Lo  ->  (Longueur |)
     (Ni  ->  (Nieme |)
     (No  ->  (Nombre |)
+    (R   ->  (Repeter | Fois...
     (Rd  ->  (Retirer_de |)
-    (R   ->  (Retourner |)
+    (Re   -> (Retourner |)
     (S   ->  (Si (|) Alors...
     (Ss  ->  (Si (|) Alors () Sinon...
     # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
@@ -999,7 +1000,8 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * **Scratch** &mdash; [article Wikipedia](http://fr.wikipedia.org/wiki/Scratch_%28langage%29)
 * **Algobox**, par Pascal Brachet &mdash; [site officiel](http://www.xm1math.net/algobox/)
 * **Java’s Cool** &mdash; [site officiel](http://javascool.gforge.inria.fr)
-* **Blockly** &mdash; [page expliquant certaines décisions](https://code.google.com/p/blockly/wiki/Language)
+* **Blockly** &mdash; [page expliquant certaines décisions](https://code.google.com/p/blockly/wiki/Language),
+  [page expliquant quelques erreurs à éviter](https://developers.google.com/blockly/hacking/mistakes)
 * **PicoLisp**, par Alexander Burger &mdash; [site officiel](http://picolisp.com)
 * **Scheme**, par Sussman et Steele &mdash;
   [article Wikipedia](http://fr.wikipedia.org/wiki/Scheme)
@@ -1018,7 +1020,7 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * **jQuery-term**, par Jakub T. Jankiewicz &mdash; [site officiel](http://terminal.jcubic.pl/)
 * **parenedit**, &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
 * **Blockly**, par Neil Fraser et la communauté &mdash; [site officiel](http://code.google.com/p/blockly/)
-* **Scite**, par Neil Hodgson &mdash; [site officiel](http://www.scintilla.org/SciTE.html)
+* **SciTE**, par Neil Hodgson &mdash; [site officiel](http://www.scintilla.org/SciTE.html)
 * **svg-tree-drawer**, par Weston Ruter &mdash; [GitHub](https://github.com/westonruter/svg-tree-drawer/)
 
 <p id="annexes">Pour les parties annexes du site :</p>

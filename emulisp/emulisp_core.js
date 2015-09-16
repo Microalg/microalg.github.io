@@ -1202,6 +1202,16 @@ var coreFunctions = {
 	},
 	"gt0": function(c) { var cv = evalLisp(c.car);
 		return ((cv instanceof Number) && (cv > 0)) ? cv : NIL; },
+	"hex": function(c) { var cv = evalLisp(c.car);
+		// Separator not implemented yet:
+		// http://www.software-lab.de/doc/refH.html#hex
+		if (cv instanceof Number) return newTransSymbol(cv.toString(16));
+		if (cv.trans) {
+			var hex = new Number(parseInt(cv.name, 16));
+			return isNaN(hex)? NIL : hex;
+		}
+		return NIL;
+	},
 	"idx": function(c) { var s = evalLisp(c.car);
 		if (!(s instanceof Symbol)) return NIL;
 		if (c.cdr === NIL) { var r = new List(); idxLinkSorted(s.getVal(), r); return r.list; }
@@ -1364,6 +1374,17 @@ var coreFunctions = {
 	"pack": function(c) {
 		if (c !== NIL) { var s = valueToStr(evalArgs(c)); if (s !== "") return newTransSymbol(s); }
 		return NIL;
+	},
+	"pad": function(c) {
+		var v = evalLisp(c.car);
+		if (!(v instanceof Number)) {
+			throw new Error(newErrMsg(NUM_EXP, v));
+		}
+		var size = evalLisp(c.cdr.car);
+		while (number.length < size) {
+			number = "0" + number;
+		}
+		return newTransSymbol(number);
 	},
 	"pass": function(c) { return applyFn(c.car, cst.evFrames.car.cdr, c.cdr); },
 	"pop": function(c) { var cv = evalLisp(c.car);

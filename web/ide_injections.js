@@ -1,4 +1,6 @@
-// Load microalg.l.
+// Some defs.
+
+// Helpers to fetch the content of lisp source files.
 // http://stackoverflow.com/questions/984510/what-is-my-script-src-url
 var this_script_url = (function(scripts) {
     var scripts = document.getElementsByTagName('script'),
@@ -31,6 +33,14 @@ function getLispSource(what) {
         lisp_srcs[what] = EMULISP_CORE.getFileSync(root_path + file);
     }
     return lisp_srcs[what];
+}
+
+// Better base 64 functions.
+function mybtoa(x) {
+    return btoa(unescape(encodeURIComponent(x)));
+}
+function myatob(x) {
+    return decodeURIComponent(escape(window.atob(x)));
 }
 
 // Editor states are stored with key = div id to print
@@ -87,11 +97,11 @@ function stdPrompt() {
     else throw new Error("Commande `Demander` annulée.")
 }
 
-function onCtrl(elt, f, config_64, presrc_b64) {
+function onCtrl(elt, f, config_64) {
     elt.keydown(function (e) {
         if (e.ctrlKey) {
             if (e.keyCode == 10 || e.keyCode == 13) {
-                f(elt, config_64, presrc_b64);
+                f(elt, config_64);
             } else if (e.keyCode == 66) {
                 e.preventDefault();
                 // Voir aussi dans editeurs/scite/malg_abbrev.properties.
@@ -116,8 +126,9 @@ function onCtrl(elt, f, config_64, presrc_b64) {
                   "(Ni":  "(Nieme |)",
                   "(N@":  "(Nieme@ |)",
                   "(No":  "(Nombre |)",
+                  "(R":   "(Repeter | Fois\n    ()\n)",
                   "(Rd":  "(Retirer_de |)",
-                  "(R":   "(Retourner |)",
+                  "(Re":  "(Retourner |)",
                   "(S":   "(Si (|) Alors\n    ()\n)",
                   "(Ss":  "(Si (|)\n Alors ()\n Sinon ()\n)",
                   "(Te":  "(Tester |)",
@@ -146,13 +157,13 @@ function onCtrl(elt, f, config_64, presrc_b64) {
     });
 }
 
-function ide_action(editor_elt, config_64, presrc_b64) {
+function ide_action(editor_elt, config_64) {
     // Compute the target HTML elt.
     var elt_id = editor_elt.attr('id').slice(0, -('-malg-editor'.length));
     var display_target_id = elt_id + '-displaytarget';
     var processing_id = elt_id + '-processing';
     // Decode config_64.
-    var config = JSON.parse(atob(config_64));
+    var config = JSON.parse(myatob(config_64));
     // Init the state and load it with MicroAlg.
     EMULISP_CORE.init();
     var lisp_source = 'microalg';
@@ -172,7 +183,7 @@ function ide_action(editor_elt, config_64, presrc_b64) {
     var display_elt = editor_elt.parent().parent().parent().find('.malg-display').first();
     display_elt.html('&nbsp;');
     // Process pre src.
-    var presrc = atob(presrc_b64);
+    var presrc = config.presrc || '';
     EMULISP_CORE.eval(presrc);
     // Process src.
     var src = editor_elt.val();
@@ -221,8 +232,7 @@ function inject_microalg_editor_in(elt_id, config) {
     var processing_id = elt_id + '-processing';
     var src = '';
     var blockly_src = '';
-    config.src = config.src.replace(/’/g, "'");
-    var config_64 = btoa(JSON.stringify(config));
+    var config_64 = mybtoa(JSON.stringify(config));
     // According to config.localStorage, load source code (if any) from local
     // storage in the `src` var.
     if (config.localStorage) {
@@ -239,17 +249,14 @@ function inject_microalg_editor_in(elt_id, config) {
             src = config.src;
         }
     }
-    // Encode (b64) presrc if any.
-    var presrc_b64 = '';
-    if (config.presrc) {
-        presrc_b64 = btoa(config.presrc);
-    }
     if (config.blockly || config.blockly_only) {
         // Le source doit être sur une ligne pour passer dans le js généré:
         blockly_src = src.replace(/(\r\n|\n|\r)/gm, "")
         // On contre-échappe les backslashes car ce code sera inséré dans
         // une iframe.
-                         .replace(/\\/g, "\\\\");
+                         .replace(/\\/g, "\\\\")
+        // On échappe les ':
+                         .replace("'", "\\'")
     }
     // Build the html and bind to ide_action.
     var script_container = $('#' + elt_id);
@@ -277,10 +284,13 @@ function inject_microalg_editor_in(elt_id, config) {
                                       'spellcheck="false">' + src + '</textarea></div>' +
         '<input type="button" value="OK" class="malg-ok" ' +
                 'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' +
-                                     "'" + config_64 + "'" + ', ' +
-                                     "'" + presrc_b64 + "'" + ')" />' +
+                                     "'" + config_64 + "'" + ')" />' +
         '<div class="malg-error"></div>' +
-        '<div id="' + display_target_id + '" class="malg-display">&nbsp;</div>';
+        '<div id="' + display_target_id + '" class="malg-display">&nbsp;</div>' +
+        ((config.autorun && !config.processing)?
+          "<script>ide_action($('#" + editor_id + "'), '" + config_64 +"');</script>\n":
+          "") +
+        '';
     if (config.processing) {
         if (typeof Processing == "undefined") {
             script_string += '<script src="' + root_path + 'web/processing-1.4.15.min.js"></script>';
@@ -302,6 +312,9 @@ function inject_microalg_editor_in(elt_id, config) {
         '                processing_sketches["' + processing_id + '"] = Processing.getInstanceById("' + processing_id + '");' + "\n" +
         '                if (processing_sketches["' + processing_id + '"]) {' + "\n" +
         '                    clearInterval(processing_tIds["' + processing_id + '"]);' + "\n" +
+        (config.autorun?
+          "ide_action($('#" + editor_id + "'), '" + config_64 +"');\n":
+          "") +
         '                }' + "\n" +
         '            }, 500);' + "\n" +
         '        }' + "\n" +
@@ -317,8 +330,8 @@ function inject_microalg_editor_in(elt_id, config) {
                 ' <category name="Valeurs">' +
                 '  <block type="texte_litteral"></block>' +
                 '  <block type="nombre_litteral"></block>' +
-                '  <block type="valeur_utilisateur"></block>' +
                 '  <block type="variable"></block>' +
+                '  <block type="valeur_utilisateur"></block>' +
                 '  <block type="vrai"></block>' +
                 '  <block type="faux"></block>' +
                 '  <block type="liste"></block>' +
@@ -329,12 +342,13 @@ function inject_microalg_editor_in(elt_id, config) {
                 ' <category name="Cmdes sans retour">' +
                 '  <block type="commentaire"></block>' +
                 '  <block type="afficher"></block>' +
-                '  <block type="declarer"></block>' +
-                '  <block type="affecter_a"></block>' +
-                '  <block type="initialiser_pseudo_aleatoire"></block>' +
+                '  <block type="repeter"></block>' +
                 '  <block type="si"></block>' +
                 '  <block type="faire"></block>' +
                 '  <block type="tant_que"></block>' +
+                '  <block type="declarer"></block>' +
+                '  <block type="affecter_a"></block>' +
+                '  <block type="initialiser_pseudo_aleatoire"></block>' +
                 ' </category>' +
                 ' <category name="Cmdes avec retour">' +
                 '  <block type="concatener"></block>' +
@@ -353,9 +367,6 @@ function inject_microalg_editor_in(elt_id, config) {
                 ' </category>' +
                 ' <category name="Types et conversions">' +
                 '  <block type="type"></block>' +
-                '  <block type="texte?"></block>' +
-                '  <block type="nombre?"></block>' +
-                '  <block type="booleen?"></block>' +
                 '  <block type="texte"></block>' +
                 '  <block type="nombre"></block>' +
                 ' </category>' +
@@ -372,8 +383,10 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="triangle"></block>' +
                 '  <block type="segment"></block>' +
                 '  <block type="epaisseur"></block>' +
+                '  <block type="contour-p"></block>' +
                 '  <block type="contour"></block>' +
                 '  <block type="contour-alpha"></block>' +
+                '  <block type="remplissage-p"></block>' +
                 '  <block type="remplissage"></block>' +
                 '  <block type="remplissage-alpha"></block>' +
                 ' </category>' +
@@ -434,7 +447,7 @@ function inject_microalg_editor_in(elt_id, config) {
     }
     var editor = $('#' + elt_id + '-malg-editor');
     createRichInput(editor);
-    onCtrl(editor, ide_action, config_64, presrc_b64);
+    onCtrl(editor, ide_action, config_64);
 }
 
 function export_action(elt_id, select) {
@@ -485,7 +498,6 @@ function malg2other(lang, src) {
         var exported_src = cleanTransient(EMULISP_CORE.eval(source_preparee).toString());
         EMULISP_CORE.init();
         EMULISP_CORE.eval(getLispSource('microalg'));
-        exported_src = "Attention, fonctionnalité encore expérimentale !\n\n" + exported_src;
         return exported_src;
     }
 }

@@ -43,6 +43,15 @@ Blockly.MicroAlg.addReservedWords(
     'Queue, Retirer_de, Retourner, Rien, Si, Sinon, ' +
     'Tant_que, Tester, Tete, Texte, Type, ' +
     'Vide?, Vrai');
+Blockly.MicroAlg.newQuote = function(open) {
+    if (open == Blockly.RTL) {
+      var file = 'quote1.png';
+    } else {
+      var file = 'quote0.png';
+    }
+    return new Blockly.FieldImage(
+        Blockly.pathToBlockly + 'media/' + file, 12, 12, '"');
+}
 
 // La suite, jusqu’au commentaire de fin, n’a pas été modifiée.
 
@@ -278,21 +287,12 @@ Blockly.Blocks['commentaire'] = {
     this.setColour(colour);
     this.appendDummyInput()
         .appendField('!!!')
-        .appendField(this.newQuote_(true))
+        .appendField(Blockly.MicroAlg.newQuote(true))
         .appendField(new Blockly.FieldTextInput(''), 'COMZ')
-        .appendField(this.newQuote_(false));
+        .appendField(Blockly.MicroAlg.newQuote(false));
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Commentaire. Aucune action n’est réalisée.');
-  },
-  newQuote_: function(open) {
-    if (open == Blockly.RTL) {
-      var file = 'quote1.png';
-    } else {
-      var file = 'quote0.png';
-    }
-    return new Blockly.FieldImage(Blockly.pathToBlockly + 'media/' + file,
-                                  12, 12, '"');
   }
 };
 
@@ -487,9 +487,11 @@ Blockly.Blocks['declarer'] = {
     this.setNextStatement(true);
     this.setTooltip('Déclarer une variable avec un type.');
     this.interpolateMsg(
-      'Declarer' + ' %1 ' + 'De_type' + '%2',
+      'Declarer %1 De_type %2 %3 %4',
       ['VAR', new Blockly.FieldVariable("ma_variable")],
-      ['TYPE', null],
+      ['Q1', Blockly.MicroAlg.newQuote(true)],
+      ['TYPE', new Blockly.FieldTextInput('')],
+      ['Q2', Blockly.MicroAlg.newQuote(false)],
       Blockly.ALIGN_RIGHT);
     this.setInputsInline(false);
     this.contextMenuMsg_ = "Créer truc"; // ???
@@ -509,7 +511,7 @@ Blockly.Blocks['declarer'] = {
 // Gen Declarer
 // https://github.com/google/blockly/blob/master/generators/javascript/variables.js
 Blockly.MicroAlg['declarer'] = function(block) {
-  var type = Blockly.MicroAlg.statementToCode(block, 'TYPE') || '';
+  var type = Blockly.MicroAlg.quote_(block.getFieldValue('TYPE'));
   var type_cleaned = type.toString().trim();
   return '(Declarer ' + this.getFieldValue('VAR') + ' De_type ' + type_cleaned + ')';
 };
@@ -1126,6 +1128,35 @@ Blockly.MicroAlg['queue'] = function(block) {
   }
 };
 
+// Bloc Repeter
+Blockly.Blocks['repeter'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Repeter');
+    this.setColour(colour);
+    this.appendValueInput("REPET")
+        .setCheck("Number")
+        .appendField("Repeter");
+    this.appendDummyInput()
+        .appendField("Fois");
+    this.setInputsInline(true);
+    this.appendStatementInput('INSTR')
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Structure itérative');
+    },
+};
+
+// Gen Repeter
+Blockly.MicroAlg['repeter'] = function(block) {
+    var instr = Blockly.MicroAlg.statementToCode(block, 'INSTR') || '';
+    var repet = Blockly.MicroAlg.statementToCode(block, 'REPET') || '';
+    instr = instr.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
+    var code = '(Repeter ' + repet.trim() + ' Fois\n' +
+               instr +
+               '\n)'
+    return code;
+};
+
 // Bloc Si
 // https://github.com/google/blockly/blob/master/blocks/logic.js#L34
 Blockly.Blocks['si'] = {
@@ -1388,20 +1419,11 @@ Blockly.Blocks['texte_litteral'] = {
     this.setHelpUrl(malg_url + '#textesavecblockly');
     this.setColour(colour);
     this.appendDummyInput()
-        .appendField(this.newQuote_(true))
+        .appendField(Blockly.MicroAlg.newQuote(true))
         .appendField(new Blockly.FieldTextInput(''), 'TEXT')
-        .appendField(this.newQuote_(false));
+        .appendField(Blockly.MicroAlg.newQuote(false));
     this.setOutput(true, 'String');
     this.setTooltip('Texte');
-  },
-  newQuote_: function(open) {
-    if (open == Blockly.RTL) {
-      var file = 'quote1.png';
-    } else {
-      var file = 'quote0.png';
-    }
-    return new Blockly.FieldImage(Blockly.pathToBlockly + 'media/' + file,
-                                  12, 12, '"');
   }
 };
 
@@ -1615,13 +1637,16 @@ Blockly.Blocks['cercle'] = {
         .appendField('Cercle');
     this.appendValueInput("ORIG_X")
         .setCheck('Number')
-        .appendField('X');
+        .appendField('X')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("ORIG_Y")
         .setCheck('Number')
-        .appendField('Y');
+        .appendField('Y')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("R")
         .setCheck('Number')
-        .appendField('R');
+        .appendField('R')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Dessine le cercle de centre (X,Y) et de rayon R.');
@@ -1636,6 +1661,29 @@ Blockly.MicroAlg['cercle'] = function(block) {
   return '(Cercle (Liste ' + x.trim() + ' ' + y.trim() + ') ' + r.trim() + ')';
 };
 
+// Bloc Contour Picker
+Blockly.Blocks['contour-p'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Contour');
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Contour')
+        .appendField(new Blockly.FieldColour("#ff0000"), "COULEUR");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Change la couleur des contours.');
+  }
+};
+
+// Gen Contour Picker
+Blockly.MicroAlg['contour-p'] = function(block) {
+  var c = block.getFieldValue('COULEUR');
+  var r = parseInt(c.slice(1, 3), 16).toString();
+  var v = parseInt(c.slice(3, 5), 16).toString();
+  var b = parseInt(c.slice(5, 7), 16).toString();
+  return '(Contour (Liste ' + r + ' ' + v + ' ' + b + '))';
+};
+
 // Bloc Contour
 Blockly.Blocks['contour'] = {
   init: function() {
@@ -1645,13 +1693,16 @@ Blockly.Blocks['contour'] = {
         .appendField('Contour');
     this.appendValueInput("R")
         .setCheck('Number')
-        .appendField('R');
+        .appendField('R')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("V")
         .setCheck('Number')
-        .appendField('V');
+        .appendField('V')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("B")
         .setCheck('Number')
-        .appendField('B');
+        .appendField('B')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Change la couleur des contours.');
@@ -1675,16 +1726,20 @@ Blockly.Blocks['contour-alpha'] = {
         .appendField('Contour');
     this.appendValueInput("R")
         .setCheck('Number')
-        .appendField('R');
+        .appendField('R')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("V")
         .setCheck('Number')
-        .appendField('V');
+        .appendField('V')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("B")
         .setCheck('Number')
-        .appendField('B');
+        .appendField('B')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("A")
         .setCheck('Number')
-        .appendField('A');
+        .appendField('A')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Change la couleur des contours.');
@@ -1709,16 +1764,20 @@ Blockly.Blocks['ellipse'] = {
         .appendField('Ellipse');
     this.appendValueInput("ORIG_X")
         .setCheck('Number')
-        .appendField('X');
+        .appendField('X')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("ORIG_Y")
         .setCheck('Number')
-        .appendField('Y');
+        .appendField('Y')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("R1")
         .setCheck('Number')
-        .appendField('R1');
+        .appendField('R1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("R2")
         .setCheck('Number')
-        .appendField('R2');
+        .appendField('R2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Dessine l’ellipse de centre (X,Y) et de rayons R1 et R2.');
@@ -1764,16 +1823,20 @@ Blockly.Blocks['rectangle'] = {
         .appendField('Rectangle');
     this.appendValueInput("X1")
         .setCheck('Number')
-        .appendField('X1');
+        .appendField('X1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y1")
         .setCheck('Number')
-        .appendField('Y1');
+        .appendField('Y1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("X2")
         .setCheck('Number')
-        .appendField('X2');
+        .appendField('X2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y2")
         .setCheck('Number')
-        .appendField('Y2');
+        .appendField('Y2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Dessine le rectangle de sommets opposés (X1,Y1) et (X2,Y2).');
@@ -1790,6 +1853,29 @@ Blockly.MicroAlg['rectangle'] = function(block) {
                     '(Liste ' + x2.trim() + ' ' + y2.trim() + '))';
 };
 
+// Bloc Remplissage Picker
+Blockly.Blocks['remplissage-p'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Remplissage');
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('Remplissage')
+        .appendField(new Blockly.FieldColour("#ff0000"), "COULEUR");
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Change la couleur du remplissage des formes.');
+  }
+};
+
+// Gen Remplissage Picker
+Blockly.MicroAlg['remplissage-p'] = function(block) {
+  var c = block.getFieldValue('COULEUR');
+  var r = parseInt(c.slice(1, 3), 16).toString();
+  var v = parseInt(c.slice(3, 5), 16).toString();
+  var b = parseInt(c.slice(5, 7), 16).toString();
+  return '(Remplissage (Liste ' + r + ' ' + v + ' ' + b + '))';
+};
+
 // Bloc Remplissage
 Blockly.Blocks['remplissage'] = {
   init: function() {
@@ -1799,13 +1885,16 @@ Blockly.Blocks['remplissage'] = {
         .appendField('Remplissage');
     this.appendValueInput("R")
         .setCheck('Number')
-        .appendField('R');
+        .appendField('R')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("V")
         .setCheck('Number')
-        .appendField('V');
+        .appendField('V')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("B")
         .setCheck('Number')
-        .appendField('B');
+        .appendField('B')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Change la couleur du remplissage des formes.');
@@ -1829,16 +1918,20 @@ Blockly.Blocks['remplissage-alpha'] = {
         .appendField('Remplissage');
     this.appendValueInput("R")
         .setCheck('Number')
-        .appendField('R');
+        .appendField('R')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("V")
         .setCheck('Number')
-        .appendField('V');
+        .appendField('V')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("B")
         .setCheck('Number')
-        .appendField('B');
+        .appendField('B')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("A")
         .setCheck('Number')
-        .appendField('A');
+        .appendField('A')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Change la couleur du remplissage des formes.');
@@ -1863,16 +1956,20 @@ Blockly.Blocks['segment'] = {
         .appendField('Segment');
     this.appendValueInput("X1")
         .setCheck('Number')
-        .appendField('X1');
+        .appendField('X1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y1")
         .setCheck('Number')
-        .appendField('Y1');
+        .appendField('Y1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("X2")
         .setCheck('Number')
-        .appendField('X2');
+        .appendField('X2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y2")
         .setCheck('Number')
-        .appendField('Y2');
+        .appendField('Y2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Dessine le segment d’extrémités (X1,Y1) et (X2,Y2).');
@@ -1898,22 +1995,28 @@ Blockly.Blocks['triangle'] = {
         .appendField('Triangle');
     this.appendValueInput("X1")
         .setCheck('Number')
-        .appendField('X1');
+        .appendField('X1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y1")
         .setCheck('Number')
-        .appendField('Y1');
+        .appendField('Y1')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("X2")
         .setCheck('Number')
-        .appendField('X2');
+        .appendField('X2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y2")
         .setCheck('Number')
-        .appendField('Y2');
+        .appendField('Y2')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("X3")
         .setCheck('Number')
-        .appendField('X3');
+        .appendField('X3')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.appendValueInput("Y3")
         .setCheck('Number')
-        .appendField('Y3');
+        .appendField('Y3')
+        .setAlign(Blockly.ALIGN_RIGHT);
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Dessine le triangle de sommets (X1,Y1), (X2,Y2) et (X3,Y3).');
