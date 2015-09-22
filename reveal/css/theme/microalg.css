@@ -1,0 +1,87 @@
+/* Hand crafted sheet, based on default.css */
+
+body {
+  color: black;
+  background-color: white; }
+
+.reveal a:link {color:#337;}
+.reveal a:visited {color:#333;}
+.reveal a:hover {color:#000;}
+.reveal a:active {color:#000;}
+
+.reveal .slides {
+  text-align: left; }
+
+.reveal {
+  font-family: sans-serif;
+  font-size: 26px; }
+
+.reveal h1, .reveal h2 {
+  margin-bottom: 0.5em; }
+
+.reveal h1 {
+  text-align: center;
+  font-size: 2.5em; }
+
+.reveal h2 {
+  font-size: 1.8em; }
+
+.reveal code {
+    margin: 0 2px;
+    padding: 0px 5px;
+    border: 1px solid #EAEAEA;
+    background-color: #F0F0F0;
+    border-radius: 3px;
+    white-space: nowrap; }
+
+.reveal pre code {
+    white-space: pre;
+    position: relative;
+    z-index: -2; }
+
+.reveal img {
+    display: block;
+    margin: 0 auto; 
+    max-width: none;
+    max-height: none; }
+
+/* Original default.css */
+
+.reveal .controls div.navigate-left,
+.reveal .controls div.navigate-left.enabled {
+  border-right-color: #13daec; }
+
+.reveal .controls div.navigate-right,
+.reveal .controls div.navigate-right.enabled {
+  border-left-color: #13daec; }
+
+.reveal .controls div.navigate-up,
+.reveal .controls div.navigate-up.enabled {
+  border-bottom-color: #13daec; }
+
+.reveal .controls div.navigate-down,
+.reveal .controls div.navigate-down.enabled {
+  border-top-color: #13daec; }
+
+.reveal .controls div.navigate-left.enabled:hover {
+  border-right-color: #71e9f4; }
+
+.reveal .controls div.navigate-right.enabled:hover {
+  border-left-color: #71e9f4; }
+
+.reveal .controls div.navigate-up.enabled:hover {
+  border-bottom-color: #71e9f4; }
+
+.reveal .controls div.navigate-down.enabled:hover {
+  border-top-color: #71e9f4; }
+
+.reveal .progress {
+  background: rgba(0, 0, 0, 0.2); }
+
+.reveal .progress span {
+  background: #13daec;
+  -webkit-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  -moz-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  -ms-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  -o-transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
+  transition: width 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); }

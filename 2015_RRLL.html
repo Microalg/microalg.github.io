@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>MicroAlg RRLL 2015</title>
+        <link rel="stylesheet" href="reveal/css/reveal.min.css">
+        <link rel="stylesheet" href="reveal/css/theme/microalg.css" id="theme">
+
+        <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+        <script>
+            document.write( '<link rel="stylesheet" href="reveal/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="reveal/lib/js/html5shiv.js"></script>
+        <![endif]-->
+
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <link rel="icon" href="visuels/logo_microalg.ico" />
+
+    </head>
+
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section data-markdown data-separator="^\n----*\n" data-vertical="^\n\n" data-charset="utf-8">
+
+                    <script type="text/template">
+# MicroAlg
+
+![logo](images/logo_microalg.svg)
+
+---
+
+# Contexte
+
+* Éducation Nationale
+* Divers plans
+    * informatiques
+    * et/ou numériques
+* Réforme des lycée en 2009
+    * algo en maths
+* 2012
+    * BTS Services Informatiques aux Organisations
+        * 1h d’algo par semaine
+    * Spécialité Info et Sc. du Numérique en Term S
+        * Réaction !!!
+
+---
+
+# État de l’art
+
+* AlgoBox
+* Python
+* Scratch
+* Java's Cool
+* ...
+
+---
+
+# MicroAlg
+
+Les **débutants en programmation**
+
+n’ont pas besoin d’un **énorme camion** toutes options.
+
+Ils veulent juste une **simple trottinette**
+
+qu’ils comprennent tout de suite.
+
+---
+
+# En bref
+
+* Utilisable directement dans un **navigateur**
+* Ou avec un **éditeur de texte** classique
+* Syntaxe **simplissime** et **universelle**
+* Mots-clés **en français** et **peu nombreux**
+* Programmation par **blocs**
+    * // programmation textuelle
+* **Galerie** (wiki avec insertion d’échantillons)
+* **Graphismes** et **Tortue**
+* **Exports**
+    * vers d’autres langages
+    * visualisation (arbres)
+* **Jeux de tests** programmables depuis MicroAlg
+* **Bride** contre les **boucles infinies**
+* Tirages pseudo-aléatoires **reproductibles**
+
+---
+
+# Démo
+
+&nbsp;
+
+# [microalg.info](http://microalg.info/)
+
+---
+
+# Merci
+
+* Marie [www.lezard-rouge.fr](http://www.lezard-rouge.fr/)
+* [alliance-libre.org](http://www.lezard-rouge.fr/)
+                    </script>
+                </section>
+            </div>
+        </div>
+
+        <script src="reveal/lib/js/head.min.js"></script>
+        <script src="reveal/js/reveal.min.js"></script>
+
+        <script>
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                slideNumber: true,
+                history: true,
+                center: false,
+
+                theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+                transition: Reveal.getQueryHash().transition || 'none', // default/cube/page/concave/zoom/linear/fade/none
+
+                // Optional libraries used to extend on reveal.js
+                dependencies: [
+                    { src: 'reveal/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'reveal/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'reveal/plugin/markdown/markdown.js',
+                        condition: function() { return !!document.querySelector( '[data-markdown]' ); },
+                        // All list items are fragments, thanks to
+                        // http://stackoverflow.com/questions/13705848/fragments-in-reveal-js-using-markdown?rq=1#15354240
+                        callback: function() {
+                            Array.prototype.forEach.call(document.querySelectorAll('ul > li, ol > li'),
+                            function(ele){ if (ele.className != 'nofragment') ele.className = 'fragment';});
+                        } },
+                    { src: 'reveal/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    { src: 'reveal/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+                ],
+                minScale: 1,
+                maxScale: 1
+            });
+        </script>
+    </body>
+</html>
