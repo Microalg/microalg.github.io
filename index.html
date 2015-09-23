@@ -409,18 +409,18 @@
    processing: true,
    src:
       '(RAZ)\n' +
-      '(Initialiser@)\n' +
       '(Epaisseur 2)\n' +
       '(Remplissage (Liste 255 255 255))\n' +
-      '(Initialiser n 1)\n' +
-      '(Initialiser x 0)\n' +
+      '(Declarer n x y r decalage De_type "nombre")\n' +
+      '(Affecter_a n 1)\n' +
+      '(Affecter_a x 0)\n' +
       '(Tant_que (<= n 5)\n' +
       ' Faire\n' +
       '    (Affecter_a credit_iterations 300)\n' +
       '    (Affecter_a x (+ (* n 50) 150))\n' +
-      '    (Initialiser y 200)\n' +
-      '    (Initialiser r 25)\n' +
-      '    (Initialiser decalage 0)\n' +
+      '    (Affecter_a y 200)\n' +
+      '    (Affecter_a r 25)\n' +
+      '    (Affecter_a decalage 0)\n' +
       '    (Tant_que (>= r 4)\n' +
       '     Faire\n' +
       '        (Contour (Liste (Entier@ 0 255) (Entier@ 0 255) (Entier@ 0 255)))\n' +
