@@ -374,8 +374,10 @@
   <script src="web/tipofthemoment.js"></script>
 
   <script>inject_microalg_editor_in('script-si-majeur-mineur', {src:
+      '(Declarer age De_type "nombre")\n' +
       '(Afficher "Quel âge as-tu ?")\n' +
-      '(Si (< (Nombre (Demander)) 18)\n' +
+      '(Affecter_a age (Nombre (Demander)))\n' +
+      '(Si (< age 18)\n' +
       ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
       ' Sinon (Afficher "Tu prétends être majeur.")\n' +
       ')'});
