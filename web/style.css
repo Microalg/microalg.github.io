@@ -1,5 +1,7 @@
 html {
   font-size: 62.5%;
+  color: #000;
+  background-color: #fff;
 }
 body.microalg {
     font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
