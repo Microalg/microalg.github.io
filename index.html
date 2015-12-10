@@ -386,8 +386,10 @@
       '(Afficher "Quel âge as-tu ?")\n' +
       '(Affecter_a age (Nombre (Demander)))\n' +
       '(Si (< age 18)\n' +
-      ' Alors (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
-      ' Sinon (Afficher "Tu prétends être majeur.")\n' +
+      ' Alors\n' +
+      '    (Afficher "Tu es mineur, mais tu peux continuer sur le site.")\n' +
+      ' Sinon\n' +
+      '    (Afficher "Tu prétends être majeur.")\n' +
       ')'});
   </script>
 
@@ -436,15 +438,18 @@
       '        (Contour (Liste (Entier@ 0 255) (Entier@ 0 255) (Entier@ 0 255)))\n' +
       '        (Cercle (Liste x y) r)\n' +
       '        (Affecter_a decalage (+ decalage (Entier@ -1 1)))\n' +
-      '        (Si (< decalage -2) Alors\n' +
+      '        (Si (< decalage -2)\n' +
+      '         Alors\n' +
       '            (Affecter_a decalage -2)\n' +
       '        )\n' +
-      '        (Si (> decalage 2) Alors\n' +
+      '        (Si (> decalage 2)\n' +
+      '         Alors\n' +
       '             (Affecter_a decalage -2)\n' +
       '        )\n' +
       '        (Affecter_a x (+ x decalage))\n' +
       '        (Affecter_a y (+ y 2))\n' +
-      '        (Si (= 1 (Entier@ 1 6)) Alors\n' +
+      '        (Si (= 1 (Entier@ 1 6))\n' +
+      '         Alors\n' +
       '            (Affecter_a r (- r 2))\n' +
       '        )\n' +
       '    )\n' +
