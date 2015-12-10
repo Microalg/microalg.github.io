@@ -127,15 +127,15 @@
     <p>Le bloc <code>Programme</code> ne peut pas être supprimé, mais vous
     pouvez supprimer les autres, par exemple avec un clic-droit. Essayez !</p>
     <p>Maintenant, retrouvez les blocs <code>Afficher</code> et
-    <code>"..."</code> dans les catégories <code>Commandes</code> ou
-    <code>Autres</code> pour réécrire le même programme (ou à peu près), puis
+    <code>"..."</code> dans les catégories <code>Cmdes sans retour</code> ou
+    <code>Valeurs</code> pour réécrire le même programme (ou à peu près), puis
     testez-le.</p>
 
     <h2 id="commentaires"><a href="#commentaires">: </a>Commentaires</h2>
     <p>Pour expliquer certains passages délicats d’un programme, on peut écrire
     des instructions qui n’ont aucun effet. C’est le rôle de la commande
-    <code>!!!</code>. Il faut, comme pour la commande <code>Afficher</code>,
-    mettre le message entre guillemets.</p>
+    <code>!!!</code>. Son bloc est dans la catégorie
+    <code>Cmdes sans retour</code>.</p>
     <div id="script-commentaires"></div>
     <script>inject_microalg_editor_in('script-commentaires', {
      blockly_only: true,
@@ -202,6 +202,7 @@
     affiche trois fois la même chose :</p>
     <div id="script-repeter"></div>
     <script>inject_microalg_editor_in('script-repeter', {
+     blockly_only: true,
      src:
         '(Repeter 3 Fois\n' +
         '    (Afficher "Bonjour.")\n' +
@@ -804,6 +805,11 @@ Sinon commande-1-si-faux
     <br>
     <br>
     <br>
+    <script type="text/javascript" src="web/tabIndent.js"></script>
+    <script>
+      tabIndent.config.tab = ' ';
+      tabIndent.renderAll();
+    </script>
     <script>
         $().showUp('.navbar', {
             upClass: 'navbar-show',

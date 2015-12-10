@@ -1,4 +1,4 @@
-(setq version "0.4.05")
+(setq version "0.4.06")
 (put 'version 'text (pack "MicroAlg version " version))
 (setq apropos
 "L’idée de MicroAlg est née lors d’une formation ISN, de la frustration due à
@@ -25,7 +25,7 @@ Voir <http://microalg.info>.")
 "Nieme" "Nieme@" "Nombre" "Non"
 "Ou"
 "Queue"
-"RAZ" "Rectangle" "Remplissage" "Repeter" "Retirer_de" "Retourner" "Rien"
+"RAZ" "Rectangle" "Remplissage" "Repere" "Repeter" "Retirer_de" "Retourner" "Rien"
 "sequence_tirages@"
 "Segment" "Si" "Sinon"
 "Tant_que" "Tester" "Tete" "Texte" "Triangle" "Type"
@@ -36,6 +36,16 @@ Voir <http://microalg.info>.")
 (ifn caadr
   (de caadr (arg)
      (car (car (cdr arg)))
+  )
+)
+(ifn cdddr
+  (de cdddr (arg)
+     (cdr (cddr arg))
+  )
+)
+(ifn cddddr
+  (de cddddr (arg)
+     (cdr (cdddr arg))
   )
 )
 (ifn cut
@@ -211,9 +221,11 @@ Notez bien que l’argument passé à `!!!` doit être un texte et doit donc êt
 entre guillemets.
 ")
 (put '!!! 'text "Commande commentaire.")
-(de !!! (!comz !deuze)
-  (ifn (str? !comz) (quit "Un commentaire doit être du texte (entre guillemets)."))
-  (if !deuze (quit "La commande `!!!` n’accepte qu’un argument."))
+(de !!! !arg_lst
+  (if (<> (length !arg_lst) 1)
+    (quit "La commande `!!!` n’accepte qu’un argument."))
+  (ifn (str? (car !arg_lst))
+    (quit "Un commentaire doit être du texte (entre guillemets)."))
   Rien)
 
 # Aide
@@ -288,9 +300,7 @@ Si vous ne l’avez pas déjà fait, commencez par le
   (setq *LastStdOut (if a_afficher a_afficher ""))
   (ifn !testing
        (println (ifn a_afficher
-                     (if (<> *EMUENV "browser")
-                         " "
-                         "&nbsp;")
+                     " "
                      a_afficher)))
   Rien  # Pas de valeur de retour
   )
@@ -432,7 +442,21 @@ Si la variable contient un texte ou une liste et qu’une position est fournie,
 comme par exemple dans :  
 `(Affecter_a var val En_position idx)`  
 alors l’élément à la `idx` ième position dans `var` est affecté de la valeur
- `val`.")
+`val`.
+
+    : (Declarer mot De_type \"texte\")
+    -> Rien
+    : (Affecter_a mot \"salut\")
+    -> Rien
+    : (Afficher mot)
+    \"salut\"
+    -> Rien
+    : (Affecter_a mot \"z\" En_position 1)
+    -> Rien
+    : (Afficher mot)
+    \"zalut\"
+    -> Rien
+")
 (put 'Affecter_a 'text "Commande `Affecter_a`.")
 (de !affecter_a (var val_expr kw idx_expr cinquieme)
     (let (evaled_var (eval var)
@@ -446,15 +470,16 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
              ((== var 'Faux) (quit (pack !onppauv "au booléen Faux.")))
              ((== var 'Rien) (quit (pack !onppauv "à Rien.")))
          )
+         (ifn (get var 'type)
+              (quit "Variable non déclarée." var)
+         )
          (ifn kw
               (prog
                  (if (and (!liste? (eval var)) (not (!liste? val)))
                      (quit (pack !onppauv "autre qu’une liste à une liste, utiliser `Affecter_a … … En_position …`.") var))
                  # Affectation au symbole dans `var`.
-                 (ifn (get var 'type)
-                      (quit "Variable non déclarée." var)
-                 )
                  (if (or (not val)  # Pour accepter "" qui est NIL.
+                         (= (get var 'type) "rien")
                          (<> Faux (= (get var 'type) (Type val))))
                      (set var val)
                      (quit "Le type ne correspond pas."
@@ -466,7 +491,7 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
                  # Affectation à l’élément `idx` du symbole dans `var`.
                  # Tout d’abord quelques vérifications:
                  (if (<> 'En_position kw)
-                     (quit "Le mot-clef intermédiaire avant l’indice doit être `En_position`.")
+                     (quit "`Affecter_a` n’est pas bien fermé, ou il manque `En_position`.")
                  )
                  (if cinquieme (quit "Après `En_position`, il n’y a qu’un paramètre."))
                  (let (len (!longueur evaled_var))
@@ -475,6 +500,13 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
                      ((le0 idx) (quit "Indice négatif ou nul." idx))
                      ((lt0 (- len idx)) (quit "Indice trop grand." (list idx '> len)))
                    )
+                 )
+                 (if (!boolM2P (!texte? evaled_var))  # check pour textes, inutile pour listes
+                     (ifn (and (str? val) (not (<> 1 (length val))))
+                          (quit (pack "La valeur affectée à un texte doit être "
+                                      "un texte de longueur 1 (un caractère) "
+                                      "mais vous avez donné : " (Texte val) "."))
+                     )
                  )
                  # Puis le travail:
                  (cond
@@ -679,7 +711,7 @@ La numérotation commence à 1.
 
     : (Nieme \"salut\" 2)
     -> \"a\"
-    : (Nieme (Liste 1 3 5 7) 2
+    : (Nieme (Liste 1 3 5 7) 2)
     -> 3
 ")
 (put 'Nieme 'text "Commande `Nieme`.")
@@ -896,10 +928,12 @@ commandes `Entier@` et `Nieme@`, dans cet ordre.
 ")
 (setq sequence_tirages@ (Liste))
 (put 'sequence_tirages@ 'type "liste")
+(setq !shift@ 5)
+(setq !space_length@ (/ (- 4294967296 (% 4294967296 !shift@)) !shift@))
 (de !prochain_etat@ ()
   (ifn !etat@ (setq !etat@ (% (+ (time) (usec)) 4294967296)))  # 2^32
   # http://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
-  # Dans !rand ci-dessous, on ne garde que le quotient par !shift.
+  # Dans !rand ci-dessous, on ne garde que le quotient par !shift@.
   (setq !etat@ (% (+ (* !etat@ 1664525) 1013904223) 4294967296)) )
 (de !rand (!min !max)
   (if (!boolM2P (> (!longueur sequence_tirages@) 0))
@@ -914,8 +948,10 @@ commandes `Entier@` et `Nieme@`, dans cet ordre.
       )
       (let (!mod (- (+ !max 1) !min)
             !etat (!prochain_etat@)
-            !shift 5
-            !shifted_etat (/ (- !etat (% !etat !shift)) !shift))
+            !shifted_etat (/ (- !etat (% !etat !shift@)) !shift@))
+            (if (gt0 (- !mod !space_length@))
+                (quit (pack "L’espace des valeurs possibles dépasse "
+                            !space_length@ ".")) )
             (+ !min (% !shifted_etat !mod))
       )
   )
@@ -1061,16 +1097,18 @@ en minuscule).
     -> \"42\"
 ")
 (put 'Texte 'text "Commande `Texte`.")
-(de Texte (x) (cond
-                ((not (<> x 'Vrai)) "Vrai")
-                ((not (<> x 'Faux)) "Faux")
-                ((not (<> x 'Rien)) "Rien")
-                ((!liste? x) (!text x))  # mettre avant str?
-                ((str? x) x)
-                ((num? x) (format x))
-                ((sym? x) (pack x))
-                (T "???")
-              ))
+(de Texte (x)
+  (cond
+    ((not (<> x 'Vrai)) "Vrai")
+    ((not (<> x 'Faux)) "Faux")
+    ((not (<> x 'Rien)) "Rien")
+    ((!liste? x) (!text x))  # mettre avant str?
+    ((str? x) x)
+    ((num? x) (format x))
+    ((sym? x) (pack x))
+    (T "???")
+  )
+)
 (put 'Nombre 'doc
 "Commande qui retourne le nombre correspondant à son paramètre textuel.
 
@@ -1078,12 +1116,14 @@ en minuscule).
     -> 42
 ")
 (put 'Nombre 'text "Commande `Nombre`.")
-(de Nombre (x) (cond
-                ((num? x) x)
-                ((str? x) (or (format x)
-                              (quit "`Nombre` : la valeur ne peut pas être convertie.")))
-                (T NIL)
-              ))
+(de Nombre (x)
+  (cond
+    ((num? x) x)
+    ((str? x) (or (format x)
+                  (quit "Cette valeur ne peut pas être convertie par `Nombre`." x)))
+    (T NIL)
+  )
+)
 
 # Structure conditionnelle
 (put 'Vrai 'doc "Booléen valant Vrai.")
@@ -1118,17 +1158,21 @@ Ou :
     )
 ")
 (put 'Si 'text "Commande `Si`.")
-(de Si arg_lst (let (condition (car arg_lst)
-                     kw_alors  (cadr arg_lst)
-                     splitted  (split (cddr arg_lst) 'Sinon)
-                     bloc_vrai (car splitted)
-                     bloc_faux (cadr splitted))
-                    (if (<> Alors kw_alors) (quit "`Si` : Le mot-clef `Alors` doit être le deuxième argument."))
-                    (if (!boolCheckM2P (eval condition) "La condition n’est pas un booléen.")
-                        (run bloc_vrai)
-                        (if (== NIL bloc_faux)
-                            Rien
-                            (run bloc_faux)))))
+(de Si arg_lst
+  (let (condition (car arg_lst)
+        kw_alors  (cadr arg_lst)
+        splitted  (split (cddr arg_lst) 'Sinon)
+        bloc_vrai (car splitted)
+        bloc_faux (cadr splitted))
+       (if (<> Alors kw_alors)
+           (quit "`Si` : Le mot-clef `Alors` doit être le deuxième argument."))
+       (if (!boolCheckM2P (eval condition) "La condition n’est pas un booléen.")
+           (run bloc_vrai)
+           (if (== NIL bloc_faux)
+               Rien
+               (run bloc_faux)))
+  )
+)
 
 # Opérations logiques
 (put 'Non 'doc
@@ -1167,7 +1211,7 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_ET>.")
         )
     )
     # Le calcul :
-    (!boolP2M (apply 'and (mapcar '((x) (!boolM2P (eval x))) !arg_lst)))
+    (!boolP2M (apply 'and (mapcar '((!x) (!boolM2P (eval !x))) !arg_lst)))
 )
 (put 'Ou 'doc
 "Ou logique.
@@ -1191,7 +1235,7 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
         )
     )
     # Le calcul :
-    (!boolP2M (apply 'or (mapcar '((x) (!boolM2P (eval x))) !arg_lst)))
+    (!boolP2M (apply 'or (mapcar '((!x) (!boolM2P (eval !x))) !arg_lst)))
 )
 
 # Structures itératives
@@ -1236,16 +1280,17 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
     -> Rien
 ")
 (put 'Tant_que 'text "Commande `Tant_que`.")
-(de Tant_que arg_lst (let (!cond (car arg_lst)
-                           !mot-clef (cadr arg_lst)
-                           !corps (cddr arg_lst))
-                          (if (<> 'Faire !mot-clef) (quit "Commande `Tant_que` sans mot-clé `Faire`."))
-                          (while (!boolCheckM2P (eval !cond) "La condition n’est pas un booléen.")
-                                 (if (=0 (dec 'credit_iterations))
-                                     (quit credit_iterations_message))
-                                 (run !corps))
-                          Rien
-                     )
+(de Tant_que arg_lst
+  (let (!cond (car arg_lst)
+        !mot-clef (cadr arg_lst)
+        !corps (cddr arg_lst))
+       (if (<> 'Faire !mot-clef) (quit "Commande `Tant_que` sans mot-clé `Faire`."))
+       (while (!boolCheckM2P (eval !cond) "La condition n’est pas un booléen.")
+              (if (=0 (dec 'credit_iterations))
+                  (quit credit_iterations_message))
+              (run !corps))
+       Rien
+  )
 )
 (put 'Faire 'doc
 "Structure itérative de type « faire ... tant que ... ».
@@ -1266,25 +1311,26 @@ Voir <http://fr.wikipedia.org/wiki/Fonction_OU>.")
     -> Rien
 ")
 (put 'Faire 'text "Commande `Faire`.")
-(de Faire arg_lst (let (!splitted (split arg_lst 'Tant_que)
-                        !corps (car !splitted)
-                        !cond (caadr !splitted))
-                       (ifn (<> arg_lst !corps)
-                            (quit "Commande `Faire` sans mot-clé `Tant_que`."))
-                       (if  (!boolM2P (> (length (cadr !splitted)) 1))
-                            (quit "Il ne faut qu’un seul élément après le mot-clé `Tant_que`."))
-                       (run !corps)
-                       (let !evaled_cond (eval !cond)
-                         (if (!boolCheckM2P !evaled_cond) "La condition n’est pas un booléen.")
-                           (while (!boolCheckM2P !evaled_cond "La condition n’est pas un booléen.")
-                                  (if (=0 (dec 'credit_iterations))
-                                      (quit credit_iterations_message))
-                                  (run !corps)
-                                  (setq !evaled_cond (eval !cond))
-                         )
-                       )
-                       Rien
-                  )
+(de Faire arg_lst
+  (let (!splitted (split arg_lst 'Tant_que)
+        !corps (car !splitted)
+        !cond (caadr !splitted))
+       (ifn (<> arg_lst !corps)
+            (quit "Commande `Faire` sans mot-clé `Tant_que`."))
+       (if  (!boolM2P (> (length (cadr !splitted)) 1))
+            (quit "Il ne faut qu’un seul élément après le mot-clé `Tant_que`."))
+       (run !corps)
+       (let !evaled_cond (eval !cond)
+         (if (!boolCheckM2P !evaled_cond) "La condition n’est pas un booléen.")
+           (while (!boolCheckM2P !evaled_cond "La condition n’est pas un booléen.")
+                  (if (=0 (dec 'credit_iterations))
+                      (quit credit_iterations_message))
+                  (run !corps)
+                  (setq !evaled_cond (eval !cond))
+         )
+       )
+       Rien
+  )
 )
 (put 'Fois 'doc "Mot-clef intermédiaire pour la commande `Repeter`.")
 (setq Fois 'Fois)
@@ -1388,9 +1434,18 @@ Exemple 2 :
 (de !definir @
   (let (arg_lst (rest)
         signature (car arg_lst)
+        sig_as_txt (pack "(" (apply 'glue (cons " " (list signature))) ")")
+        corps     (cdr arg_lst))
+       (ifn (lst? signature)
+         (quit (pack "Le premier argument de `Definir` doit être de la forme "
+                     "`(commande arg1 arg2 ...)`.")))
+       (ifn signature
+         (quit "`Definir` a au moins deux paramètres."))
+       (ifn corps
+         (quit (pack "`Definir` le corps de `" sig_as_txt "` est vide.")))
+    (let (arg_lst (rest)
         nom       (car signature)
         params    (cdr signature)
-        corps     (cdr arg_lst)
         aug_corps (conc
                     (!liste_inits_type params)
                     (!liste_inits_val params)
@@ -1412,6 +1467,7 @@ Exemple 2 :
                             "*."))
        (set nom (list params (list 'run (cons 'quote aug_corps))))
        Rien  # Pas de valeur de retour
+    )
   )
 )
 (de Definir !arg_lst (apply '!definir !arg_lst))
@@ -1543,7 +1599,8 @@ Voir la commande `Exemples_de`.")
 # Factorisation du test du type des args
 (de !check_type_args (!cmd !primz !deuz)
   (if (not (and (num? !primz) (num? !deuz)))
-      (quit (pack "Les paramètres de " !cmd " doivent être des nombres"))
+      (quit (pack "Les paramètres de " !cmd " doivent être des nombres.")
+            (Concatener (Texte !primz) " " !cmd " " (Texte !deuz)))
   )
 )
 (put '= 'doc
@@ -1745,6 +1802,98 @@ Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
 (put 'RAZ 'text "Commande `RAZ`.")
 (de RAZ ()
   (!processing "RAZ")
+  Rien
+)
+(de grad_list (!min !max !scl)
+  (let (!mod_min (% !min !scl)
+        !mod_max (% !max !scl)
+        !petit (if (gt0 !mod_min)
+                   (+ (- !min !mod_min) !scl)
+                   (- !min !mod_min))
+        !grand (if (lt0 !mod_max)
+                   (- (- !max !mod_max) !scl)
+                   (- !max !mod_max))
+        !nb_grad (+ (/ (- !grand !petit) !scl) 1))
+       (mapcar '((x) (+ !petit (* x !scl))) (range 0 (- !nb_grad 1)))
+  )
+)
+(put 'Repere 'doc
+"Dans la sortie graphique, permet de choisir un nouveau repère.
+
+Cette commande peut s’utiliser avec 4 ou 6 paramètres.
+
+* Les quatre premiers paramètres sont parfois appelés Xmin, Xmax, Ymin et Ymax.
+  Ils valent par défaut 0, 600, 0 et 600.  
+* Le cinquième et le sixième sont facultatifs et représentent l’écart entre,
+  respectivement, les graduations sur l’axe des abscisses et les graduations
+  sur l’axe des ordonnées.  
+  S’ils sont fournis, les axes et les graduations sont dessinés.
+
+**Exemples** :
+
+`(Repere -1 3 -2 2)`  
+Avec ces valeurs, le carré graphique 600×600 permettra de visualiser les points
+d’abscisses comprises entre -1 et 3 et d’ordonnées comprises entre -2 et 2.
+
+`(Repere -10 10 -2 2 1 0.5)`  
+Avec ces valeurs, le carré graphique 600×600 permettra de visualiser les points
+d’abscisses comprises entre -10 et 10 et d’ordonnées comprises entre -1 et 1.  
+De plus, des axes gradués seront dessinés, toutes les unités sur l’axe des
+abscisses, et toutes les demies unités sur l’axe des ordonnées.  
+Attention, les proportions ne seront pas respectées.
+
+`(Repere -10 10 -2 2 11 3)`  
+Idem, mais les axes seront dessinés sans graduations.
+
+**Attention** :  
+La commande `Epaisseur` et les commandes de la tortue ne sont pas
+  affectées par le changement de repère.
+
+Voir <http://microalg.info/doc.html#utilisationdescommandesgraphiques>.")
+(put 'Repere 'text "Commande `Repere`.")
+(de Repere !arg_lst
+  (let (!nb_args (length !arg_lst)
+        !err_prefix "`Repere` prend 4 ou 6 paramètres. Vous en donnez ")
+    (cond
+      ((gt0 (- !nb_args 6))
+            (quit (pack !err_prefix "plus que 6.")))
+      ((lt0 (- !nb_args 4))
+            (quit (pack !err_prefix "moins que 4.")))
+      ((not (<> !nb_args 5))
+            (quit (pack !err_prefix "5.")))
+      (T (let (xmin (eval (car !arg_lst))
+               xmax (eval (cadr !arg_lst))
+               ymin (eval (caddr !arg_lst))
+               ymax (eval (cadddr !arg_lst))
+               xscl (eval (car (cddddr !arg_lst)))
+               yscl (eval (cadr (cddddr !arg_lst))))
+              (if (not (apply 'and (mapcar 'num? (list xmin xmax ymin ymax))))
+                  (quit "Tous les arguments de `Repere` doivent être des nombres.") )
+              (!processing (pack "Repere " xmin " " xmax " " ymin " " ymax))
+              (if (not (<> 6 !nb_args))
+                  (prog
+                    (if (not (apply 'and (mapcar 'num? (list xscl yscl))))
+                        (quit "Tous les arguments de `Repere` doivent être des nombres.") )
+                    (if (lt0 (* ymin ymax))
+                        (Segment (Liste xmin 0) (Liste xmax 0)) )
+                    (if (lt0 (* xmin xmax))
+                        (Segment (Liste 0 ymin) (Liste 0 ymax)) )
+                    (let (!x_grad '((x e) (Segment (Liste x (- e))
+                                                   (Liste x e)))
+                          !y_grad '((y e) (Segment (Liste (- e) y)
+                                                   (Liste e y)))
+                          !x_grads (grad_list xmin xmax xscl)
+                          !y_grads (grad_list ymin ymax yscl)
+                          !x_e (/ (* 2 (- ymax ymin)) 600)
+                          !y_e (/ (* 2 (- xmax xmin)) 600)
+                         )
+                         (mapcar '!x_grad !x_grads (need (length !x_grads) !x_e))
+                         (mapcar '!y_grad !y_grads (need (length !y_grads) !y_e))
+                    )
+                  )
+              )))
+    )
+  )
   Rien
 )
 (put 'Contour 'doc

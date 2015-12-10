@@ -1,10 +1,10 @@
-/* 07jun15jk
+/* 23sep15jk
  * (c) Jon Kleiser
  */
 
 var EMULISP_CORE = (function () {
 
-var VERSION = [2, 0, 5, 0],
+var VERSION = [2, 0, 6, 0],
 	MONLEN = [31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	BOXNAT_EXP = "Boxed native object expected",
 	BOOL_EXP = "Boolean expected", CELL_EXP = "Cell expected", LIST_EXP = "List expected",
@@ -404,7 +404,7 @@ function indx(x, y) {	// Ersatz-like
 }
 
 function Source(text, chars) {
-	this.src = text;
+	this.src = new String(text);
 	// character limitation for symbols
 	if (chars instanceof Symbol) {
 		this.charset = chars.valueOf();
@@ -950,7 +950,7 @@ function emuprompt(c) { // No support (yet) for the two parameters (non-split ch
 
 var coreFunctions = {
 	"and": function(c) { var v = NIL; while (c instanceof Cell) { v = evalLisp(c.car);
-			if (!aTrue(v)) return NIL; c = c.cdr; } return v;
+		if (!aTrue(v)) return NIL; c = c.cdr; } return v;
 	},
 	"any": function(c) { var cv = evalLisp(c.car);
 		if (cv instanceof Symbol) return cachedTextParse(cv.valueOf()).car;
@@ -1292,6 +1292,8 @@ var coreFunctions = {
 	"loop": function(c) {
 		var v = NIL; while (true) { var r = iter(c); v = r.v; if (r.m) break; }; return v;
 	},
+	"lst?": function(c) { var v = evalLisp(c.car);
+		return ((v instanceof Cell) || v === NIL) ? T : NIL; },
 	"lt0": function(c) { var cv = evalLisp(c.car);
 		return ((cv instanceof Number) && (cv < 0)) ? cv : NIL; },
 	"make": function(c) { mkNew(); prog(c); return mkResult(); },
@@ -1319,8 +1321,24 @@ var coreFunctions = {
 		}
 		return r.list;
 	},
+	"max": function(c) { var m = c.car; c = c.cdr; var v = NIL;
+		while (c instanceof Cell) {
+			v = evalLisp(c.car);
+			if (ltVal(m, v)) m = v;
+			c = c.cdr;
+		}
+		return m;
+	},
 	"method": function(c) { var m = evalLisp(c.car), t = evalLisp(c.cdr.car); TheKey = m;
 		return ((m = method(t)) === null) ? NIL : m;
+	},
+	"min": function(c) { var m = c.car; c = c.cdr; var v = NIL;
+		while (c instanceof Cell) {
+			v = evalLisp(c.car);
+			if (ltVal(v, m)) m = v;
+			c = c.cdr;
+		}
+		return m;
 	},
 	"n0": function(c) { return eqVal(evalLisp(c.car), ZERO) ? NIL : T; },
 	"need": function(c, ex) { var x, y, z, n = numeric(evalLisp((ex = ex.cdr).car));
@@ -1893,8 +1911,14 @@ function evalMeth(m, lst) {
 }
 
 function evalSym(s, lst) {
-	if (s.car === NIL) throw new Error(newErrMsg(UNDEF, s));
-	return (s.car === Meth.car) ? evalMeth(s, lst.cdr) : evalDef(s.car, lst);
+	var sVal = s.car;
+	if (sVal === NIL) throw new Error(newErrMsg(UNDEF, s));
+	if (sVal === Meth.car) return evalMeth(s, lst.cdr);
+	if (sVal instanceof Symbol) {
+		//console.log("evalSym: sVal=%s, lst=%s", lispToStr(sVal), lispToStr(lst));
+		return evalLisp(new Cell(sVal, lst.cdr));		// maybe just NIL instead of lst.cdr?
+	}
+	return evalDef(sVal, lst);
 }
 
 function evalLisp(lst) {
@@ -1959,7 +1983,11 @@ function _stdPrint(text) {
 	if (typeof stdPrint === "function") stdPrint(text, cst)
 	else // when function stdPrint is not available in front end
 	//if (!confirm("_stdPrint:\n" + text)) throw new Error("_stdPrint aborted");
-	console.log(text);
+	if (emuEnv() == 'rhino') {
+		print(text);
+	} else {
+		console.log(text);
+	}
 }
 
 function _warn(msg) {

@@ -44,15 +44,21 @@ Aller directement à :
 * [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
 * [Types](#types)
 * [Erreurs fréquentes](#erreursfrquentes)
+* [Abréviations](#abrviations)
 * [Export](#export)
+    * [Limitations](#limitations)
+    * [Fonctionnement](#fonctionnementdelexport)
 * [Feuille de route](#feuillederoute)
 * [Contribuer](#contribuer)
 * [Architecture](#architecture)
 * [Intégrations](#intgrations)
+    * [Navigateur](#navigateur)
     * [SciTE](#scite)
     * [Vim](#vim)
     * [Blockly](#blockly)
-    * [Sortie graphique](#sortiegraphique) et [Tortue](#tortue) (merci Processing)
+    * [Sortie graphique](#sortiegraphique) avec Processing
+        * [Tortue](#tortue)
+        * [Fonctionnement](#communicationavecprocessing)
 * [Remerciements](#remerciements)
 
 ## Avertissement
@@ -171,8 +177,10 @@ en sorte que `(Demander)` attende l’utilisateur.
   forme :  
   `(!!! "Ceci est un commentaire")`
 * Si une *commande* ne prend pas d’*argument*, on écrira simplement :  
-  `(Commande)`. C’est assez rare, les seules commandes qui n’ont pas besoin de
-  paramètre sont `Demander`, `Initialiser@` et `Millisecondes`.
+  `(Commande)`  
+  C’est assez rare, les seules commandes qui n’ont pas de paramètre sont
+  `BC`, `LC`, `Demander`, `Demander_un_nombre` et `Millisecondes`. De plus,
+  le paramètre de `TG` et de `TD` (l’angle) est facultatif.
 * Les *instructions* peuvent être imbriquées. En effet, dans une *instruction*,
   un des *arguments* d’une *commande* peut être remplacé par une autre
   *instruction* :  
@@ -257,13 +265,88 @@ suivre l’évolution d’une quantité.
 Cette section est générée directement à partir du fichier `microalg.l`, que
 vous pouvez trouver [ici](microalg.l).
 
+Ces symboles sont aussi classés [par thème](#symbolesparthmes).
+
 Aller directement à :
 
 <div id="syms"></div>
 
-## Types
+### Symboles par thèmes
 
-En cours de rédaction.
+**Structures de contrôle**
+
+`(Si ... Alors ... Sinon ...)`, `(Tant_que ... Faire ...)` et
+`(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
+
+**Gestion des variables**
+
+`(Affecter_a ... ... [En_position ...])`,
+`(Declarer ... [...] De_type "...")`
+
+**Types et conversions**
+
+`(Type ...)`, `(Nombre ...)`, `(Texte ...)`
+
+**Gestion des listes et du texte**
+
+`(Liste ... [...])`, `(Vide? ...)`, `(Concatener ... [...])`
+`(Longueur ...)`, `(Nieme ... ...)`, `(Nieme@ ...)`, `(Tete ...)`,
+`(Queue ...)`, `(Ajouter_a ... ...)`, `(Retirer_de ...)`
+
+**Opérations mathématiques, comparaisons et nombres pseudo-aléatoires**
+
+`+`, `-`, `*`, `/`, `%`, `^`, `1000Cosinus`, `1000Sinus`,
+`=`, `=/`, `<`, `<=`, `>`, `>=`, `(Entier@ ... ...)`, `(Initialiser@ ...)`
+
+**Logique booléenne**
+
+`Vrai`, `Faux`, `(Et ... [...])`, `(Ou ... [...])`, `(Non ...)`
+
+**Commandes graphiques**
+
+`(RAZ)`,
+`(Repere ... ... ... ... [... ...])`,
+`(Epaisseur ...)`,
+`(Contour (Liste ... ... ...))`,
+`(Remplissage (Liste ... ... ...))`,
+`(Cercle (Liste ... ...) ...)`,
+`(Ellipse (Liste ... ...) ... ...)`,
+`(Rectangle (Liste ... ...) (Liste ... ...)`,
+`(Segment (Liste ... ...) (Liste ... ...)`,
+`(Segment (Liste ... ...) (Liste ... ...) (Liste ... ...)`,
+
+**Commandes pour la tortue**
+
+`(AV ...)`, `(BC)`, `(LC)`, `(TD [...])`, `(TG [...])`
+
+**Création et test de nouvelles commandes**
+
+    (Definir (... ... [...])
+        "documentation"
+        "auteur"
+        ...
+        (Retourner ...)
+    )
+
+    (Exemples_de ...
+        (Liste
+            (? ...) ...
+            [(? ...) ...]
+        )
+    )
+
+    (Tester ...)
+
+**Variables spéciales**
+
+`credit_iterations`, `sequence_tirages@`, `valeur_utilisateur`
+
+**Divers**
+
+`Rien`, `(Afficher ...)`, `(!!! "commentaire")`, `(Aide ...)`,
+`(Demander)`, `(Demander_un_nombre)`, `(Geler ...)`, `(Millisecondes)`
+
+## Types
 
 On trouvera :
 
@@ -279,12 +362,15 @@ Deux valeurs : `Vrai` ou `Faux`.
 
 ### Nombre
 
-Les nombres de MicroAlg sont ceux de PicoLisp.
-
 * Les entiers sont arbitrairement grands, positifs ou négatifs.
     * [Documentation PicoLisp](http://software-lab.de/doc/ref.html#number)
       (en anglais)
-* Les décimaux sont à <a href="http://fr.wikipedia.org/wiki/Virgule_fixe"
+* Par défaut (MicroAlg sur EmuLisp, donc JavaScript), les décimaux sont à
+  <a href="https://fr.wikipedia.org/wiki/Virgule_flottante"
+  class="wp">virgule flottante</a>.
+    * Le séparateur décimal est `.`.
+* Si vous utilisez MicroAlg sur PicoLisp ou Ersatz, Les décimaux sont à
+  <a href="http://fr.wikipedia.org/wiki/Virgule_fixe"
   class="wp">virgule fixe</a>.
     * Le séparateur décimal est `.`.
     * L’échelle est `*Scl`. <!-- TODO: http://pastebin.com/A6tPQNqT -->
@@ -293,22 +379,31 @@ Les nombres de MicroAlg sont ceux de PicoLisp.
 
 ### Texte
 
-Délimités par des guillemets doubles : `"salut"`.
+Les valeurs de type *texte* sont délimitées par des guillemets doubles :
+`"salut"`.
 
-* [Documentation PicoLisp](http://software-lab.de/doc/ref.html#transient)
-  (en anglais)
-* [Documentation PicoLisp](http://software-lab.de/doc/ref.html#transient-io)
-  (en anglais)
+Il est possible d’incorporer des guillemets en les *échappant* avec un `^`
+(voir
+<a href="https://fr.wikipedia.org/wiki/Caract%C3%A8re_d%27%C3%A9chappement"
+   class="wp">l’article Wikipedia</a> sur les caractères d’échappement).
+
+Pour plus de détails :
+
+* [Documentation PicoLisp sur les
+  *transients*](http://software-lab.de/doc/ref.html#transient) (en anglais)
+* [Documentation PicoLisp sur les notations des
+  *transients*](http://software-lab.de/doc/ref.html#transient-io) (en anglais)
 
 ### Liste
 
-En cours de rédaction.
+Pour créer une valeur de type *liste*, il faut taper : `(Liste ...)`.
 
-**Attention, les listes ne sont pas disponibles dans la version web !**
+Les valeurs contenues peuvent être de types différents. Il est même possible
+de créer des listes de listes (de listes…).
 
 ### Commande
 
-En cours de rédaction.
+En cours d’élaboration.
 
 ## Erreurs fréquentes
 
@@ -320,6 +415,9 @@ valeur ou de la commande qui est parfois fournie :
     * Vous utilisez peut-être `Concatener`, mais il manque une parenthèse
       fermante. Le reste du programme est vu comme le reste des arguments à
       `Afficher`.
+* Après `En_position`, il n’y a qu’un paramètre.
+    * Vous n’avez peut-être pas bien fermé la parenthèse de la commande
+      `Affecter_a`.
 * "type" -- Ce type n’existe pas.
     * Le type `"type"` que vous fournissez n’existe pas. Il doit valoir
       `"booleen"`, `"liste"`, `"nombre"`, `"rien"` ou `"texte"`.
@@ -352,20 +450,28 @@ valeur ou de la commande qui est parfois fournie :
 * Impossible d’utiliser la sortie graphique avec `malg-njs` ou `malg-rjs`.
     * Il faut configurer SciTE pour qu’il utilise `malg-j` (voire `malg` si
       vous avez pu l’installer). Cliquer sur **View** puis **Parameters** et
-      indiquer par exemple `malg-j`.  Voir [cette section](#horsnavigateur).
+      indiquer par exemple `malg-j`.  Voir [cette section](#excution).
 * Indice négatif ou nul.
 * Indice non entier.
 * Indice trop grand.
 * java.lang.ClassCastException: PicoLisp$Symbol cannot be cast to PicoLisp$Number
     * Une commande qui concerne uniquement les nombres (comme `+`, `-`, `*`,
-    `/`, `%` ou `**`) a été écrite avec autre chose qu’un nombre en argument
+    `/`, `%` ou `^`) a été écrite avec autre chose qu’un nombre en argument
     (peut-être du texte, un booléen, une liste ou `Rien`).
 * java.lang.NullPointerException
     * Il y a peut-être dans votre code une commande de la forme `(x)` ou `x`
       est une variable contenant un nombre. Dans ce cas, vous voulez peut-être
       juste écrire la valeur de `x`, car `x` n’est pas une commande.
 * java.lang.StackOverflowError
-    * Voir la sous-section [récursion](#rcursion).
+    * Voir la sous-section [récursion](#rcursioninfinie).
+* L’espace des valeurs possibles dépasse … .
+    * Le générateur de nombre pseudo-aléatoires qui sert aux commandes
+      `Entier@` et `Nieme@` ne peut travailler qu’avec un certain nombre de
+      valeurs possibles (environ un cinquième de 2 puissance 32), soit un peu
+      plus de 800 millions.  
+      MicroAlg ne peut donc pas tirer un entier au sort entre deux valeurs dont
+      la différence est supérieure à 800 millions, ou tirer un élément dans une
+      liste de plus de 800 millions d’éléments. Désolé.
 * X -- La condition n’est pas un booléen.
     * Voir la sous-section [booléens](#boolens).
 * La variable n’est pas initialisée.
@@ -380,7 +486,7 @@ valeur ou de la commande qui est parfois fournie :
 * (V est un W ; X un Y) -- Le type ne correspond pas.
 * Mauvais tirage forcé : x n’est pas compris entre min et max.
 * Maximum call stack size exceeded.
-    * Voir la sous-section [récursion](#rcursion).
+    * Voir la sous-section [récursion](#rcursioninfinie).
 * Mot-clef `Alors` manquant.
     * La condition du `Si` correspondant a pu être laissée ouverte.
     * Le `Si` correspondant a pu être fermé prématurément.
@@ -393,12 +499,17 @@ valeur ou de la commande qui est parfois fournie :
       Pensez à utiliser la commande `Nombre` pour convertir cette valeur.
 * X not found.
     * Voir la sous-section [espaces dans les noms de fichiers](#espacesdanslesnomsdefichiers).
+* processing_sketches is not defined
+    * Dans la version web, vous lancez une commande graphique sans que la
+      fenêtre graphique soit ouverte. Si vous le pouvez, configurez votre
+      échantillon avec `"processing":true`. [Voir les exemples de configurations
+      sur la galerie](http://galerie.microalg.info/microalg:config_echantillons).
 * X -- Read open error
     * Voir la sous-section [espaces dans les noms de fichiers](#espacesdanslesnomsdefichiers).
 * Stack overflow
-    * Voir la sous-section [récursion](#rcursion).
+    * Voir la sous-section [récursion](#rcursioninfinie).
 * too much recursion
-    * Voir la sous-section [récursion](#rcursion).
+    * Voir la sous-section [récursion](#rcursioninfinie).
 * Un objet vide n’a pas de queue.
 * Un objet vide n’a pas de tête.
 * X -- undefined
@@ -425,7 +536,7 @@ le signaler en :
    en premier car c’est une commande comme les autres. Par exemple `(n > 1)`
    ne fonctionnera pas, il faut écrire `(> n 1)`.
 
-### Récursion
+### Récursion infinie
 
 * Il est possible que vos appels récursifs (appel d’une commande depuis sa
   définition) ne trouvent pas de point d’appui. Votre test est-il bon ?  
@@ -439,6 +550,36 @@ le signaler en :
   parce que son nom contient des espaces. Pour le confirmer, observez le nom de
   fichier qui précède ce message d’erreur, il s’arrête sans doute au premier
   espace rencontré.
+
+## Abréviations
+
+Que ce soit dans l’interface web (navigateur) ou dans SciTE
+(voir [cette section](#scite) pour l’utilisation de MicroAlg avec SciTE),
+un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
+
+    (Af  ->  (Affecter_a |)
+    (Afe ->  (Affecter_a | En_position )
+    (A   ->  (Afficher |)
+    (Aj  ->  (Ajouter_a |)
+    (Co  ->  (Concatener |)
+    (D   ->  (Definir |...
+    (De  ->  (Declarer | De_type "")
+    (Dm  ->  (Demander)
+    (E   ->  (Exemples_de |...
+    # Pour Faire, deux lignes vides pour aider à penser au compteur.
+    (F   ->  (Faire (|)...
+    (Li  ->  (Liste |)
+    (Lo  ->  (Longueur |)
+    (Ni  ->  (Nieme |)
+    (No  ->  (Nombre |)
+    (R   ->  (Repeter | Fois...
+    (Rd  ->  (Retirer_de |)
+    (Re   -> (Retourner |)
+    (Rp   -> (Repere |)
+    (S   ->  (Si (|) Alors...
+    (Ss  ->  (Si (|) Alors () Sinon...
+    # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
+    (Tq  ->  (Tant_que (|) ...
 
 ## Export
 
@@ -477,6 +618,116 @@ sera représenté par un arbre ayant cette structure :
       ├─"du texte"
       └─"et encore du texte"
 
+### Fonctionnement de l’export
+
+Cette section est plutôt technique et est destinée à celles et ceux qui veulent
+comprendre le fonctionnement MicroAlg.
+
+#### Le principe
+
+Exporter un programme depuis MicroAlg vers n’importe quoi (un autre langage de
+programmation, de description…) est assez facile car MicroAlg est un
+Lisp (<a class="wp" href="https://fr.wikipedia.org/wiki/Lisp">voir l’article
+Wikipedia correspondant</a>).
+Il est donc possible de reprogrammer les commandes de MicroAlg pour qu’elles
+retournent une chaîne de caractères au lieu d’avoir leur comportement habituel.
+Ce n’est pas possible avec la plupart des autres langages car certaines
+commandes comme `Si` ou `Tant_que` sont des mots-clefs et donc ne sont pas
+reprogrammables.
+
+Par exemple, l’addition peut être reprogrammée pour que `(+ x 1)` donne `"x+1"`
+(voir [ici](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg_export_casio.l#L12)) :
+
+    (de + (A B) (pack "(" A "+" B ")"))
+
+Ce qui signifie, si on devait traduire cette ligne en MicroAlg :
+
+    (Definir (+ A B)
+        (Retourner (Concatener A "+" B))
+    )
+
+L’expression `(+ x 1)`, au lieu de :
+
+1. chercher la valeur de x,
+1. d’y ajouter 1,
+1. et de retourner le résultat,
+
+va concaténer `x` (sans en chercher la valeur) `+` et `1` pour donner `"x+1"`.
+
+Ainsi, les fichiers `microalg_export_*.l` reprogramment MicroAlg pour chaque
+langage cible.
+
+#### Récursion
+
+Une fois que MicroAlg est reprogrammé, l’exécution d’un programme complet
+génère récursivement la version exportée, sans effort supplémentaire. En effet,
+chaque commande inclut le travail des commandes qui lui ont été passées en
+argument.
+
+Avec par exemple `(+ (* 2 x) 1)` :
+
+1. `+` attend que ses arguments aient été exécutés
+    * le premier est `(* 2 x)`
+        * (là est la récursion) `*` concatène `"2"`, `"*"` et `"x"` pour donner
+          `"2*x"`
+    * le second est le nombre 1
+1. `+` peut maintenant concaténér `"2*x"`, `"+"` et `"1"` pour donner `"2*x+1"`.
+
+#### Préparation
+
+Dans les exemples précédents, nous n’avons pas évoqué le mécanisme qui
+transforme `x` en `"x"`.
+
+Pour empêcher l’évaluateur d’aller chercher la valeur de `x` et de plutôt
+utiliser la chaîne de caractères `"x"`, on « protège » certaines valeurs comme
+les nombres, les textes et les symboles (sauf certains mots-clefs).
+
+Encore une fois, c’est assez facile car nous travaillons avec un Lisp. Nous
+utilisons son
+[homoiconicité](https://fr.wikipedia.org/wiki/Homoiconicit%C3%A9), qui nous
+permet de manipuler le code source facilement car ce code source est encodé
+dans la structure de donnée fondamentale des Lisps : la liste.
+
+Un travail de transformation du code est donc effectué par la commande
+`proteger_source` du fichier `microalg_export.l`
+([voir ici](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg_export.l)).
+
+Elle remplace :
+
+* un nombre littéral `42` par `(Litteral 42)`,
+* un texte littéral `"bonjour"` par `(Litteral "bonjour")`,
+* certains symboles `x` par `(Variable x)`.
+
+Ainsi, pour chaque langage cible, l’implémentation de `Litteral` et `Variable`
+permet de contrôler finement l’export.
+
+C’est en particulier ce qui permet de mettre en place, à partir d’un programme
+textuel en MicroAlg, les blocs de Blockly correspondants
+([voir le code](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg_export_blockly.l)
+de `microalg_export_blockly.l`).  
+En effet, sans cela, les simples nombres ne pourraient pas générer le code XML
+correspondant aux blocs « nombre ».
+
+De plus, spécifiquement pour Blockly, une autre préparation est nécessaire car
+un bloc est accroché au bloc précédent seulement s’il est dans ses balises
+`<next>...</next>`. C’est le rôle de `insertion_next`
+([voir le code](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg_export_blockly.l#L35t))
+qui réorganise un programme comme :
+
+    (Afficher "bonjour")
+    (Afficher "tout le")
+    (Afficher "monde !")
+
+en :
+
+    (Afficher "bonjour" (Next (Afficher "tout le" (Next (Afficher "monde !")))))
+
+La commande `Next` étant définie un peu plus loin simplement ainsi :
+
+    (de Next (content)
+      (pack "<next>"
+            content
+            "</next>"))
 
 ## Feuille de route
 
@@ -604,15 +855,8 @@ Attention, `pil-j` n’est pas le nom officiel de l’exécutable d’Ersatz (c�
 pas de `pil-Xjs`. `pil-rjs` et `pil-njs` n’existent (pour l’instant) que dans
 MicroAlg.
 
-Concernant les commandes graphiques, `microalg.l` envoie des informations à
-`microalg.pde` :
-
-* via TCP/IP dans la version Java avec
-  [`connect`](http://www.software-lab.de/doc/refC.html#connect)
-  côté PicoLisp/Ersatz, et
-  [`Client`](https://processing.org/reference/libraries/net/Client.html)
-  et [`Server`](https://processing.org/reference/libraries/net/Server.html) côté Processing
-* via un bête `eval(interact(…` dans la version JavaScript
+Concernant les commandes graphiques, voir la section
+[Communication avec Processing](#communicationavecprocessing).
 
 ### Interpréteurs
 
@@ -684,6 +928,26 @@ MicroAlg s’intègre à d’autres systèmes. Pour l’instant, à part l’int
 avec des éditeurs de texte, MicroAlg s’intègre uniquement avec Blockly,
 mais il est prévu de travailler sur Mario, NetLogo, GeoGebra, GeoTortue…
 
+### Navigateur
+
+MicroAlg est utilisable dans tous les navigateurs récents. C’est même le seul
+environnement qui permette la programmation avec des blocs.
+
+D’une part, certaines pages du site officiel contiennent des
+*échantillons interactifs*, comme :
+
+* [la page d’accueil](http://microalg.info/#script-si-majeur-mineur),
+* [l’environnement de programmation web](ide.html) (web IDE),
+* [ce tutoriel](tuto.html) mais aussi les autres…
+
+Mais d’autre part, il est possible d’inclure des échantillons interactifs dans
+n’importe quel site, pour peu que vous ayez les connaissances techniques
+suffisantes. Voir [cette section](https://github.com/Microalg/microalg/blob/latest/INSTALL.md#user-content-installer-sur-son-site)
+du document d’installation.
+
+Notez que les [abréviations](#abrviations) sont utilisables dans les
+échantillons interactifs des navigateurs.
+
 ### SciTE
 
 Moins populaire que NotePad++, il est pourtant très souple et intéressant,
@@ -711,33 +975,9 @@ avec le programme. Les valeurs demandées par le programme doivent y être tapé
 **Bug connu** (si vous utilisez autre chose que Windows) : pas moyen de faire
 en sorte que `(Demander)` attende l’utilisateur.
 
-#### Abbréviations
+#### Abréviations avec SciTE
 
-Après avoir tapé les préfixes ci-dessous, un appui sur `Ctrl`+`B` vous
-donnera la suite.
-
-    (Af  ->  (Affecter_a |)
-    (Afe ->  (Affecter_a | En_position )
-    (A   ->  (Afficher |)
-    (Aj  ->  (Ajouter_a |)
-    (Co  ->  (Concatener |)
-    (D   ->  (Definir |...
-    (De  ->  (Declarer | De_type "")
-    (Dm  ->  (Demander)
-    (E   ->  (Exemples_de |...
-    # Pour Faire, deux lignes vides pour aider à penser au compteur.
-    (F   ->  (Faire (|)...
-    (Li  ->  (Liste |)
-    (Lo  ->  (Longueur |)
-    (Ni  ->  (Nieme |)
-    (No  ->  (Nombre |)
-    (R   ->  (Repeter | Fois...
-    (Rd  ->  (Retirer_de |)
-    (Re   -> (Retourner |)
-    (S   ->  (Si (|) Alors...
-    (Ss  ->  (Si (|) Alors () Sinon...
-    # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
-    (Tq  ->  (Tant_que (|) Faire...
+Voir [cette section](#abrviation).
 
 #### Problèmes connus
 
@@ -846,6 +1086,27 @@ Certaines commandes de langage MicroAlg n’ont pas encore de bloc.
   utilisateur utiliseront du code textuel, ce qui est aussi le cas pour
   `Definir` et `Retourner`)
 
+#### Passer des blocs au texte
+
+* Les blocs de la catégorie Valeurs, sauf Liste, ne s’écrivent pas
+  avec des parenthèses.
+* Les autres blocs, qu’ils aient ou non une prise sur la gauche,
+  s’écrivent : `(nom_du_bloc … …)` où les pointillés sont à remplacer par des
+  valeurs ou d’autres commandes.
+    * Avoir la [liste des commandes](#listedessymbolesprdfinis) sous les yeux
+      est donc bien pratique.
+    * Même les opérations et les comparaisons sont à écrire `(+ 2 2)` ou
+      `(< 0 1)`.
+    * Opérations sur les nombres :
+        * `Somme` correspond à la commande `+`.
+        * `Différence` correspond à la commande `-`.
+        * `Produit` correspond à la commande `*`.
+        * `Quotient` correspond à la commande `/`.
+        * `Reste` correspond à la commande `%`.
+        * `Puissance` correspond à la commande `^`.
+* Si vous ne tapez pas très vite, des [abréviations](#abrviations) peuvent
+  vous aider.
+
 ## Sortie graphique
 
 Pour sa sortie graphique, MicroAlg utilise
@@ -946,6 +1207,39 @@ on passe un entier en paramètre. C’est le nombre de pixel de la largeur des
 traits.  À partir de la ligne cette commande est utilisée, toutes les formes
 seront dessinées avec l’épaisseur choisie, jusqu’à un autre appel à `Epaisseur`.
 
+### Communication avec Processing
+
+Cette section est plutôt technique et est destinée à celles et ceux qui veulent
+comprendre le fonctionnement MicroAlg.
+
+Même si l’export du code MicroAlg vers du code Processing est possible (voir
+la section [Fonctionnement de l’export](#fonctionnementdelexport)), la sortie
+graphique n’utilise pas de conversion. Les commandes graphiques envoient des
+informations à un sketch Processing, qui réalise les affichages en conséquence.
+
+En n’utilisant que du code compatible Processing/Processing.js, MicroAlg
+peut n’utiliser qu’un seul fichier `.pde` pour les deux modes :
+`pde/microalg/microalg.pde`.
+
+Plus précisément, par exemple avec l’instruction `(Epaisseur 5)` :
+
+1. La commande `Epaisseur` envoie `"Epaisseur 5"` à la commande
+   `!processing` ([voir le code](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg.l#L1794)).
+1. La commande `!processing` centralise la communication avec le sketch et
+   envoie à son tour "Epaisseur 5" au sketch `pde/microalg/microalg.pde`
+   ([voir le code](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/microalg.l#L1725)) :
+    * via TCP/IP dans la version Java avec
+      [`connect`](http://www.software-lab.de/doc/refC.html#connect)
+      côté PicoLisp/Ersatz, et
+      [`Client`](https://processing.org/reference/libraries/net/Client.html)
+      et [`Server`](https://processing.org/reference/libraries/net/Server.html)
+      côté Processing,
+    * via un bête `eval(interact(…` dans la version JavaScript.
+1. Dans `pde/microalg/microalg.pde`, la chaîne `"Epaisseur 5"` est décomposée
+   en commande et arguments, et un switch géant sur le nom de la commande gère
+   la commande Processing finale à exécuter
+   ([voir le code](https://github.com/Microalg/microalg/blob/f229f05a696c132cd58e07d31d83ffd9def81c65/pde/microalg/microalg.pde#L80)).
+
 ## Tortue
 
 L’affichage de la tortue est bien sûr graphique. Il est donc indispensable
@@ -1003,6 +1297,10 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * Alix et Noham, tout juste sept ans au moment des premiers tests du tutoriel
   de la tortue.
 * Mathis et Tiphaine, pour la deuxième vague des tests du tutoriel de la tortue.
+* Les SIO1 de 2015-2016, pour leurs essais de programmes parfois brutaux, mais
+  parfois pas tant que ça, qui ont permis de déceler des bugs ou des messages
+  d’erreur peu clairs.
+* Caro.
 
 <p id="modeles">Modèles et contre-modèles :</p>
 
@@ -1028,7 +1326,8 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * **int.js**, par Roman Shtylman &mdash; [GitHub](https://github.com/defunctzombie/int/)
 * **jQuery**, par John Resig et la communauté &mdash; [site officiel](http://jquery.com/)
 * **jQuery-term**, par Jakub T. Jankiewicz &mdash; [site officiel](http://terminal.jcubic.pl/)
-* **parenedit**, &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
+* **parenedit** &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
+* **tabIndent**, par Julian Lam &mdash; [site officiel](http://julianlam.github.io/tabIndent.js/)
 * **Blockly**, par Neil Fraser et la communauté &mdash; [site officiel](http://code.google.com/p/blockly/)
 * **SciTE**, par Neil Hodgson &mdash; [site officiel](http://www.scintilla.org/SciTE.html)
 * **svg-tree-drawer**, par Weston Ruter &mdash; [GitHub](https://github.com/westonruter/svg-tree-drawer/)

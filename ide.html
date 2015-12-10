@@ -105,6 +105,7 @@
             inject_microalg_editor_in('script-container',
                 {src: '(Afficher "Bonjour tout le monde !")',
                  blockly: true,
+                 output: 'MD',
                  processing: true,
                  localStorage: true});
             // Focus et curseur final dans l’éditeur:
@@ -120,6 +121,11 @@
             inject_microalg_jrepl_in('repl-container2',
                 ': # Voici la console interactive de MicroAlg.\n' +
                 ': # <- le # indique que la fin de la ligne est un commentaire.');
+    </script>
+    <script type="text/javascript" src="web/tabIndent.js"></script>
+    <script>
+      tabIndent.config.tab = ' ';
+      tabIndent.renderAll();
     </script>
 </body>
 </html>
