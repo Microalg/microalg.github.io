@@ -43,7 +43,7 @@ Aller directement à :
 * [Syntaxe](#syntaxe) - [Forme de Backus-Naur](#formedebackusnaur)
 * [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
 * [Types](#types)
-* [Erreurs fréquentes](#erreursfrquentes)
+* [Aide sur les messages d’erreur](#aidesurlesmessagesderreur)
 * [Abréviations](#abrviations)
 * [Export](#export)
     * [Limitations](#limitations)
@@ -438,14 +438,13 @@ les [formes de Backus-Naur](#formedebackusnaur).
 
 **Structures de contrôle**
 
-`(Si ... Alors ... Sinon ...)`, `(Tant_que ... Faire ...)` et
-`(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
+`(Si ... Alors ...)`, `(Si ... Alors ... Sinon ...)`, `(Tant_que ... Faire ...)`
+et `(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
 
 **Gestion des variables**
 
 `(Declarer ... [...] De_type "...")`,
 `(Affecter_a ... ... [En_position ...])`.
-
 
 **Types et conversions**
 
@@ -573,16 +572,28 @@ de créer des listes de listes (de listes…).
 
 En cours d’élaboration.
 
-## Erreurs fréquentes
+## Aide sur les messages d’erreur
+
+Un programme peut produire des erreurs à l’exécution. Certaines erreurs ont pu
+être identifiées par un numéro et rédigées en français et sont répertoriées
+[dans cette section](#erreursnumrotes). Mais pour des raisons techniques,
+certaines sont restées en anglais. Ces dernières sont listées dans
+[cette section](#erreursfrquentes).
+
+Ainsi, si le message d’erreur ne permet pas de résoudre le problème, des
+informations supplémentaires sont données ici. Dans le cas d’une erreur
+non numérotée, il faut chercher soi-même dans la liste des
+[erreurs fréquentes](#erreursfrquentes).
+
+Dans tous les cas, si vous ne trouvez pas l’information que vous cherchiez,
+merci de m’<a href="mailto:profgra.org@gmail.com"
+class="email">écrire un petit email</a>.
+
+### Erreurs fréquentes
 
 Les messages sont classés par ordre alphabétique, sans tenir compte de la
 valeur ou de la commande qui est parfois fournie :
 
-* `Afficher` n’a qu’un paramètre, faites plusieurs affichages ou utilisez
-  `Concatener`.
-    * Vous utilisez peut-être `Concatener`, mais il manque une parenthèse
-      fermante. Le reste du programme est vu comme le reste des arguments à
-      `Afficher`.
 * Après `En_position`, il n’y a qu’un paramètre.
     * Vous n’avez peut-être pas bien fermé la parenthèse de la commande
       `Affecter_a`.
@@ -718,6 +729,281 @@ le signaler en :
   parce que son nom contient des espaces. Pour le confirmer, observez le nom de
   fichier qui précède ce message d’erreur, il s’arrête sans doute au premier
   espace rencontré.
+
+### Erreurs numérotées
+
+[1](#erreur_1)
+[2](#erreur_2)
+[3](#erreur_3)
+[4](#erreur_4)
+[5](#erreur_5)
+[6](#erreur_6)
+[7](#erreur_7)
+[8](#erreur_8)
+[9](#erreur_9)
+[10](#erreur_10)
+[11](#erreur_11)
+[12](#erreur_12)
+[13](#erreur_13)
+[14](#erreur_14)
+[15](#erreur_15)
+[16](#erreur_16)
+[17](#erreur_17)
+[18](#erreur_18)
+[19](#erreur_19)
+[20](#erreur_20)
+[21](#erreur_21)
+[22](#erreur_22)
+[23](#erreur_23)
+[24](#erreur_24)
+[25](#erreur_25)
+[26](#erreur_26)
+[27](#erreur_27)
+[28](#erreur_28)
+[29](#erreur_29)
+[30](#erreur_30)
+
+#### erreur_1
+
+> La commande `!!!` n’accepte qu’un argument.
+
+Voir [l’aide de la commande !!!](#sym-!!!).
+
+#### erreur_2
+
+> Un commentaire doit être du texte (entre guillemets).
+
+Voir [l’aide de la commande !!!](#sym-!!!).
+
+#### erreur_3
+
+> Parenthèses mal placées dans `(X Y Z)`.
+
+Cela peut arriver si vous mettez les valeurs d’une liste dans une autre
+série de parenthèses : `(Liste (X Y Z))`. Il faut taper `(Liste X Y Z)`.
+
+#### erreur_4
+
+> Pas de représentation textuelle pour `truc`.
+
+`truc` a une valeur tellement étrange que MicroAlg n’arrive pas à l’afficher.
+
+Merci de m’envoyer votre programme
+<a href="mailto:profgra.org@gmail.com" class="email">par email</a> pour que
+je puisse vous en dire plus.
+
+#### erreur_5
+
+> `Afficher` : la variable `truc` n’a pas été déclarée.
+
+Vérifiez l’orthographe de votre variable.
+
+#### erreur_6
+
+> `Afficher` n’a qu’un paramètre, faites plusieurs affichages ou utilisez
+> `Concatener`.
+
+Vous utilisez peut-être `Concatener`, mais il manque peut-être une parenthèse
+fermante, ce qui fait que le reste du programme est vu comme le reste des
+arguments de `Afficher`.
+
+#### erreur_7
+
+> `Concatener` : l’argument n°X (`truc`) est une variable qui n’a pas été
+> déclarée.
+
+Vérifiez l’orthographe de votre variable.
+
+#### erreur_8
+
+> `Concatener` : la valeur `truc` est de type `"machin"` et n’est donc pas
+> concaténable.
+
+* Seules les valeurs de type `"texte"` ou `"liste"` sont concaténables. Vérifiez
+  le type des valeurs que vous voulez concaténer.
+* Pour construire du texte avec des valeurs qui ne sont pas de type `"texte"`,
+  on peut utiliser la commande [`Texte`](#sym-Texte).
+
+#### erreur_9
+
+> `Concatener` : l’argument n°X (`truc`) doit être de type `"machin"` mais est
+> `"bidule"`.
+
+Les valeurs à concaténer doivent être du même type que la première valeur
+envoyée à `Concatener`.
+
+#### erreur_10
+
+> `Declarer` prend au moins 3 paramètres. Vous en donnez X.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_11
+
+> `Declarer` : mot-clef `De_type` manquant.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_12
+
+> `Declarer` : le type ne peut pas être `truc` mais doit être du texte
+> (entre "").
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_13
+
+> `Declarer` : le type `"truc"` n’existe pas.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_14
+
+> `Declarer` : la variable `truc` a déjà été déclarée de type `"bidule"`.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_15
+
+> `Initialiser` a été abandonnée dans la version 0.4. Merci d’utiliser
+> `Declarer`.
+
+C’est vrai.
+
+#### erreur_16
+
+> On ne peut pas affecter une valeur à `truc`…
+
+On ne peut affecter une valeur qu’à une variable, qu’il faut déclarer au
+préalable.
+
+Voir l’aide de la commande [Declarer](#sym-Declarer) et de la commande
+[Affecter_a](#sym-Affecter_a).
+
+#### erreur_17
+
+> `Affecter_a` : la variable `truc` n’a pas été déclarée.
+
+Avant d’utiliser une variable, il faut la déclarer avec la commande `Declarer`.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_18
+
+> `truc` est une liste. On ne peut pas lui affecter `machin` qui n’est pas une
+> liste.
+
+* Si vous vouliez ajouter une nouvelle valeur à la liste, il faut utiliser
+  [Ajouter_a](#sym-Ajouter_a).
+* Si vous vouliez remplacer une valeur de la liste par une autre valeur, il
+  faut utiliser `Affecter_a … … En_position …`.
+  Voir [la documentation de Affecter_a](#sym-Affecter_a).
+
+#### erreur_19
+
+> `Affecter_a` : le type ne correspond pas. `truc` est un `"machin"` et
+> `bidule` est un `"chose"`.
+
+Si une variable est d’un certain type, il faut lui affecter une valeur du même
+type. Vérifiez le type de votre variable ou de votre valeur.
+
+#### erreur_20
+
+> `Affecter_a` n’est pas bien fermé, ou il manque `En_position`.
+
+Vous fournissez un troisième argument à `Affecter_a` qui n’est pas
+`En_position`.
+
+* Pour une affectation à une variable qui n’est pas de type `"liste"`,
+  Il manque sans doute une parenthèse après la valeur à affecter à la variable.
+* Si vous voulez changer une valeur d’une liste, il faut utiliser le mot-clé
+  intermédiaire `En_position`.
+
+#### erreur_21
+
+> `Affecter_a` : après `En_position`, il n’y a qu’un paramètre.
+
+Il ne faut pas en mettre plus.
+
+#### erreur_22
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice est manquant.
+
+Après le mot-clé `En_position`, il faut fournir un nombre entier qui indique
+la position de la valeur à changer.
+
+#### erreur_23
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice est une
+> variable qui n’a pas été déclarée : `truc`.
+
+Avant d’utiliser la variable `truc`, il faut la déclarer avec la commande
+`Declarer`.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_24
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice doit être un
+> nombre et non un texte. Donc `"truc"` ne convient pas.
+
+Vérifiez le type de ce que vous avez indiqué comme position.
+
+#### erreur_25
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice doit être un
+> nombre. Donc `truc` ne convient pas.
+
+Vérifiez le type de ce que vous avez indiqué comme position.
+
+#### erreur_26
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice doit être un
+> nombre entier. Donc `truc` ne convient pas.
+
+* Si c’est un nombre constant, il ne doit pas comporter de point.
+* Si c’est le résultat d’un calcul ou une variable, vérifiez que cette valeur
+  est toujours un nombre entier. Si réfléchir ne suffit pas, vous pouvez
+  insérer un affichage de cette valeur dans votre programme.
+
+#### erreur_27
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice doit être
+> strictement positif. Donc `truc` ne convient pas.
+
+* Si c’est un nombre constant, il ne doit pas être précédé du signe « moins ».
+* Si c’est le résultat d’un calcul ou une variable, vérifiez que cette valeur
+  est toujours un nombre strictement positif. Si réfléchir ne suffit pas, vous
+  pouvez insérer un affichage de cette valeur dans votre programme.
+
+**Rappel** : les positions sont numérotées à partir de 1.
+
+#### erreur_28
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice est trop
+> grand (position X dans un objet de longueur Y).
+
+* Si c’est un nombre constant, ajustez-le.
+* Si c’est le résultat d’un calcul ou une variable, vérifiez cette valeur.
+  Si réfléchir ne suffit pas, vous pouvez insérer un affichage de cette valeur
+  dans votre programme.
+
+**Rappel** : les positions sont numérotées à partir de 1.
+
+#### erreur_29
+
+> La valeur affectée à un texte doit être un texte de longueur 1 (un caractère)
+> mais vous avez donné : `truc`.
+
+Dans `(Affecter_a mon_texte truc En_position X)`, `truc` ne peut être qu’un
+caractère. Vérifiez la valeur de votre `truc`, et sa longueur si c’est un texte.
+
+#### erreur_30
+
+> Affectation positionnelle impossible sur `truc` qui est de type `"machin"`.
+
+`Affecter_a truc ... En_position ...` ne fonctionne que si `truc` est un texte
+ou une liste. Vérifiez le type de votre `truc`.
 
 ## Abréviations
 
@@ -906,8 +1192,9 @@ Voici les directions que le projet va prendre :
 * Finir de coder les derniers blocs pour
   <a href="https://blockly-demo.appspot.com/static/apps/index.html"
   class="offi">Blockly</a>.
-* Implémenter un système pour convertir des programmes écrits en MicroAlg
-  en programmes écrits Python, JS, C, PHP, C#, Pascal…
+* Continuer l’export des programmes écrits en MicroAlg vers d’autres langages :
+  Python, JS, C, PHP, C#, Pascal… et MicroAlg lui-même.
+* Faire tourner MicroAlg sur une petite plaque comme Arduino.
 
 À un niveau moins général, des rapports de bugs ou idées d’amélioration sont
 régulièrement [reportées sur Github](https://github.com/Microalg/Microalg/issues?state=open).
@@ -1098,23 +1385,33 @@ mais il est prévu de travailler sur Mario, NetLogo, GeoGebra, GeoTortue…
 
 ### Navigateur
 
-MicroAlg est utilisable dans tous les navigateurs récents. C’est même le seul
-environnement qui permette la programmation avec des blocs.
+MicroAlg est utilisable dans tous les navigateurs récents. Il est en effet
+possible d’incorporer des *échantillons interactifs* dans une page web.
 
-D’une part, certaines pages du site officiel contiennent des
-*échantillons interactifs*, comme :
+On en trouve sur le site officiel :
 
 * [la page d’accueil](http://microalg.info/#script-si-majeur-mineur),
 * [l’environnement de programmation web](ide.html) (web IDE),
 * [ce tutoriel](tuto.html) mais aussi les autres…
 
-Mais d’autre part, il est possible d’inclure des échantillons interactifs dans
-n’importe quel site, pour peu que vous ayez les connaissances techniques
+On en trouve dans [la galerie](http://galerie.microalg.info).
+
+Et il est possible d’inclure des échantillons interactifs dans
+n’importe quel site, pour peu que vous ayez des connaissances techniques
 suffisantes. Voir [cette section](https://github.com/Microalg/microalg/blob/latest/INSTALL.md#user-content-installer-sur-son-site)
 du document d’installation.
 
+#### Fonctionnalités des échantillons interactifs
+
+C’est pour l’instant le seul environnement qui permette :
+
+* la programmation avec des blocs (voir [cette section](#blockly)),
+* l’export des programmes (voir [cette section](#export)),
+* l’interprétation de l’affichage en tant que code HTML ou Markdown (grâce au
+  menu déroulant à droite du bouton `OK`).
+
 Notez que les [abréviations](#abrviations) sont utilisables dans les
-échantillons interactifs des navigateurs.
+échantillons interactifs.
 
 ### SciTE
 
@@ -1195,6 +1492,14 @@ ou [l’installation hors ligne pour les autres OS](https://github.com/Microalg/
 
 Voir [le site officiel](https://code.google.com/p/blockly/) et
 [les démos](https://blockly-demo.appspot.com/static/apps/index.html) de Blockly.
+
+#### Blocs et code textuel
+
+Dans le cas où vous avez accès à la fois aux blocs et au code textuel, le code
+textuel est mis à jour à chaque modification faite sur les blocs.
+
+Inversement, il est possible de reconstituer les blocs correspondant au code
+textuel avec `Ctrl`+`Shift`+`B` depuis l’éditeur textuel.
 
 #### Bloc Programme
 
@@ -1469,6 +1774,13 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
   parfois pas tant que ça, qui ont permis de déceler des bugs ou des messages
   d’erreur peu clairs.
 * Caro.
+* Pierre Mezerette, pour son intérêt et sa proposition d’utiliser MicroAlg au
+  cours de ses interventions, et pour avoir déniché quelques bugs dans l’export.
+* [Guillaume Blin](http://www.labri.fr/perso/gblin/), pour son intérêt et ses
+  idées autour de la mesure de la complexité des algorithmes, entre autres.
+* Christine l’Hurriec, pour avoir réclamé que pour chaque message d’erreur
+  affiché dans l’interface web, il y ait un lien vers une explication spécifique
+  [dans la documentation](#erreursnumrotes).
 
 <p id="modeles">Modèles et contre-modèles :</p>
 
