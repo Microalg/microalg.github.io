@@ -45,10 +45,11 @@ body.microalg {
     padding-top: 0.5em;
 }
 .microalg code {
+    font-size: 1.2em;
     margin: 0 2px;
     padding: 0px 5px;
     border: 1px solid #AAA;
-    background-color: #DDD;
+    background-color: #EEE;
     border-radius: 3px;
     white-space: nowrap;
 }
@@ -56,6 +57,14 @@ body.microalg {
     display: block;
     white-space: pre;
     position: relative;
+}
+.microalg blockquote {
+    background-color: #F9F9F9;
+    border: solid #CCC 1px;
+    border-left: solid #DDD 5px;
+    padding-left: 0.7em;
+    padding-top: 1px;
+    padding-bottom: 1px;
 }
 .malg-container {
     width: 95%;
