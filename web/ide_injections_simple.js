@@ -319,7 +319,7 @@ function inject_microalg_editor_in(elt_id, config) {
         '<option' + ((config.output == 'HTML')?' selected':'') + '>HTML</option>' +
         ((typeof Showdown === 'undefined') ? '' : '<option' + ((config.output == 'MD')?' selected':'') + '>MD</option>') +
         '</select> ' +
-        '<input type="button" value="OK" class="malg-ok-editor" ' +
+        '<input type="button" value="Exécuter" class="malg-ok-editor" ' +
                 'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' +
                                      "'" + config_64 + "'" + ')" />' +
         '<div class="malg-error"></div>' +
