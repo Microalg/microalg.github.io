@@ -28,30 +28,39 @@
         Besoin de JavaScript pour les exercices interactifs.
         </div>
     </noscript>
-    <h1 id="top">MicroAlg - Position de la puce</h1>
-    <h2>Définir une nouvelle commande</h2>
-    <p>Dans l’échantillon de code ci-dessous, on a préparé du code MicroAlg
-    qui :</p>
+    <h1 id="top">MicroAlg - Estimation de la probabilité du retour à l'origine
+    lors d'une promenade de 10 sauts</h1>
+    <h2>Définition de la commande Position_finale</h2>
+    <p>Dans la fenêtre ci-dessous, on a préparé du code MicroAlg qui :</p>
     <ol>
-      <li>définit une nouvelle commande : <code>Position_finale</code>,</li>
-      <li>affiche le résultat de cette nouvelle commande.</li>
+      <li>définit une nouvelle commande : <code>Position_finale</code> qui
+          retourne une valeur ;</li>
+      <li>affiche la valeur retournée par cette nouvelle commande.</li>
     </ol>
-    <p>Testez ce code en remplaçant par exemple 0 par une autre valeur.</p>
+    <p>Pour mieux comprendre, exécutez ce code après avoir remplacé 0 par une
+    autre valeur.</p>
     <div id="test-commande-position-finale"></div>
     <script>inject_microalg_editor_in('test-commande-position-finale', {
      src: '(Definir (Position_finale)\n' +
-          '    (Affecter_a position 0)\n' +
-          '    (Retourner position)\n' +
+          '    (!!! "Début")\n' +
+          '    (Affecter_a x 0)\n' +
+          '    (Retourner x)\n' +
+          '    (!!! "Fin")\n' +
           ')\n' +
+          '\n' +
+          '\n' +
           '(Afficher (Position_finale))\n' +
           ''
     });</script>
-    <p><strong>Travail à faire :</strong> En modifiant le code de cette
-    nouvelle commande, faites en sorte qu’elle simule les 10 sauts de notre
-    puce bien aimée.</p>
-    <h2>Utilisation de la nouvelle commande</h2>
-    <p>Recopier la commande que vous venez de créer dans l’échantillon de code
-    ci-dessous, et utilisez-là pour écrire le programme demandé :</p>
+    <p>Modifiez le code qui se trouve entre <code>(!!! "Debut")</code> et
+    <code>(!!! "Fin")</code> de telle sorte que la nouvelle commande simule les
+    10 sauts de notre puce bien aimée puis retourne la position finale.</p>
+    <h2>Détermination de la fréquence des promenades telles que F = 0 parmi un
+    grand nombre de promenades</h2>
+    <p>Recopier la définition de la commande que vous venez de créer dans la
+    fenêtre ci-dessous.</p>
+    <p>Dans la même fenêtre, à la suite, en utilisant la nouvelle commande,
+    écrivez le programme demandé :</p>
     <ul>
       <li>simulation d’un « grand nombre » de promenades aléatoires de
           10 sauts ;</li>
@@ -63,19 +72,7 @@
     <div id="utilisation-position-finale"></div>
     <script>inject_microalg_editor_in('utilisation-position-finale', {
      presrc: "(Affecter_a credit_iterations 11000)",
-     src: '(Afficher (Position_finale))'
-    });</script>
-    <p><strong>Travail à faire :</strong> Utiliser la nouvelle commande pour
-    compter le nombre de retours à l’origine sur un « grand nombre » de
-    promenades de 10 sauts.</p>
-    <h2>Nouvelle commande pré-définie</h2>
-    <p>Même consigne, sauf que dans l’échantillon de code ci-dessous, il n’y a
-    pas besoin de définir la commande <code>Position_finale</code> car elle a
-    été définie pour vous.</p>
-    <div id="utilisation-position-finale-gruge"></div>
-    <script>inject_microalg_editor_in('utilisation-position-finale-gruge', {
-     presrc: "(Affecter_a credit_iterations 11000)(Declarer position De_type \"nombre\")(Definir (Position_finale)(Affecter_a position 0)(Repeter 10 Fois (Affecter_a position (+ position (- (* 2 (Entier@ 0 1)) 1))))(Retourner position))",
-     src: '(Afficher (Position_finale))'
+     src: ''
     });</script>
     <script type="text/javascript" src="web/tabIndent.js"></script>
     <script>
