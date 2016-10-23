@@ -1,10 +1,10 @@
-/* 23sep15jk
+/* 22dec15jk
  * (c) Jon Kleiser
  */
 
 var EMULISP_CORE = (function () {
 
-var VERSION = [2, 0, 6, 0],
+var VERSION = [2, 0, 7, 0],
 	MONLEN = [31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 	BOXNAT_EXP = "Boxed native object expected",
 	BOOL_EXP = "Boolean expected", CELL_EXP = "Cell expected", LIST_EXP = "List expected",
@@ -30,7 +30,7 @@ function getFileSync(fileUrl) {
 		}
 		return req.responseText;
 	}
-	throw new Error("XMLHttpRequest status: " + req.status);
+	throw new Error("Retrieving " + fileUrl + ": XMLHttpRequest status " + req.status);
 }
 
 var NILTYPE = 0, NUMBERTYPE = 1, SYMBOLTYPE = 2, CELLTYPE = 3, TRUETYPE = 4;
@@ -1590,6 +1590,13 @@ var coreFunctions = {
 		}
 		return lst;
 	},
+	"sqrt": function(c) {
+		var v = evalLisp(c.car);
+		v = numeric(v);
+		if (v === NIL) return NIL;
+		if (v < 0) throw new Error(newErrMsg(BAD_ARG, v));
+		return new Number(Math.sqrt(v));
+	},
 	"str": function(c) {
 		var cv = evalLisp(c.car);
 		if (cv instanceof Symbol) {
@@ -1935,8 +1942,14 @@ function evalLisp(lst) {
 				return evalDef(lst.car.cdr, lst);
 			}
 			var s = evalLisp(lst.car);
+			if (typeof s === "function") {
+				return s(lst.cdr, lst);
+			}
 			if (typeof s.car === "function") {
 				return s.car(lst.cdr, lst);
+			}
+			if (s instanceof Cell) {
+				return evalDef(s, new Cell(s, lst.cdr));
 			}
 			return evalSym(s, lst);
 		}

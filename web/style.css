@@ -4,7 +4,7 @@ html {
     background-color: #fff;
 }
 #dokuwiki__site {
-    font-size: 120%;
+    font-size: 160%;
 }
 body.microalg {
     font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
@@ -74,9 +74,20 @@ body.microalg {
     line-height: 1.2em;
     font-family: monospace;
     white-space: pre;
+    border: solid 1px;
+    padding: 3px;
+    margin-bottom: 1em;
+}
+.malg-export-eval {
+    text-align: right;
+}
+.malg-export-eval input {
+    background-color: #eee;
+    margin: 1em 0 1em 1em;
+    border: none;
 }
 .malg-guide {
-	color: #ddd;
+    color: #ddd;
 }
 .malg-blockly-iframe {
     height: 350px;
@@ -94,9 +105,12 @@ body.microalg {
     width: 100%;
 }
 .malg-ok-editor {
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.5;
     margin: 2px;
     background-color: #ddd;
     width: 75%;
+    border: 1px solid #BABABA;
 }
 .malg-output-type {
     float: right;
@@ -146,12 +160,12 @@ pre.brut {
 }
 .microalg .link-snippet a {
     text-decoration: none;
-	border-bottom: 0;
-	background-color: #eee;
-	padding: 0 .5em 0 .5em;
+    border-bottom: 0;
+    background-color: #eee;
+    padding: 0 .5em 0 .5em;
 }
 .microalg .link-snippet a:hover {
-	background-color: #ddd;
+    background-color: #ddd;
 }
 a.wp:after, a.offi:after, a.email:after {
     color: black;

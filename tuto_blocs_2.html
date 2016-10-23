@@ -39,6 +39,7 @@
     Impossible de continuer si vous ne l’avez pas lue avant.</p>
     <p><strong>Sur cette page</strong>, aller directement à :
     <a href="#variables">Variables</a>,
+    <a href="#affectation-circulaire">Affectation circulaire</a>,
     <a href="#operations-logiques">Opérations logiques</a>,
     <a href="#manipulation-de-texte">Manipulation de texte</a>,
     <a href="#faire-tant-que">Faire… tant que…</a>,
@@ -133,7 +134,7 @@
         ')\n' +
         '(Afficher (* x x))'
     });</script>
-    <p><strong>Exercice</strong> : Dans le programme suivant, on veut demander
+    <p><strong>Exercice</strong> : Dans le programme suivant, on veut
     afficher un certain nombre de fois un texte que l’utilisateur va choisir.
     Malheureusement, le programme ne fonctionne pas comme prévu, l’utilisateur
     ne devrait écrire qu’une seule fois le mot à afficher. Corrigez ce
@@ -176,11 +177,12 @@
             </ul>
         </li>
     </ul>
-    <p><strong>Remarque</strong> : Il n’est pas interdit d’utiliser la valeur
-    d’une variable dans une instruction qui sera affectée à cette même
-    variable. C’est même parfois utile en vue d’<em>accumuler</em> des
-    valeurs, textuelles, numériques ou autres. Nous allons donner deux
-    exemples.</p>
+
+    <h2 id="affectation-circulaire"><a href="#affectation-circulaire">: </a>Affectation circulaire</h2>
+    <p>Il n’est pas interdit d’utiliser une variable dans un calcul dont le
+    résultat sera affectée à cette même variable. C’est même parfois utile en
+    vue d’<em>accumuler</em> des valeurs, qu’elles soient textuelles,
+    numériques ou d’un autre type. Nous allons donner deux exemples.</p>
     <p>Dans le premier, on accumule des nombres avec une instruction de la
     forme :<br>
     <code>(Affecter_a valeur (Somme valeur valeur_a_ajouter))</code></p>
@@ -398,8 +400,9 @@
      src:
         '(Declarer valeur De_type "nombre")\n' +
         '(Affecter_a valeur 3)\n' +
-        '(Faire (Afficher valeur)\n' +
-        '       (Affecter_a valeur (- valeur 1))\n' +
+        '(Faire\n' +
+        '    (Afficher valeur)\n' +
+        '    (Affecter_a valeur (- valeur 1))\n' +
         ' Tant_que (=/ valeur 0)\n' +
         ')\n' +
         '(Afficher "Zéro !")\n' +
@@ -443,9 +446,10 @@
         '(Declarer somme valeur De_type "nombre")\n' +
         '(Affecter_a somme 0)\n' +
         '(Affecter_a valeur 0)\n' +
-        '(Faire (Afficher "Veuillez taper un nombre SVP, 0 pour arrêter.")\n' +
-        '       (Affecter_a valeur (Nombre (Demander)))\n' +
-        '       (Affecter_a somme (+ somme valeur))\n' +
+        '(Faire\n' +
+        '    (Afficher "Veuillez taper un nombre SVP, 0 pour arrêter.")\n' +
+        '    (Affecter_a valeur (Nombre (Demander)))\n' +
+        '    (Affecter_a somme (+ somme valeur))\n' +
         ' Tant_que (=/ valeur 0)\n' +
         ')\n' +
         '(Afficher "La somme des nombres vaut :")\n' +
@@ -460,9 +464,10 @@
         '(Declarer mots mot De_type "texte")\n' +
         '(Affecter_a mots "")\n' +
         '(Affecter_a mot "")\n' +
-        '(Faire (Afficher "Veuillez taper un mot SVP, STOP pour arrêter.")\n' +
-        '       (Affecter_a mot (Demander))\n' +
-        '       (Affecter_a mots (Concatener mots " " mot))\n' +
+        '(Faire\n' +
+        '    (Afficher "Veuillez taper un mot SVP, STOP pour arrêter.")\n' +
+        '    (Affecter_a mot (Demander))\n' +
+        '    (Affecter_a mots (Concatener mots " " mot))\n' +
         ' Tant_que (=/ mot "STOP")\n' +
         ')\n' +
         '(Afficher "Vous avez tapé :")\n' +
@@ -490,8 +495,9 @@
         '(Afficher "Combien de fois voulez-vous afficher « Bonjour ! » ?")\n' +
         '(Affecter_a repetitions (Nombre (Demander)))\n' +
         '(Tant_que (=/ repetitions 0)\n' +
-        ' Faire (Afficher "Bonjour !")\n' +
-        '       (Affecter_a repetitions (- repetitions 1))\n' +
+        ' Faire\n' +
+        '    (Afficher "Bonjour !")\n' +
+        '    (Affecter_a repetitions (- repetitions 1))\n' +
         ')\n' +
         ''
     });</script>
@@ -682,8 +688,7 @@
     <p>Bouger des blocs à la souris, c’est bien. Mais taper son code soi-même,
     c’est mieux. Voici un espace de travail qui vous permet de voir à quoi
     ressemble MicroAlg sans les blocs. Observez le code (juste en dessous) au
-    fur et à mesure que vous bougez les blocs. Attention : les couleurs des
-    parenthèses n’ont rien à voir avec la couleur des blocs.</p>
+    fur et à mesure que vous bougez les blocs.</p>
     <div id="script-taper-du-code"></div>
     <script>inject_microalg_editor_in('script-taper-du-code', {
      blockly: true,
@@ -754,12 +759,8 @@
     <strong>taper le code</strong> vous-même, vous pouvez plutôt essayer :</p>
     <ul>
         <li>
-            <a href="tuto_simple.html">le tutoriel simplifié</a>, rédigé dans
-            un <strong>français simplifié</strong> ;
-        </li>
-        <li>
-            <a href="tuto.html">le tutoriel officiel</a>, rédigé dans un
-            <strong>français assez soutenu</strong> ;
+            <a href="tuto.html">le tutoriel officiel</a>, riche en explications,
+            <strong>pour les débutants</strong> ;
         </li>
         <li>
             <a href="tuto_rapide.html">le tutoriel rapide</a>, réservé aux

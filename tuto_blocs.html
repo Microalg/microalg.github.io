@@ -52,6 +52,7 @@
     </p>
     <p><strong>Sur la page suivante</strong>, aller directement à :
     <a href="tuto_blocs_2.html#variables">Variables</a>,
+    <a href="tuto_blocs_2.html#affectation-circulaire">Affectation circulaire</a>,
     <a href="tuto_blocs_2.html#operations-logiques">Opérations logiques</a>,
     <a href="tuto_blocs_2.html#manipulation-de-texte">Manipulation de texte</a>,
     <a href="tuto_blocs_2.html#faire-tant-que">Faire… tant que…</a>,
@@ -68,12 +69,8 @@
     <strong>taper le code</strong> vous-même, vous pouvez plutôt essayer :</p>
     <ul>
         <li>
-            <a href="tuto_simple.html">le tutoriel simplifié</a>, rédigé dans
-            un <strong>français simplifié</strong> ;
-        </li>
-        <li>
-            <a href="tuto.html">le tutoriel officiel</a>, rédigé dans un
-            <strong>français assez soutenu</strong> ;
+            <a href="tuto.html">le tutoriel officiel</a>, riche en explications,
+            <strong>pour les débutants</strong> ;
         </li>
         <li>
             <a href="tuto_rapide.html">le tutoriel rapide</a>, réservé aux
@@ -118,7 +115,7 @@
      src:
         '(Afficher "Bonjour tout le monde !")'
     });</script>
-    <p>Cliquer sur le bouton <code>OK</code> pour exécuter le programme. Un
+    <p>Cliquer sur le bouton <code>Exécuter</code> pour exécuter le programme. Un
     message de bienvenue devrait s’être affiché dans la barre un peu arrondie
     ci-dessus. Sinon, ne pas hésiter à poser une question dans
     <a href="http://qr.microalg.info">la section Questions/Réponses</a>,
@@ -179,7 +176,12 @@
     de deux textes », le programme s’exécute depuis l’intérieur vers
     l’extérieur : le programme concatène d’abord, et affiche ensuite.</p>
     <p>Pour finir la partie « concaténation », notons qu’il n’y a pas de limite
-    au nombre de textes à concaténer :</p>
+    au nombre de textes à concaténer.<br>
+    Il suffit de cliquer sur la petite étoile du bloc <code>Concatener</code>
+    pour pouvoir choisir combien de textes vont être concaténés, en glissant
+    un bloc supplémentaire, ou en supprimant un bloc pour faire apparaître ou
+    disparaître des emplacements. Recliquer sur l’étoile quand le compte est
+    bon.</p>
     <div id="script-concat3"></div>
     <script>inject_microalg_editor_in('script-concat3', {
      blockly_only: true,
@@ -190,11 +192,6 @@
         '             "et encore du texte"\n' +
         '))'
     });</script>
-    <p>Il suffit de cliquer sur la petite étoile du bloc <code>Concatener</code>
-    pour pouvoir choisir combien de textes vont être concaténés, en glissant
-    un bloc supplémentaire, ou en supprimant un bloc pour faire apparaître ou
-    disparaître des emplacements. Recliquer sur l’étoile quand le compte est
-    bon.</p>
 
     <h2 id="repeter"><a href="#repeter">: </a>Répéter</h2>
     <p>Un algorithme décrit souvent (mais pas toujours) un travail répétitif
@@ -212,7 +209,7 @@
     <p>À vous de tester à nouveau ce programme en changeant le nombre de
     répétitions et le texte à afficher.</p>
     <p><strong>Question</strong> : comment faire pour afficher ce texte avec le
-    moins d’instructions possible ? Huit parenthèses devraient suffire.</p>
+    moins d’instructions possible ?</p>
     <pre><code>Bonjour,
 ça va ?
 ça va ?
@@ -241,7 +238,7 @@ Bonjour,
      src:
         '(Afficher (Entier@ 1900 2015))'
     });</script>
-    <p>Comment changer ce programme pour simuler un dé à six faces ?</p>
+    <p>Comment changer ce programme pour simuler le lancer d’un dé à six faces ?</p>
     <p><strong>Utilisation avancée</strong> : si vous n’avez pas besoin de
     <a href="http://fr.wikipedia.org/wiki/Reproductibilit%C3%A9"
     class="wp">reproductibilité</a> (le fait de pouvoir obtenir à nouveau
@@ -358,7 +355,7 @@ Bonjour,
         <li>l’opération apparaît sur la gauche du bloc et non entre les nombres.</li>
     </ol>
     <p>Pour chaque exemple ci-dessous, essayer de deviner ce que va afficher
-    MicroAlg, puis vérifier en cliquant sur <code>OK</code>.</p>
+    MicroAlg, puis vérifier en cliquant sur <code>Exécuter</code>.</p>
     <div id="script-aff-deux-et-deux"></div>
     <script>inject_microalg_editor_in('script-aff-deux-et-deux', {
      blockly_only: true,

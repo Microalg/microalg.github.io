@@ -11,8 +11,13 @@
 .richtext {
     display: inline-block;
     overflow: hidden;
+    color: #282828;
+    background: #fff;
     margin: 2px 0;
+    padding: 0px;
     vertical-align: top;
+    outline: 0;
+    border: 1px solid #BABABA;
 }
 .richtext pre {
     display: inline-block;
@@ -26,14 +31,7 @@
     word-wrap: break-word;
     color: transparent;
 }
-input,.richtext {
-    padding: 0px;
-    color: #282828;
-    background: #fff;
-    outline: 0;
-    border: 1px solid #BABABA;
-}
-input, textarea, .richtext > pre {
+.richtext > textarea, .richtext > pre {
     font-family: 'Courier New', Courier, monospace;
     font-size: 100%;
     line-height: 1.5;
@@ -41,7 +39,6 @@ input, textarea, .richtext > pre {
     -moz-tab-size: 4;
     -o-tab-size: 4;
     -webkit-tab-size: 4;
-
 }
 #test:focus, input:focus, .fake_focus {
     border: 1px solid #85B6DA;

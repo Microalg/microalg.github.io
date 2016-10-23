@@ -27,6 +27,7 @@ function getLispSource(what) {
         'javascript': 'microalg_export_javascript.l',
         'malg-export':'microalg_export_microalg.l',
         'processing': 'microalg_export_processing.l',
+        'python':     'microalg_export_python.l',
         'ti':         'microalg_export_ti.l',
         'arbretxt':   'microalg_export_arbretxt.l',
         'arbresvg':   'microalg_export_arbresvg.l',
@@ -128,7 +129,7 @@ function stdPrompt() {
 }
 
 function preparation_exception(e) {
-    var msg_escaped = e.message.replace('<', '&lt;');
+    var msg_escaped = e.message.replace(/</g, '&lt;').replace(/(\r\n|\n|\r)/gm, " ");
     var link_prefix = '<a target="_blank" href="http://microalg.info/doc.html#';
     var re = /^(.*) \[erreur n°(\d+)\]$/;
     var matches = msg_escaped.match(re);
@@ -141,13 +142,26 @@ function preparation_exception(e) {
         link = link_prefix + 'erreur_' + error_id +
                    '">Voir des infos sur cette erreur.</a>';
     } else {
-        // erreurs old style
-        var re = /^(.*) -- Undefined$/;
-        var matches = msg_escaped.match(re);
-        if (matches) {
+        // erreurs old style ou non contrôlées
+        if (matches = msg_escaped.match(/^(.*) -- Undefined$/)) {
             var sym = matches[1];
             msg = "La commande `" + sym + "` n’existe pas.";
             link = link_prefix + 'erreur_0' +
+                   '">Voir des infos sur cette erreur.</a>';
+        } else if (matches = msg_escaped.match(/^(.*) -- Number expected$/)) {
+            var sym = matches[1];
+            if (sym == '$*') sym = '`(Liste ...)`';
+            else if (sym.slice(0, 11) == 'function (c') sym = 'Une commande';
+            else sym = '`' + sym + '`';
+            msg = "Les calculs attendent des nombres. " +
+                  sym + " ne convient pas.";
+            link = link_prefix + 'erreur_59' +
+                   '">Voir des infos sur cette erreur.</a>';
+        } else if (msg_escaped.match(/^too much recursion$/) ||
+                   msg_escaped.match(/^Maximum call stack size exceeded$/) ||
+                   msg_escaped.match(/^Out of stack space$/)) {
+            msg = "Récursion infinie.";
+            link = link_prefix + 'rcursioninfinie' +
                    '">Voir des infos sur cette erreur.</a>';
         } else {
             msg = msg_escaped;
@@ -187,11 +201,12 @@ function onCtrl(elt, f, config_64) {
                   "(Al":  "(!!! \"Algo |\")\n(!!! \"Fin algo \")",
                   "(At":  "(Afficher \"|\")",
                   "(Co":  "(Concatener |)",
-                  "(D":   "(Definir |\n    \"...\"\n    \"...\"\n    (Retourner )\n)",
-                  "(De":  "(Declarer | De_type \"\")",
+                  "(D":   "(Declarer | De_type \"\")",
+                  "(De":  "(Definir |\n    \"...\"\n    \"...\"\n    (Retourner )\n)",
                   "(Dm":  "(Demander)|",
+                  "(Dn":  "(Demander_un_nombre)|",
                   "(E":   "(Exemples_de |\n    (Liste\n        (? )\n        (? )\n    )\n)",
-                  "(E@":  "(Entie@ |)\n",
+                  "(E@":  "(Entier@ |)",
                   "(F":   "(Faire\n    (|)\n    ()\n Tant_que ()\n)",
                   "(I@":  "(Initialiser@ |)\n",
                   "(Li":  "(Liste |)",
@@ -347,6 +362,7 @@ function inject_microalg_editor_in(elt_id, config) {
         '<option>JavaScript</option>' +
         '<option>MicroAlg</option>' +
         '<option>Processing</option>' +
+        '<option>Python</option>' +
         '<option>Arbre 1</option>' +
         '<option>Arbre 2</option>' +
         '<option>Arbre 3</option>' +
@@ -365,7 +381,7 @@ function inject_microalg_editor_in(elt_id, config) {
         '<option' + ((config.output == 'HTML')?' selected':'') + '>HTML</option>' +
         ((typeof Showdown === 'undefined') ? '' : '<option' + ((config.output == 'MD')?' selected':'') + '>MD</option>') +
         '</select> ' +
-        '<input type="button" value="OK" class="malg-ok-editor" ' +
+        '<input type="button" value="Exécuter" class="malg-ok-editor" ' +
                 'onclick="ide_action($(\'#' + elt_id + '-malg-editor\'), ' +
                                      "'" + config_64 + "'" + ')" />' +
         '<div class="malg-error"></div>' +
@@ -431,6 +447,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="tant_que"></block>' +
                 '  <block type="declarer"></block>' +
                 '  <block type="affecter_a"></block>' +
+                '  <block type="affecter_a_en_position"></block>' +
                 '  <block type="initialiser_pseudo_aleatoire"></block>' +
                 ' </category>' +
                 ' <category name="Cmdes avec retour">' +
@@ -543,7 +560,7 @@ function export_action(elt_id, select) {
         $('#' + elt_id + '-export').html('');
         select.options[0].innerHTML = "exporter";
     } else {
-        var langs = [undefined, 'casio', 'ti', 'javascript', 'malg-export', 'processing', 'arbretxt', 'arbresvg', 'arbreninja'];
+        var langs = [undefined, 'casio', 'ti', 'javascript', 'malg-export', 'processing', 'python', 'arbretxt', 'arbresvg', 'arbreninja'];
         var lang = langs[select.selectedIndex];
         var src = $('#' + elt_id + '-malg-editor').val();
         var exported_src = malg2other(lang, src);
@@ -560,6 +577,16 @@ function export_action(elt_id, select) {
                            exported_src;
             export_target.html($('<div/>', {html: exported_src,
                                             class: 'malg-export'}));
+        } else if (lang == 'javascript') {
+            var evalDiv = $('<div/>', {class: 'malg-export-eval'});
+            evalDiv.append($('<input/>',
+                {type: 'button',
+                 value: 'Exécuter dans la console JS',
+                 onclick: 'eval(\'' + exported_src.replace(/\n/g, ' ') + '\')'}));
+            export_target.append(evalDiv);
+            export_target.append($('<div/>',
+                {html: exported_src,
+                 class: 'malg-export'}));
         } else if (lang == 'processing') {
             export_target.html('');
             if (typeof Processing === "undefined") {
@@ -626,7 +653,7 @@ function malg2other(lang, src) {
         var clean = cleanTransient(raw);
         return clean;
     } else {
-        var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")").toString();
+        var source_protegee = EMULISP_CORE.eval("(proteger_source " + src + ")").toString();
         // On récupère une liste d’instructions.
         var source_preparee = '(pack ' + source_protegee.slice(1, -1) + ')';
         var exported_src = '';
@@ -691,7 +718,7 @@ function inject_microalg_repl_in(elt_id, msg) {
     var repl_container = $('#' + elt_id);
     var rows = msg.split('\n').length;
     var repl_string = '<textarea id="' + repl_id + '" class="malg-repl" rows="' + (rows+2) + '" spellcheck="false">' + malg_prompt + msg + '</textarea>' +
-        '<input type="button" onclick="repl_action($(\'#' + elt_id + '-malg-repl\'))" value="OK" class="malg-ok"/>';
+        '<input type="button" onclick="repl_action($(\'#' + elt_id + '-malg-repl\'))" value="Exécuter" class="malg-ok"/>';
     repl_container.html(repl_string);
     var repl = $('#' + repl_id);
     createRichInput(repl);
@@ -750,8 +777,7 @@ function inject_microalg_jrepl_in(elt_id, msg) {
 function malg2blockly(src) {
     EMULISP_CORE.init();
     EMULISP_CORE.eval(getLispSource('export'));
-
-    var source_protegee = EMULISP_CORE.eval("(proteger_source  " + src + ")").toString();
+    var source_protegee = EMULISP_CORE.eval("(proteger_source_sans_indentation " + src + ")").toString();
     EMULISP_CORE.eval(getLispSource('blockly'));
     var avec_des_next = EMULISP_CORE.eval("(insertion_next '" + source_protegee + ")").toString();
     // Le car pour récupérer l’unique élément de la liste finale.
@@ -775,6 +801,9 @@ function blocklyLoaded(blockly, editor_id, msg) {
         var raw_src = blockly.MicroAlg.workspaceToCode();
         // Ne garder que le code entre les marqueurs:
         var src = /.*««««««««««([^]*)»»»»»»»»»».*/.exec(raw_src)[1];
+        // Passage dans l’export afin d’avoir la bonne mise en forme:
+        src = malg2other('malg-export', src);
+        // Et injection dans le textarea
         var textarea = $('#' + editor_id);
         textarea.val(src);
         textarea.click();  // Trigger a parenedit redraw.

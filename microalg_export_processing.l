@@ -14,7 +14,7 @@
 
 (de + (A B) (pack "(" A "+" B ")"))
 (de - (A B) (pack "(" A "-" B ")"))
-(de * (A B) (pack "(" A "×" B ")"))
+(de * (A B) (pack "(" A "*" B ")"))
 (de / (A B) (pack "(" A "/" B ")"))
 (de % (A B) (pack "(" A "%" B ")"))
 (de ^ (A B) (pack "pow(" A ", " B ")"))
@@ -27,9 +27,9 @@
         !type (cadr (caadr !splitted)))  # type is in (Litteral ...)
        (cond
          ((not (<> !type "nombre"))
-          (pack "float " (glue " " !vars) ";^J"))
+          (pack "float " (glue ", " !vars) ";^J"))
          ((not (<> !type "texte"))
-          (pack "String " (glue " " !vars) ";^J"))
+          (pack "String " (glue ", " !vars) ";^J"))
          (T (pack "Impossible de gérer le type « " !type " » avec Processing.^J"))
        )
   )
@@ -38,7 +38,7 @@
 (de Affecter_a !arg_lst
   (let (!var (cadr (car !arg_lst))  # var name is in (Variable ...)
         !val (eval (cadr !arg_lst)))
-       (pack !var " = " !val ";")))
+       (pack !var " = " !val ";^J")))
 (de Entier@ (A B) (pack "int(" A " + random(" B "-" A "+1))"))
 (setq Vrai "true")
 (setq Faux "false")
@@ -48,7 +48,7 @@
                      bloc_vrai (car splitted)
                      bloc_faux (cadr splitted))
                     (pack
-                      "if " (eval condition) "^J" "{^J"
+                      "if (" (eval condition) ")^J" "{^J"
                       (mapcar 'eval bloc_vrai)
                       (if bloc_faux (pack "} else {^J" (mapcar 'eval bloc_faux)))
                       "}^J"
@@ -56,8 +56,8 @@
                 )
 )
 (de Non (bool) (pack "!(" bool ")"))
-(de Et !arg_lst (pack "(" (glue " && " (mapcar 'eval !arg_lst)) ")"))
-(de Ou !arg_lst (pack "(" (glue " || "  (mapcar 'eval !arg_lst)) ")"))
+(de Et @ (pack "(" (glue " && " (rest)) ")"))
+(de Ou ? (pack "(" (glue " || "  (rest)) ")"))
 (de Tant_que arg_lst (let (!cond (car arg_lst)
                            !mot-clef (cadr arg_lst)
                            !corps (cddr arg_lst))
@@ -72,9 +72,9 @@
                         !corps (car !splitted)
                         !cond (caadr !splitted))
                        (pack
-                         "do{^J"
+                         "do {^J"
                          (mapcar 'eval !corps)
-                         "} while (" (eval !cond) ")^J"
+                         "} while (" (eval !cond) ");^J"
                        )
                   )
 )
@@ -182,7 +182,7 @@
 
 (de Demander () (!no_export "Demander"))
 (de Demander_un_nombre () (!no_export "Demander_un_nombre"))
-(de Initialiser@() (!no_export "Initialiser@"))
+(de Initialiser@ () (!no_export "Initialiser@"))
 (de Type () (!no_export "Type"))
 (de Definir () (!no_export "Definir"))
 (de Retourner () (!no_export "Retourner"))

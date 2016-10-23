@@ -72,14 +72,6 @@ Blockly.MicroAlg.init = function() {
     } else {
       Blockly.MicroAlg.variableDB_.reset();
     }
-
-    var defvars = [];
-    var variables = Blockly.Variables.allVariables();
-    for (var x = 0; x < variables.length; x++) {
-      defvars[x] = Blockly.MicroAlg.variableDB_.getName(variables[x],
-          Blockly.Variables.NAME_TYPE) + ' = None';
-    }
-    Blockly.MicroAlg.definitions_['variables'] = defvars.join('\n');
   }
 };
 
@@ -339,6 +331,47 @@ Blockly.MicroAlg['affecter_a'] = function(block) {
   return '(Affecter_a ' + this.getFieldValue('VAR') + ' ' + value_cleaned + ')';
 };
 
+// Bloc Affecter_a En_position
+// https://github.com/google/blockly/blob/master/blocks/variables.js
+Blockly.Blocks['affecter_a_en_position'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Affecter_a');
+    this.setColour(colour);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Affecter une valeur à un endroit dans une liste ou un texte.');
+    this.interpolateMsg(
+      'Affecter_a' + ' %1 ' + ' %2 ' + 'En_position' + ' %3',
+      ['VAR', new Blockly.FieldVariable("ma_variable")],
+      ['VALUE', null],
+      ['POS', null],
+      Blockly.ALIGN_RIGHT);
+    this.setInputsInline(true);
+    this.contextMenuMsg_ = "Créer truc"; // ???
+    this.contextMenuType_ = 'variable';
+  },
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+        this.setFieldValue(newName, 'VAR');
+    }
+  },
+  customContextMenu: Blockly.Blocks['variable'].customContextMenu
+};
+
+// Gen Affecter_a En_position
+// https://github.com/google/blockly/blob/master/generators/javascript/variables.js
+Blockly.MicroAlg['affecter_a_en_position'] = function(block) {
+  var value = Blockly.MicroAlg.statementToCode(block, 'VALUE') || '';
+  var value_cleaned = value.toString().trim();
+  var pos = Blockly.MicroAlg.statementToCode(block, 'POS') || '';
+  var pos_cleaned = pos.toString().trim();
+  return '(Affecter_a ' + this.getFieldValue('VAR') + ' ' + value_cleaned +
+         ' En_position ' + pos_cleaned + ')';
+};
+
 // Bloc Afficher
 Blockly.Blocks['afficher'] = {
   init: function() {
@@ -486,11 +519,16 @@ Blockly.Blocks['declarer'] = {
     this.setPreviousStatement(true);
     this.setNextStatement(true);
     this.setTooltip('Déclarer une variable avec un type.');
+    var TYPES =
+        [['nombre',  'nombre'],
+         ['texte',   'texte'],
+         ['booleen', 'booleen'],
+         ['liste',   'liste']];
     this.interpolateMsg(
       'Declarer %1 De_type %2 %3 %4',
       ['VAR', new Blockly.FieldVariable("ma_variable")],
       ['Q1', Blockly.MicroAlg.newQuote(true)],
-      ['TYPE', new Blockly.FieldTextInput('')],
+      ['TYPE', new Blockly.FieldDropdown(TYPES)],
       ['Q2', Blockly.MicroAlg.newQuote(false)],
       Blockly.ALIGN_RIGHT);
     this.setInputsInline(false);
@@ -1150,8 +1188,10 @@ Blockly.Blocks['repeter'] = {
 Blockly.MicroAlg['repeter'] = function(block) {
     var instr = Blockly.MicroAlg.statementToCode(block, 'INSTR') || '';
     var repet = Blockly.MicroAlg.statementToCode(block, 'REPET') || '';
+    var trimmed_repet = repet.trim();
+    var prepared_repet = trimmed_repet? trimmed_repet : '(...)';
     instr = instr.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
-    var code = '(Repeter ' + repet.trim() + ' Fois\n' +
+    var code = '(Repeter ' + prepared_repet + ' Fois\n' +
                instr +
                '\n)'
     return code;
@@ -1273,9 +1313,11 @@ Blockly.Blocks['si_alors_sinon_sinon'] = {
 // https://github.com/google/blockly/blob/master/generators/python/logic.js#L32
 Blockly.MicroAlg['si'] = function(block) {
     var cond = Blockly.MicroAlg.statementToCode(block, 'COND') || '';
+    var trimmed_cond = cond.trim();
+    var prepared_cond = trimmed_cond? trimmed_cond : '(...)';
     var branch = Blockly.MicroAlg.statementToCode(block, 'ALORS') || '';
     branch = branch.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
-    var code = '(Si ' + cond.substring(Blockly.MicroAlg.INDENT.length) +
+    var code = '(Si ' + prepared_cond +
                '\n Alors\n' + branch;
     if (block.elseCount_) {
         branch = Blockly.MicroAlg.statementToCode(block, 'SINON') || '';
@@ -1306,8 +1348,10 @@ Blockly.Blocks['tant_que'] = {
 Blockly.MicroAlg['tant_que'] = function(block) {
     var instr = Blockly.MicroAlg.statementToCode(block, 'INSTR') || '';
     var cond = Blockly.MicroAlg.statementToCode(block, 'COND') || '';
+    var trimmed_cond = cond.trim();
+    var prepared_cond = trimmed_cond? trimmed_cond : '(...)';
     instr = instr.replace(/\)\(/gm, ')\n' + Blockly.MicroAlg.INDENT + '(');
-    var code = '(Tant_que ' + cond.trim() +
+    var code = '(Tant_que ' + prepared_cond +
                '\nFaire\n' + instr;
     code += '\n)'
     return code;

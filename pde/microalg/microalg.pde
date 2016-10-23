@@ -37,14 +37,14 @@ void reset() {
 }
 
 class Turtle {
-    int x, y;
-    int oldx, oldy;
-    int angle;
+    float x, y;
+    float oldx, oldy;
+    float angle;
     color tcolor;
 
     Turtle() {
-        oldx = int(width/2);
-        oldy = int(height/2);
+        oldx = width/2;
+        oldy = height/2;
         x = oldx;
         y = oldy;
         tcolor = #000000;
@@ -52,19 +52,19 @@ class Turtle {
         stroke(tcolor);
     }
 
-    void forward(int step) {
-        x = oldx - int(step * cos(radians(angle+90)));
-        y = oldy - int(step * sin(radians(angle+90)));
+    void forward(float step) {
+        x = oldx - step * cos(radians(angle+90));
+        y = oldy - step * sin(radians(angle+90));
         line(oldx, oldy, x, y);
         oldx = x;
         oldy = y;
     }
 
-    void left(int dangle) {
+    void left(float dangle) {
         angle -= dangle;
     }
 
-    void right(int dangle) {
+    void right(float dangle) {
         angle += dangle;
     }
 
@@ -82,19 +82,19 @@ class Turtle {
     }
 }
 
-float mapx(x) {
+float mapx(float x) {
     return map(x, x_min, x_max, 0, 600);
 }
 
-float mapy(y) {
+float mapy(float y) {
     return map(y, y_min, y_max, 600, 0);
 }
 
-float mapw(x) {
+float mapw(float x) {
     return map(x, 0, x_max - x_min, 0, 600);
 }
 
-float maph(y) {
+float maph(float y) {
     return map(y, 0, y_max - y_min, 0, 600);
 }
 
@@ -121,7 +121,9 @@ void interact(String data) {
         if (params.length == 5) {
             alpha = int(params[4]);
         }
-        stroke(int(params[1]), int(params[2]), int(params[3]), alpha);
+        Color c = color(int(params[1]), int(params[2]), int(params[3]), alpha);
+        stroke(c);
+        turtle.pencolor(c);
     } else if (cmd.equals("Remplissage")) {
         int alpha = 255;
         if (params.length == 5) {
@@ -149,11 +151,11 @@ void interact(String data) {
                  mapx(float(params[3])), mapy(float(params[4])),
                  mapx(float(params[5])), mapy(float(params[6])));
     } else if (cmd.equals("AV")) {
-        turtle.forward(int(params[1]));
+        turtle.forward(float(params[1]));
     } else if (cmd.equals("TD")) {
-        turtle.right(int(params[1]));
+        turtle.right(float(params[1]));
     } else if (cmd.equals("TG")) {
-        turtle.left(int(params[1]));
+        turtle.left(float(params[1]));
     } else if (cmd.equals("BC")) {
         turtle.pendown();
     } else if (cmd.equals("LC")) {

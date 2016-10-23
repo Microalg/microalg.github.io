@@ -37,20 +37,17 @@
 
 Aller directement à :
 
-* [Installation](#installation)
-* [Pourquoi MicroAlg](#pourquoimicroalg)
-* [Limitations](#limitations)
-* [Syntaxe](#syntaxe) - [Forme de Backus-Naur](#formedebackusnaur)
+* [Installation](#installation) - [Architecture](#architecture)
+* [Pourquoi MicroAlg](#pourquoimicroalg) - [Limitations](#limitations)
+* [Syntaxe](#syntaxe) - [Types](#types) - [Forme de Backus-Naur](#formedebackusnaur)
 * [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
-* [Types](#types)
 * [Aide sur les messages d’erreur](#aidesurlesmessagesderreur)
-* [Abréviations](#abrviations)
+* [Outils d’édition](#outilsddition)
+    * [Indentation](#indentation)
+    * [Abréviations](#abrviations)
 * [Export](#export)
-    * [Limitations](#limitations)
+    * [Limitations](#limitationsdelexport)
     * [Fonctionnement](#fonctionnementdelexport)
-* [Feuille de route](#feuillederoute)
-* [Contribuer](#contribuer)
-* [Architecture](#architecture)
 * [Intégrations](#intgrations)
     * [Navigateur](#navigateur)
     * [SciTE](#scite)
@@ -59,6 +56,7 @@ Aller directement à :
     * [Sortie graphique](#sortiegraphique) avec Processing
         * [Tortue](#tortue)
         * [Fonctionnement](#communicationavecprocessing)
+* [Feuille de route](#feuillederoute) - [Contribuer](#contribuer)
 * [Remerciements](#remerciements)
 
 ## Avertissement
@@ -125,7 +123,8 @@ entiers, pas de nombres à virgule.
 Par défaut cependant, que ce soit dans le navigateur ou dans la configuration
 par défaut de l’éditeur de texte, MicroAlg travaille avec des
 <a href="http://fr.wikipedia.org/wiki/Virgule_flottante" class="wp">nombres
-flottants</a>.
+flottants</a> de la norme
+<a href="https://fr.wikipedia.org/wiki/IEEE_754" class="wp">IEEE754</a>.
 
 *EN DÉTAILS*  
 Dans les versions reposant sur JavaScript, c’est-à-dire dans le navigateur mais
@@ -168,27 +167,46 @@ en sorte que `(Demander)` attende l’utilisateur.
 * Un *programme* est constitué d’une ou plusieurs *instructions*.
 * Une *instruction* est constituée de parenthèses, contenant une *commande* et
   ses *arguments* :  
-  `(Commande arg1 arg2 ...)`
+  `(Commande arg1 arg2 ...)`  
+    * C’est absolument universel dans MicroAlg. Même les commentaires sont de
+      cette forme :  
+      `(!!! "Ceci est un commentaire")`
+    * Si une *commande* ne prend pas d’*argument*, on écrira simplement :  
+      `(Commande)`  
+      C’est assez rare, les seules commandes qui n’ont pas de paramètre sont
+      `BC`, `LC`, `Demander`, `Demander_un_nombre` et `Millisecondes`. De plus,
+      le paramètre de `TG` et de `TD` (l’angle) est facultatif.
 * Les séparateurs possibles sont :
     * l’espace,
     * le retour à la ligne,
     * la tabulation (déconseillée).
-* C’est absolument universel dans MicroAlg. Même les commentaires sont de cette
-  forme :  
-  `(!!! "Ceci est un commentaire")`
-* Si une *commande* ne prend pas d’*argument*, on écrira simplement :  
-  `(Commande)`  
-  C’est assez rare, les seules commandes qui n’ont pas de paramètre sont
-  `BC`, `LC`, `Demander`, `Demander_un_nombre` et `Millisecondes`. De plus,
-  le paramètre de `TG` et de `TD` (l’angle) est facultatif.
+* Les symboles (noms de variables ou commandes) ne peuvent pas contenir les
+  caractères suivants :  
+  `"` `'` `(` `)` `,` `[` `]` `` ` `~` `{` `}`.  
+  Le point peut être utilisé dans un symbole, mais pas tout seul.
 * Les *instructions* peuvent être imbriquées. En effet, dans une *instruction*,
   un des *arguments* d’une *commande* peut être remplacé par une autre
   *instruction* :  
   `(Commande2 (Commande1 arg1 arg2 ...) arg3 ...)`  
   Un environnement MicroAlg doit colorer les parenthèses selon leur profondeur :
   <span class="paren_1">(</span> <span class="paren_2">(</span> <span class="paren_3">(</span> <span class="paren_4">(</span> <span class="paren_5">(</span> <span class="paren_6">(</span> <span class="paren_0">(</span> <span class="paren_0">)</span> <span class="paren_6">)</span> <span class="paren_5">)</span> <span class="paren_4">)</span> <span class="paren_3">)</span> <span class="paren_2">)</span> <span class="paren_1">)</span>.
-* L’ordre de traitement est un parcours en profondeur suffixe de l’arbre
-  défini par la position des parenthèses :
+
+<div id="trucs-syntaxe"></div>
+Quelques « trucs » :
+
+* Si l’indentation est respectée :
+    * les parenthèses en début de ligne (ouvrantes ou fermantes) seront toujours rouges ;
+    * les parenthèses correspondantes n’étant pas sur la même ligne mais
+      alignées verticalement seront de la même couleur.
+* On ne trouvera jamais deux parenthèses ouvrantes de suite.
+
+### Ordre d’exécution
+
+* L’imbrication des parenthèses donnent à un programme en MicroAlg une
+  structure d’arbre.
+* À part pour quelques commandes prédéfinies comme `Si`, `Tant_que` ou
+  `Definir`, l’ordre de traitement est un parcours en profondeur suffixe de
+  l’arbre défini par la position des parenthèses :
     * Ce que l’on appelle *ordre d’apparition* désignera l’ordre de lecture
       habituel : de gauche à droite puis de haut en bas.
     * Les instructions sont traitées dans l’ordre de leur apparition.
@@ -205,19 +223,6 @@ en sorte que `(Demander)` attende l’utilisateur.
            src="visuels/Sorted_binary_tree_postorder.svg"/>
       Source : <a title="Public domain, via Wikimedia Commons"
       href="https://commons.wikimedia.org/wiki/File%3ASorted_binary_tree_postorder.svg">Wikimedia Commons</a>
-* Les symboles (noms de variables ou commandes) ne peuvent pas contenir les
-  caractères suivants :  
-  `"` `'` `(` `)` `,` `[` `]` `` ` `~` `{` `}`.  
-  Le point peut être utilisé dans un symbole, mais pas tout seul.
-
-<div id="trucs-syntaxe"></div>
-Quelques « trucs » :
-
-* Si l’indentation est respectée :
-    * les parenthèses en début de ligne (ouvrantes ou fermantes) seront toujours rouges ;
-    * les parenthèses correspondantes n’étant pas sur la même ligne mais
-      alignées verticalement seront de la même couleur.
-* On ne trouvera jamais deux parenthèses ouvrantes de suite.
 
 ### Forme de Backus-Naur
 
@@ -310,7 +315,8 @@ avec deux modifications :
         '(' Initialiser@ ' ' <instr_nombre> ')' |
         '(' RAZ ')'
         '(' Repere ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ')' |
-        '(' Repere ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ')' |
+        '(' Repere ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> ' ' <instr_nombre> '
+                     ' <instr_nombre> ' ' <instr_nombre> ')' |
         '(' Epaisseur ' ' <instr_nombre> ')' |
         '(' Contour ' ' <couleur> ')' |
         '(' Remplissage ' ' <couleur> ')' |
@@ -461,6 +467,9 @@ et `(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
 `+`, `-`, `*`, `/`, `%`, `^`, `1000Cosinus`, `1000Sinus`,
 `=`, `=/`, `<`, `<=`, `>`, `>=`, `(Entier@ ... ...)`, `(Initialiser@ ...)`.
 
+Les six premières opérations peuvent aussi être écrites
+`Somme`, `Diff`, `Produit`, `Quotient`, `Reste` et `Puissance`.
+
 **Logique booléenne**
 
 `Vrai`, `Faux`, `(Et ... [...])`, `(Ou ... [...])`, `(Non ...)`.
@@ -517,17 +526,17 @@ et `(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
 
 On trouvera :
 
-* [booléen](#boolen),
-* [nombre](#nombre),
-* [texte](#texte),
-* [liste](#liste),
-* [commande](#commande).
+* [booléen](#typeboolen),
+* [nombre](#typenombre),
+* [texte](#typetexte),
+* [liste](#typeliste),
+* [commande](#typecommande).
 
-### Booléen
+### Type Booléen
 
 Deux valeurs : `Vrai` ou `Faux`.
 
-### Nombre
+### Type Nombre
 
 * Les entiers sont arbitrairement grands, positifs ou négatifs.
     * [Documentation PicoLisp](http://software-lab.de/doc/ref.html#number)
@@ -544,15 +553,19 @@ Deux valeurs : `Vrai` ou `Faux`.
     * [Documentation PicoLisp](http://software-lab.de/doc/ref.html#num-io)
       (en anglais)
 
-### Texte
+### Type Texte
 
 Les valeurs de type *texte* sont délimitées par des guillemets doubles :
 `"salut"`.
 
-Il est possible d’incorporer des guillemets en les *échappant* avec un `^`
+Il est possible d’incorporer des guillemets en les *échappant* avec un `\`
 (voir
 <a href="https://fr.wikipedia.org/wiki/Caract%C3%A8re_d%27%C3%A9chappement"
    class="wp">l’article Wikipedia</a> sur les caractères d’échappement).
+
+Exemple :
+
+    (Afficher "C’est le mot \"Bonjour\" !")
 
 Pour plus de détails :
 
@@ -561,14 +574,14 @@ Pour plus de détails :
 * [Documentation PicoLisp sur les notations des
   *transients*](http://software-lab.de/doc/ref.html#transient-io) (en anglais)
 
-### Liste
+### Type Liste
 
 Pour créer une valeur de type *liste*, il faut taper : `(Liste ...)`.
 
 Les valeurs contenues peuvent être de types différents. Il est même possible
 de créer des listes de listes (de listes…).
 
-### Commande
+### Type Commande
 
 En cours d’élaboration.
 
@@ -594,9 +607,6 @@ class="email">écrire un petit email</a>.
 Les messages sont classés par ordre alphabétique, sans tenir compte de la
 valeur ou de la commande qui est parfois fournie :
 
-* Après `En_position`, il n’y a qu’un paramètre.
-    * Vous n’avez peut-être pas bien fermé la parenthèse de la commande
-      `Affecter_a`.
 * "type" -- Ce type n’existe pas.
     * Le type `"type"` que vous fournissez n’existe pas. Il doit valoir
       `"booleen"`, `"liste"`, `"nombre"`, `"rien"` ou `"texte"`.
@@ -618,6 +628,9 @@ valeur ou de la commande qui est parfois fournie :
       boucles de votre programme. Sinon, si votre programme a vraiment besoin
       de plus d’itérations, vous pouvez recharger votre crédit en affectant
       une valeur à la variable `credits_iterations`.
+* `Definir` : le paramètre X a déjà été déclaré comme variable.
+    * Certains symboles comme `fin` préexistent pour des raisons techniques.
+      Veuillez ne pas les utiliser comme nom de paramètre.
 * `Entier@` prend 2 paramètres. Vous en donnez X.
 * EOF Overrun
     * Il manque une parenthèse fermante quelque part. La ligne indiquée est
@@ -625,14 +638,10 @@ valeur ou de la commande qui est parfois fournie :
 * X -- Executable or Number expected.
     * Vous avez ouvert deux parenthèses de suite.
     * Il y a une parenthèse en trop devant `X`.
-* Il manque le deuxième paramètre : l’indice.
 * Impossible d’utiliser la sortie graphique avec `malg-njs` ou `malg-rjs`.
     * Il faut configurer SciTE pour qu’il utilise `malg-j` (voire `malg` si
       vous avez pu l’installer). Cliquer sur **View** puis **Parameters** et
       indiquer par exemple `malg-j`.  Voir [cette section](#excution).
-* Indice négatif ou nul.
-* Indice non entier.
-* Indice trop grand.
 * java.lang.ClassCastException: PicoLisp$Symbol cannot be cast to PicoLisp$Number
     * Une commande qui concerne uniquement les nombres (comme `+`, `-`, `*`,
     `/`, `%` ou `^`) a été écrite avec autre chose qu’un nombre en argument
@@ -653,9 +662,6 @@ valeur ou de la commande qui est parfois fournie :
       liste de plus de 800 millions d’éléments. Désolé.
 * X -- La condition n’est pas un booléen.
     * Voir la sous-section [booléens](#boolens).
-* La variable n’est pas initialisée.
-    * Vous utilisez une variable inconnue de MicroAlg. Vérifier l’orthographe
-      de la variable.
 * Le premier paramètre de `Entier@` doit être un nombre.
 * Le premier paramètre de X doit être un booléen.
     * Voir la sous-section [booléens](#boolens).
@@ -685,21 +691,22 @@ valeur ou de la commande qui est parfois fournie :
       sur la galerie](http://galerie.microalg.info/microalg:config_echantillons).
 * X -- Read open error
     * Voir la sous-section [espaces dans les noms de fichiers](#espacesdanslesnomsdefichiers).
+* `Repeter` : le mot-clef `Fois` doit être en 2ème position.
+    * Vérifiez l’orthographe de ce mot-clef intermédiaire. Attention à la
+      majuscule.
 * Stack overflow
     * Voir la sous-section [récursion](#rcursioninfinie).
 * too much recursion
     * Voir la sous-section [récursion](#rcursioninfinie).
 * Un objet vide n’a pas de queue.
 * Un objet vide n’a pas de tête.
-* X -- undefined
-    * Vous tentez d’utiliser la commande `X` mais qui n’existe pas. La
-      commande est sans doute mal orthographiée, ou vous utilisez une vieille
+* X -- Undefined
+    * Vous tentez d’utiliser la commande `X` (vous avez mis une parenthèse
+      devant), mais elle n’existe pas. La commande est sans doute mal
+      orthographiée (attention aux majuscules), ou vous utilisez une vieille
       version de MicroAlg.
-    * « `Affecter` -- undefined » indique qu’il vous manque un « _ ».
-    * « `Tant` -- undefined » indique qu’il vous manque un « _ ».
-* Valeur de type X, ne peut initialiser Y qui est de type Z.
-* X -- Variable non initialisée.
-    * Affectation sur une variable non initialisée.
+    * « `Affecter` -- Undefined » indique qu’il vous manque un « _ ».
+    * « `Tant` -- Undefined » indique qu’il vous manque un « _ ».
 
 Si jamais le message que vous avez n’est pas ou pas assez documenté, merci de
 le signaler en :
@@ -717,11 +724,32 @@ le signaler en :
 
 ### Récursion infinie
 
-* Il est possible que vos appels récursifs (appel d’une commande depuis sa
-  définition) ne trouvent pas de point d’appui. Votre test est-il bon ?  
-  Avant que l’ordinateur ne *plante* franchement, un des langages utilisés par
-  MicroAlg arrête ce qui lui semble être un travail infini. La limite est
-  variable et ne peut que très rarement être modifiée.
+Le programme est perdu dans une récursion infinie : une commande s’appelle
+elle-même sans cesse.
+
+Avant que l’ordinateur ne *plante* franchement, un mécanisme de la plate-forme
+que vous utilisez (et non MicroAlg, d’où la variété des messages d’erreur)
+arrête ce qui lui semble être un travail infini car un certain nombre d’appels
+a été dépassé. Ce nombre est variable suivant les plate-formes et ne peut que
+très rarement être modifié.
+
+Vous êtes peut-être dans un des cas suivants :
+
+* Vos appels récursifs ne trouvent pas de point d’appui. Votre test est-il bon ?
+* Un texte est utilisé comme une commande alors qu’il ne devrait pas.
+* Un mot-clef est utilisé comme une commande alors qu’il ne devrait pas. Dans
+  ce cas, enlevez la parenthèse devant :
+    * `(Vrai ...` → `Vrai ...`
+    * `(Faux ...` → `Faux ...`
+    * `(Rien ...` → `Rien ...`
+    * `(Alors ...` → `Alors ...`
+    * `(Sinon ...` → `Sinon ...`
+    * `(Fois ...` → `Fois ...`
+    * `(En_position ...` → `En_position ...`
+    * `(De_type ...` → `De_type ...`
+* Vous utilisez les parenthèses comme des accolades. Attention, la première
+  parenthèse est toujours *devant* la commande (voir la section
+  [syntaxe](#syntaxe)).
 
 ### Espaces dans les noms de fichiers
 
@@ -763,6 +791,69 @@ le signaler en :
 [28](#erreur_28)
 [29](#erreur_29)
 [30](#erreur_30)
+[31](#erreur_31)
+[32](#erreur_32)
+[33](#erreur_33)
+[34](#erreur_34)
+[35](#erreur_35)
+[36](#erreur_36)
+[37](#erreur_37)
+[38](#erreur_38)
+[39](#erreur_39)
+[40](#erreur_40)
+[41](#erreur_41)
+[42](#erreur_42)
+[43](#erreur_43)
+[44](#erreur_44)
+[45](#erreur_45)
+[46](#erreur_46)
+[47](#erreur_47)
+[48](#erreur_48)
+[49](#erreur_49)
+[50](#erreur_50)
+[51](#erreur_51)
+[52](#erreur_52)
+[53](#erreur_53)
+[54](#erreur_54)
+[55](#erreur_55)
+[56](#erreur_56)
+[57](#erreur_57)
+[58](#erreur_58)
+[59](#erreur_59)
+[60](#erreur_60)
+[61](#erreur_61)
+[62](#erreur_62)
+[63](#erreur_63)
+[64](#erreur_64)
+[65](#erreur_65)
+[66](#erreur_66)
+[67](#erreur_67)
+[68](#erreur_68)
+[69](#erreur_69)
+[70](#erreur_70)
+[71](#erreur_71)
+[72](#erreur_72)
+[73](#erreur_73)
+[74](#erreur_74)
+[75](#erreur_75)
+[76](#erreur_76)
+[77](#erreur_77)
+[78](#erreur_78)
+[79](#erreur_79)
+[80](#erreur_80)
+[81](#erreur_81)
+[82](#erreur_82)
+[83](#erreur_83)
+[84](#erreur_84)
+[85](#erreur_85)
+[86](#erreur_86)
+[87](#erreur_87)
+[88](#erreur_88)
+[89](#erreur_89)
+[90](#erreur_90)
+[91](#erreur_91)
+[92](#erreur_92)
+[93](#erreur_93)
 
 #### erreur_0
 
@@ -774,6 +865,9 @@ le signaler en :
   version de MicroAlg.
 * « `Affecter` -- Undefined » indique qu’il vous manque un « _ ».
 * « `Tant` -- Undefined » indique qu’il vous manque un « _ ».
+
+**Remarque** : hors web, cette erreur apparaît sous la forme
+`truc -- Undefined`.
 
 #### erreur_1
 
@@ -808,16 +902,21 @@ je puisse vous en dire plus.
 
 > `Afficher` : la variable `truc` n’a pas été déclarée.
 
-Vérifiez l’orthographe de votre variable.
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
 
 #### erreur_6
 
-> `Afficher` n’a qu’un paramètre, faites plusieurs affichages ou utilisez
-> `Concatener`.
+> `Afficher` n’a qu’un paramètre.
 
-Vous utilisez peut-être `Concatener`, mais il manque peut-être une parenthèse
-fermante, ce qui fait que le reste du programme est vu comme le reste des
-arguments de `Afficher`.
+* Pour afficher sur plusieurs lignes, faites plusieurs affichages.
+* Pour afficher plusieurs valeurs sur une même ligne, utilisez `Concatener`.
+* Vous utilisez peut-être `Concatener`, mais il manque peut-être une parenthèse
+  fermante, ce qui fait que le reste du programme est vu comme le reste des
+  arguments de `Afficher`.
 
 #### erreur_7
 
@@ -935,7 +1034,9 @@ Vous fournissez un troisième argument à `Affecter_a` qui n’est pas
 
 > `Affecter_a` : après `En_position`, il n’y a qu’un paramètre.
 
-Il ne faut pas en mettre plus.
+* Il ne faut pas en mettre plus.
+* Vous n’avez peut-être pas bien fermé la parenthèse de la commande
+  `Affecter_a`.
 
 #### erreur_22
 
@@ -1017,7 +1118,482 @@ caractère. Vérifiez la valeur de votre `truc`, et sa longueur si c’est un te
 `Affecter_a truc ... En_position ...` ne fonctionne que si `truc` est un texte
 ou une liste. Vérifiez le type de votre `truc`.
 
-## Abréviations
+#### erreur_31
+
+> `Demander` ne prend pas de paramètre.
+
+Il faut taper `(Demander)`. Ne rien mettre avant la parenthèse fermante.
+
+#### erreur_32
+
+> `Demander_un_nombre` ne prend pas de paramètre.
+
+Il faut taper `(Demander_un_nombre)`. Ne rien mettre avant la parenthèse
+fermante.
+
+#### erreur_33
+
+> `Demander_un_nombre` : La valeur entrée n’est pas un nombre.
+
+Ce n’est pas une erreur liée au programme.  
+Cette erreur survient lorsque l’utilisateur du programme tape autre chose qu’un
+nombre lorsque le programme lui en demande un.
+
+#### erreur_34
+
+> `Liste` : l’argument n°X, `truc`, est une variable qui n’a pas été déclarée.
+
+Avant d’utiliser la variable `truc`, il faut la déclarer avec la commande
+`Declarer`, puis lui affecter une valeur avec `Affecter_a`.
+
+#### erreur_35
+
+> `Longueur` n’a qu’un paramètre.
+
+Vous en fournissez peut-être plus, ou alors la parenthèse est mal fermée.
+
+#### erreur_36
+
+> `Longueur` : la variable `truc` n’a pas été déclarée.
+
+Avant d’utiliser la variable `truc`, il faut la déclarer avec la commande
+`Declarer`, puis lui affecter une valeur avec `Affecter_a`.
+
+#### erreur_37
+
+> Le nombre `truc` n’a pas de `Longueur`.
+
+On ne peut passer à `Longueur` qu’une valeur de type `"texte"` ou `"liste"`.
+
+#### erreur_38
+
+> `Vrai` n’a pas de `Longueur`.
+
+On ne peut passer à `Longueur` qu’une valeur de type `"texte"` ou `"liste"`.
+
+#### erreur_39
+
+> `Faux` n’a pas de `Longueur`.
+
+On ne peut passer à `Longueur` qu’une valeur de type `"texte"` ou `"liste"`.
+
+#### erreur_40
+
+> `Rien` n’a pas de `Longueur`.
+
+On ne peut passer à `Longueur` qu’une valeur de type `"texte"` ou `"liste"`.  
+Si vous avez passé une variable, l’avez-vous initialisée ?
+
+#### erreur_41
+
+> `truc` n’a pas de `Longueur`.
+
+On ne peut passer à `Longueur` qu’une valeur de type `"texte"` ou `"liste"`.
+
+#### erreur_42
+
+> `Nieme` attend exactement deux arguments, vous en donnez X.
+
+Voir [la documentation](#sym-Nieme) de cette commande.
+
+#### erreur_43
+
+> `Nieme` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_44
+
+> `Nieme` ne peut pas extraire une valeur du nombre X.
+
+Le premier argument de `Nieme` doit être du texte ou une liste.  
+Vérifiez le type de votre valeur.
+
+#### erreur_45
+
+> `Nieme` ne peut pas extraire une valeur du booléen `Vrai`.
+
+Le premier argument de `Nieme` doit être du texte ou une liste.  
+Vérifiez le type de votre valeur.
+
+#### erreur_46
+
+> `Nieme` ne peut pas extraire une valeur du booléen `Faux`.
+
+Le premier argument de `Nieme` doit être du texte ou une liste.  
+Vérifiez le type de votre valeur.
+
+#### erreur_47
+
+> `Nieme` ne peut pas extraire une valeur de `Rien`.
+
+Le premier argument de `Nieme` doit être du texte ou une liste.  
+Si c’est une variable, l’avez-vous initialisée ?
+
+#### erreur_48
+
+> `Nieme` : l’indice doit être un nombre et non ce qui semble être un texte
+> vide.
+
+Voir [la documentation](#sym-Nieme) de cette commande.
+
+#### erreur_49
+
+> `Nieme` : l’indice est une variable non déclarée : `truc`.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_50
+
+> `Nieme` : l’indice doit être un nombre et donc le texte `"truc"` ne convient
+> pas.
+
+Voir [la documentation](#sym-Nieme) de cette commande.
+
+#### erreur_51
+
+> `Nieme` : l’indice vaut `Rien` et donc ne convient pas. Il faut un nombre.
+
+Le premier argument de `Nieme` doit être du texte ou une liste.  
+Si c’est une variable, l’avez-vous initialisée ?
+
+#### erreur_52
+
+> `Nieme` : l’indice doit être un nombre entier et donc `truc` ne convient pas.
+
+Voir [la documentation](#sym-Nieme) de cette commande.
+
+**Rappel** : les positions sont numérotées à partir de 1.
+
+#### erreur_53
+
+> `Nieme` : l’indice doit être strictement positif et donc X ne convient pas.
+
+Les positions sont numérotées à partir de 1. Si vous utilisez une variable pour
+l’indice, il ne faut donc pas qu’elle s’annule. Contrôlez-la mieux.
+
+#### erreur_54
+
+> `Nieme` : l’indice est trop grand (position X dans un objet de longueur Y).
+
+Si vous utilisez une variable pour l’indice, il ne faut pas qu’elle soit trop
+grande. Contrôlez-la mieux.
+
+**Rappel** : les positions sont numérotées à partir de 1.
+
+#### erreur_55
+
+> `Nieme` : l’indice doit être un nombre et donc `truc` ne convient pas.
+
+Voir [la documentation](#sym-Nieme) de cette commande.
+
+#### erreur_56
+
+> Affectation positionnelle impossible sur `Rien`.
+
+`Affecter_a truc ... En_position ...` ne fonctionne que si `truc` est un texte
+ou une liste. Si c’est une variable, l’avez-vous initialisée ?
+
+#### erreur_57
+
+> `Affecter_a ... En_position ...` : après `En_position`, l’indice doit être un
+> nombre. Donc `Rien` ne convient pas.
+
+Vérifiez la valeur de ce que vous avez indiqué comme position.  
+Si c’est une variable, l’avez-vous initialisée ?
+
+#### erreur_58
+
+> `Affecter_a ... En_position ...` : avant `En_position`, il faut la variable
+> puis la valeur.
+
+Il manque sans doute l’une des deux.
+
+#### erreur_59
+
+> Les calculs attendent des nombres. `truc` ne convient pas.
+
+Les commandes `+`, `-`, `*`, `/`, `^` et `%` ne travaillent que sur des
+nombres.
+
+Dans le cas où la valeur qui pose problème est `Rien`, vérifiez que les
+variables que vous utilisez ont bien été initialisées.
+
+**Remarque** : hors web, cette erreur apparaît sous la forme
+`truc -- Number expected`.
+
+#### erreur_60
+
+> `Tete` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_61
+
+> Vous cherchez la tête de `truc`, qui n’est ni un texte ni une liste mais
+> de type `"machin"`.
+
+Si la valeur qui ne convient pas est `Rien`, il se peut que vous utilisiez
+une variable qui n’a pas été initialisée.
+
+#### erreur_62
+
+> Un valeur vide n’a pas de tête.
+
+Vérifiez la valeur dont vous cherchez la tête. Il faut au moins qu’elle
+contienne **un** élément.
+
+#### erreur_63
+
+> `Queue` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_64
+
+> Vous cherchez la queue de `truc`, qui n’est ni un texte ni une liste mais
+> de type `"machin"`.
+
+Si la valeur qui ne convient pas est `Rien`, il se peut que vous utilisiez
+une variable qui n’a pas été initialisée.
+
+#### erreur_65
+
+> Un valeur vide n’a pas de queue.
+
+Vérifiez la valeur dont vous cherchez la queue. Il faut au moins qu’elle
+contienne **un** élément.
+
+#### erreur_66
+
+> `Ajouter_a` attend exactement deux arguments. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Ajouter_a](#sym-Ajouter_a).
+
+#### erreur_67
+
+> `Ajouter_a` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_68
+
+> `Ajouter_a` : la variable n’a pas été initialisée. Affectez-lui une valeur
+> de type `"texte"` ou `"liste"`.
+
+Cela peut être le texte vide `""` ou la liste vide `(Liste)`, ou des valeurs
+non vides.
+
+#### erreur_69
+
+> `Ajouter_a` : la variable est de type `"truc"` alors qu’elle doit être de
+> type `"texte"` ou `"liste"`.
+
+Vérifiez bien le type et la valeur de votre variable.
+
+#### erreur_70
+
+> Vous voulez ajouter `"truc"` à `machin` mais on ne peut `Ajouter_a` un texte
+> qu’un seul caractère.
+
+Le deuxième argument de la commande `Ajouter_a` doit être un texte de longueur
+1 comme `"a"` ou `"x"`.
+
+#### erreur_71
+
+> `Retirer_de` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Retirer_de](#sym-Retirer_de).
+
+#### erreur_72
+
+> `Retirer_de` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_73
+
+> `Retirer_de` : la variable n’a pas été initialisée. Affectez-lui une valeur
+> de type `"texte"` ou `"liste"`.
+
+Voir [l’aide de la commande Retirer_de](#sym-Retirer_de).
+
+#### erreur_74
+
+> `Retirer_de` : la variable est de type `"truc"` alors qu’elle doit être de
+> type `"texte"` ou `"liste"`.
+
+Vérifiez bien le type et la valeur de votre variable.
+
+#### erreur_75
+
+> Mauvais tirage forcé : `truc` n’est pas compris entre `machin` et `bidule`.
+
+Une des valeurs spécifiées dans la liste `sequence_tirages@` :
+
+* n’est pas comprise entre les arguments passés à `Entier@`,
+* ou est strictement plus grande que la longueur d’un argument passé à `Nieme@`.
+
+#### erreur_76
+
+> L’espace des valeurs possibles dépasse `truc`.
+
+Le générateur de nombres pseudo aléatoires peut « seulement » choisir entre
+`truc` valeurs possibles. L’écart entre les deux arguments d’un appel à
+`Entier@` dépasse ce nombre donc `Entier@` ne peut pas fonctionner correctement.
+
+#### erreur_77
+
+> `Initialiser@` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Initialiser@](#sym-Initialiser@).
+
+#### erreur_78
+
+> `Initialiser@` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_79
+
+> `Initialiser@` : la variable `truc` n’a pas été initialisée. Affectez-lui une
+> valeur de type `"nombre"`.
+
+Voir [l’aide de la commande Initialiser@](#sym-Initialiser@).
+
+#### erreur_80
+
+> `Initialiser@` : l’argument doit être un nombre. Vous avez donné `truc`.
+
+Vérifiez le type de la valeur que vous passez à `Initialiser@`.
+
+Voir [l’aide de la commande Initialiser@](#sym-Initialiser@).
+
+#### erreur_81
+
+> `Initialiser@` n’accepte que des valeurs entre 0 (inclus) et 2 puissance 32
+> (exclus). Vous avez donné : `truc`.
+
+Vérifiez la valeur que vous passez à `Initialiser@`.
+
+#### erreur_82
+
+> `Entier@` attend exactement deux arguments. Vous en donnez truc.
+
+Voir [l’aide de la commande Entier@](#sym-Entier@).
+
+#### erreur_83
+
+> Le minimum donné à `Entier@` n’est pas un nombre entier (vous avez donné
+> `truc`).
+
+`Entier@` attend deux nombres entiers. Si vous utilisez une variable pour le
+premier nombre, vérifiez sa valeur.
+
+#### erreur_84
+
+> Le maximum donné à `Entier@` n’est pas un nombre entier (vous avez donné
+> `truc`).
+
+`Entier@` attend deux nombres entiers. Si vous utilisez une variable pour le
+second nombre, vérifiez sa valeur.
+
+#### erreur_85
+
+> Le minimum et le maximum de `Entier@`, ne sont pas dans l’ordre
+> (`truc` > `machin`).
+
+Si vous utilisez une ou plusieurs variables pour les arguments de `Entier@`,
+vérifiez leur valeur.
+
+#### erreur_86
+
+> `Nieme@` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Nieme@](#sym-Nieme@).
+
+#### erreur_87
+
+> `Nieme@` ne peut pas extraire un élément pseudo-aléatoire du nombre `truc`.
+
+Vérifiez la valeur de ce que vous passez à la commande `Nieme@`.
+
+#### erreur_88
+
+> `Nieme@` ne peut pas extraire un élément pseudo-aléatoire du booléen `Vrai`.
+
+Vérifiez la valeur de ce que vous passez à la commande `Nieme@`.
+
+#### erreur_89
+
+> `Nieme@` ne peut pas extraire un élément pseudo-aléatoire du booléen `Faux`.
+
+Vérifiez la valeur de ce que vous passez à la commande `Nieme@`.
+
+#### erreur_90
+
+> `Nieme@` ne peut pas extraire un élément pseudo-aléatoire de la valeur `Rien`.
+
+Vérifiez la valeur de ce que vous passez à la commande `Nieme@`.  
+Si vous avez passé une variable, l’avez-vous initialisée ?
+
+#### erreur_91
+
+> `Nieme@` ne peut extraire un élément pseudo-aléatoire que d’une liste ou
+> d’un texte. Vous avez donné `truc` qui est de type `"machin"`.
+
+Vérifiez la valeur de ce que vous passez à la commande `Nieme@`.
+
+#### erreur_92
+
+> `Type` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Type](#sym-Type).
+
+#### erreur_93
+
+> `Affecter_a` attend au moins deux arguments. Vous en donnez `truc`.
+
+Il faut au minimum le nom de la variable et une valeur.  
+Voir [l’aide de la commande Affecter_a](#sym-Affecter_a).
+
+## Outils d’édition
+
+### Indentation
+
+En sélectionnant plusieurs ligne (ou en se mettant au début d’une seule), il
+est possible d’indenter ou de désindenter son code avec la touche `TAB` et la
+combinaison `SHIFT`+`TAB`.
+
+### Abréviations
 
 Que ce soit dans l’interface web (navigateur) ou dans SciTE
 (voir [cette section](#scite) pour l’utilisation de MicroAlg avec SciTE),
@@ -1026,17 +1602,24 @@ un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
     (Af  ->  (Affecter_a |)
     (Afe ->  (Affecter_a | En_position )
     (A   ->  (Afficher |)
+    (Al  ->  (!!! "Algo |")...
+    (At  ->  (Afficher "|")
     (Aj  ->  (Ajouter_a |)
     (Co  ->  (Concatener |)
-    (D   ->  (Definir |...
-    (De  ->  (Declarer | De_type "")
-    (Dm  ->  (Demander)
+    (D   ->  (Declarer | De_type "")
+    (De  ->  (Definir |...
+    (Dm  ->  (Demander)|
+    (Dn  ->  (Demander_un_nombre)|
     (E   ->  (Exemples_de |...
+    (E@  ->  (Entier@ |)
     # Pour Faire, deux lignes vides pour aider à penser au compteur.
     (F   ->  (Faire (|)...
+    (I@  ->  (Initialiser@ |)
     (Li  ->  (Liste |)
     (Lo  ->  (Longueur |)
+    (M   ->  (Millisecondes)|
     (Ni  ->  (Nieme |)
+    (N@  ->  (Nieme@ |)
     (No  ->  (Nombre |)
     (R   ->  (Repeter | Fois...
     (Rd  ->  (Retirer_de |)
@@ -1044,6 +1627,7 @@ un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
     (Rp   -> (Repere |)
     (S   ->  (Si (|) Alors...
     (Ss  ->  (Si (|) Alors () Sinon...
+    (Te   -> (Tester |)
     # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
     (Tq  ->  (Tant_que (|) ...
 
@@ -1051,7 +1635,7 @@ un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
 
 Pour l’instant, cette fonctionnalité n’existe que dans l’interface web.
 
-### Limitations de l’export
+### Remarques pour les utilisateurs
 
 #### Limitations générales
 
@@ -1071,6 +1655,31 @@ un langage de calculatrice.
   seront préfixées brutalement par `Str` ou non, suivant qu’on a utilisé
   `(Demander)` ou `(Nombre (Demander))`.
 * La commande `Declarer` s’exporte en un commentaire seulement.
+
+#### Limitations de l’export vers JavaScript et Python
+
+Le code produit lors de l’export n’est pas toujours idiomatique. De plus il
+ne faut pas croire que maîtriser l’export de programmes en MicroAlg, même de
+beaucoup de programmes, vous permettra de dire que vous maîtrisez ces langages !
+
+#### Spécificités de l’export vers Javascript
+
+Le code produit lors de l’export peut être exécuté directement dans le
+navigateur en appuyant sur le bouton `Exécuter dans la console JS`. Le
+résultat apparaîtra dans la console JavaScript (appuyer sur `F12` pour la
+faire apparaître).
+
+#### Spécificités de l’export vers Processing
+
+L’export vers Processing est spécial pour deux raisons :
+
+1. la procédure `setup` est définie avec des instructions fixes, et les
+   instructions qui correspondent au code MicroAlg sont insérées dans la
+   procédure `draw` ;
+2. le code Processing est exécuté dans la page.
+
+Ces spécificités permettent de créer des animations avec MicroAlg, même si le
+langage n’est pas prévu pour.
 
 #### Précisions sur la visualisation sous forme d’arbre
 
@@ -1205,7 +1814,7 @@ Voici les directions que le projet va prendre :
   <a href="https://blockly-demo.appspot.com/static/apps/index.html"
   class="offi">Blockly</a>.
 * Continuer l’export des programmes écrits en MicroAlg vers d’autres langages :
-  Python, JS, C, PHP, C#, Pascal… et MicroAlg lui-même.
+  C, PHP, C#, Pascal…
 * Faire tourner MicroAlg sur une petite plaque comme Arduino.
 
 À un niveau moins général, des rapports de bugs ou idées d’amélioration sont
@@ -1230,7 +1839,6 @@ les compétences techniques au autres du contributeur :
     * buzzer le projet ;
 * compétences en **orthographe**, **expression ecrite** :
     * relire et corriger les fautes, trouver de meilleures formulations ;
-    * travailler sur le [tutoriel simple](tuto_simple.html) ;
 * compétences **pédagogiques** :
     * retravailler les tutoriels ;
     * écrire d’autres tutoriels, par exemple pour détailler un sujet précis ;
@@ -1265,10 +1873,10 @@ Pour cela, il y a plusieurs méthodes :
 * JVM : pour <a href="http://fr.wikipedia.org/wiki/Machine_virtuelle_Java"
   class="wp">Java Virtual Machine</a>,
   exécute du byte-code Java
-* Rhino : plateforme en Java pur permettant d’interpréter du code JavaScript
+* Rhino : plate-forme en Java pur permettant d’interpréter du code JavaScript
   (voir <a href="http://fr.wikipedia.org/wiki/Rhino_%28moteur_JavaScript%29"
   class="wp">l’article Wikipedia</a>)
-* NodeJS : plateforme permettant d’interpréter du code JavaScript
+* NodeJS : plate-forme permettant d’interpréter du code JavaScript
   (voir <a href="http://fr.wikipedia.org/wiki/Nodejs"
   class="wp">l’article Wikipedia</a>)
 * browser : le navigateur (Internet) installé sur la MACHINE
@@ -1278,7 +1886,7 @@ Pour cela, il y a plusieurs méthodes :
 * `pil`, `pil-j`, `pil-rjs` et `pil-njs` : les interpréteurs des
   implémentations de PicoLisp
 * `microalg.l` : le fichier définissant le langage MicroAlg
-* Processing(.js) : langage et plateforme de programmation visuelle et
+* Processing(.js) : langage et plate-forme de programmation visuelle et
   sonore (voir les sites <a href="http://processing.org/" class="offi">processing.org</a>
   et <a href="http://processingjs.org/" class="offi">processingjs.org</a>)
 * `.pde` (abréviation de `microalg.pde`) : le fichier convertissant les
@@ -1419,11 +2027,28 @@ C’est pour l’instant le seul environnement qui permette :
 
 * la programmation avec des blocs (voir [cette section](#blockly)),
 * l’export des programmes (voir [cette section](#export)),
-* l’interprétation de l’affichage en tant que code HTML ou Markdown (grâce au
-  menu déroulant à droite du bouton `OK`).
+* l’interprétation de l’affichage en tant que code HTML ou Markdown, grâce au
+  menu déroulant à droite du bouton `Exécuter`
+  (voir [cette section](#formatdelaffichage)).
 
 Notez que les [abréviations](#abrviations) sont utilisables dans les
 échantillons interactifs.
+
+#### Format de l’affichage
+
+Dans le navigateur, à droite du bouton `Exécuter`, un menu déroulant permet
+de choisir le format de l’affichage. Ce qui est passé à la commande `Afficher`
+peut en effet subir une transformation avant de passer à l’écran.
+
+Les possibilités sont `brut`, `HTML` et `MD`.
+
+* `brut` : aucune transformation ;
+* `HTML` : l’affichage est vu comme du code HTML et les balises sont
+  interprétées (voir [l’article HTML sur Wikipedia](https://fr.wikipedia.org/wiki/Hypertext_Markup_Language)) ;
+* `MD` : l’affichage est vu comme du code Markdown
+  (voir [l’article Markdown sur Wikipedia](https://fr.wikipedia.org/wiki/Markdown)).
+
+Voir [des exemples sur la galerie](http://galerie.microalg.info/microalg:affichage).
 
 ### SciTE
 
@@ -1529,7 +2154,7 @@ Voir aussi [cette section](#nombre).
 Il faut taper du texte dans un bloc de texte, sinon la valeur par défaut est
 le texte vide `""`.
 
-Voir aussi [cette section](#texte).
+Voir aussi [cette section](#typetexte).
 
 #### Opérations avec Blockly
 
@@ -1603,7 +2228,7 @@ graphique ne peuvent pas être codés avec les blocs de Blockly.
 
 ### Mise en place de la sortie graphique
 
-Pour l’installation de Processing sur votre plateforme, se reporter à
+Pour l’installation de Processing sur votre plate-forme, se reporter à
 [cette page](https://github.com/Microalg/microalg/blob/latest/INSTALL.md).
 Cette installation est nécessaire uniquement si vous utilisez MicroAlg avec
 l’éditeur de texte SciTE.

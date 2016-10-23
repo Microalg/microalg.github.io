@@ -10,55 +10,58 @@
   )
 )
 (de indent (!instr)
-  (indent_std !instr))
+  (let (!lines_with_final_NIL (mapcar pack (split (chop !instr) "^J"))
+        !lines (reverse (cdr (reverse !lines_with_final_NIL))))
+       (mapcar (list '(!line)
+                     (list 'pack "    " '!line "^J")) !lines)
+  )
+)
 
 (de + @ (pack "(" (glue " + " (rest)) ")"))
 (de - (A B) (pack "(" A "-" B ")"))
 (de * @ (pack "(" (glue " * " (rest)) ")"))
 (de / (A B) (pack "(" A "/" B ")"))
 (de % (A B) (pack "(" A "%" B ")"))
-(de ^ (A B) (pack "Math.pow(" A ", " B ")"))
+(de ^ (A B) (pack "(" A "**" B ")"))
 
-(de !!! (comz) (pack "// " (cdr (reverse (cdr (reverse (chop comz))))) "^J"))
-(de Afficher (obj) (pack "console.log(" obj ");^J"))
+(de !!! (comz) (pack "# " (cdr (reverse (cdr (reverse (chop comz))))) "^J"))
+(de Afficher (obj) (pack "print(" obj ")^J"))
 (de Declarer !arg_lst
   (let (!splitted (split !arg_lst 'De_type)
         !vars (mapcar 'cadr (car !splitted))  # var name is in (Variable ...)
         !type (cadr (caadr !splitted)))  # type is in (Litteral ...)
-        (pack "var " (glue ", " !vars) ";^J")
+        (pack "# " (glue ", " !vars) " sont des variables^J")
   )
 )
 (de Concatener @ (glue " + " (rest)))
 (de Affecter_a !arg_lst
   (let (!var (cadr (car !arg_lst))  # var name is in (Variable ...)
         !val (eval (cadr !arg_lst)))
-       (pack !var " = " !val ";^J")))
-(de Entier@ (A B) (pack "int(" A " + random(" B "-" A "+1))"))
-(setq Vrai "true")
-(setq Faux "false")
+       (pack !var " = " !val "^J")))
+(de Entier@ (A B) (pack "random.randint(" A ", " B ")"))
+(setq Vrai "True")
+(setq Faux "False")
 (de Si arg_lst (let (condition (car arg_lst)
                      kw_alors  (cadr arg_lst)
                      splitted  (split (cddr arg_lst) 'Sinon)
                      bloc_vrai (car splitted)
                      bloc_faux (cadr splitted))
                     (pack
-                      "if (" (eval condition) ")^J" "{^J"
+                      "if " (eval condition) ":^J"
                       (mapcar 'eval bloc_vrai)
-                      (if bloc_faux (pack "} else {^J" (mapcar 'eval bloc_faux)))
-                      "}^J"
+                      (if bloc_faux (pack "else:^J" (mapcar 'eval bloc_faux)))
                     )
                 )
 )
-(de Non (bool) (pack "!(" bool ")"))
-(de Et !arg_lst (pack "(" (glue " && " (mapcar 'eval !arg_lst)) ")"))
-(de Ou !arg_lst (pack "(" (glue " || "  (mapcar 'eval !arg_lst)) ")"))
+(de Non (bool) (pack "not (" bool ")"))
+(de Et !arg_lst (pack "(" (glue " and " (mapcar 'eval !arg_lst)) ")"))
+(de Ou !arg_lst (pack "(" (glue " or "  (mapcar 'eval !arg_lst)) ")"))
 (de Tant_que arg_lst (let (!cond (car arg_lst)
                            !mot-clef (cadr arg_lst)
                            !corps (cddr arg_lst))
                           (pack
-                            "while (" (eval !cond) ") {^J"
+                            "while " (eval !cond) ":^J"
                             (mapcar 'eval !corps)
-                            "}^J"
                           )
                      )
 )
@@ -66,14 +69,21 @@
                         !corps (car !splitted)
                         !cond (caadr !splitted))
                        (pack
-                         "do {^J"
+                         "while True:^J"
                          (mapcar 'eval !corps)
-                         "} while (" (eval !cond) ");^J"
+                         "    if not (" (eval !cond) "):^J"
+                         "        break^J"
                        )
                   )
 )
-
-(de =  (A B) (pack "(" A " === " B ")"))
+(de Repeter arg_lst (let (nb (eval (car arg_lst))
+                          prg (cddr arg_lst))
+                         (pack "for _ in range(" nb "):^J"
+                               (mapcar 'eval prg)
+                         )
+                    )
+)
+(de =  (A B) (pack "(" A " == " B ")"))
 (de <  (A B) (pack "(" A " < "  B ")"))
 (de <= (A B) (pack "(" A " <= " B ")"))
 (de >  (A B) (pack "(" A " > "  B ")"))
@@ -82,25 +92,25 @@
 
 (de Liste @ (pack "[" (glue ", " (rest)) "]"))
 
-(de 1000Cosinus (angle) (pack "Math.cos(" angle "/180*Math.PI)"))
-(de 1000Sinus   (angle) (pack "Math.sin(" angle "/180*Math.PI)"))
+(de 1000Cosinus (angle) (pack "math.cos(" angle "/180*math.pi)"))
+(de 1000Sinus   (angle) (pack "math.sin(" angle "/180*math.pi)"))
 
-(de Longueur (A) (pack A ".length"))
+(de Longueur (A) (pack "len(" A ")"))
 (de Nieme (obj idx) (pack obj "[" idx "]"))
-(de Millisecondes () "(new Date().getTime())")
+(de Millisecondes () "(time.time()*1000.0)")
 
-(de Demander () "window.prompt()")
-(de Demander_un_nombre () "parseFloat(window.prompt())")
-(de Type (A) (pack "typeof(" A ")"))
+(de Demander () "input()")
+(de Demander_un_nombre () "float(input())")
+(de Type (A) (pack "type(" A ")"))
 
 (de Tete (obj) (pack obj "[0]"))
-(de Queue (obj) (pack obj ".slice(1)"))
-(de Ajouter_a (obj val) (pack obj ".push(" val ");^J"))
-(de Retirer_de (obj val) (pack obj ".pop();^J"))
+(de Queue (obj) (pack obj "[1:]"))
+(de Ajouter_a (obj val) (pack obj ".append(" val ")^J"))
+(de Retirer_de (obj val) (pack obj ".pop()^J"))
 # En_position
-(de Nieme@ (obj idx) (pack obj "[Math.floor(Math.random() * " obj ".length)]"))
-(de Texte (obj) (pack "String(" obj ")"))
-(de Nombre (obj) (pack "parseFloat(" obj ")"))
+(de Nieme@ (obj) (pack "random.choice(" obj ")"))
+(de Texte (obj) (pack "str(" obj ")"))
+(de Nombre (obj) (pack "float(" obj ")"))
 (de ... () " (...) ")
 
 (de !no_export (cmd)
@@ -114,7 +124,6 @@
 (de ? () (!no_export "?"))
 # Rien
 # Alors Sinon
-(de Repeter () (!no_export "Repeter"))
 
 (de AV () (!no_export "AV"))
 (de BC () (!no_export "BC"))
