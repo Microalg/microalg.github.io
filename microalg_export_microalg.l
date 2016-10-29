@@ -21,10 +21,10 @@
 (de - (A B) (pack "(- " A " " B ")"))
 (de * @ (pack "(* " (glue " " (rest)) ")"))
 (de / (A B) (pack "(/ " A " " B ")"))
-(de % (A B) (pack "(%" A " " B ")"))
+(de % (A B) (pack "(% " A " " B ")"))
 (de ^ (A B) (pack "(\^ " A " " B ")"))
 
-(de !!! (comz) (pack "(!!! " comz ")^J"))
+(de !!! (comz) (pack "(!!! " (if comz @ "\"\"") ")^J"))
 (de Afficher (obj) (pack "(Afficher " obj ")^J"))
 (de Declarer !arg_lst
   (let (!splitted (split !arg_lst 'De_type)
@@ -133,7 +133,7 @@
   )
 )
 (de Epaisseur (e)
-  (pack "(Epaisseur" e ")^J")
+  (pack "(Epaisseur " e ")^J")
 )
 (de Rectangle (p1 p2)
   (pack "(Rectangle " p1 " " p2 ")^J")
