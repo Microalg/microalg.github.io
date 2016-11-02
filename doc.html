@@ -854,6 +854,17 @@ Vous êtes peut-être dans un des cas suivants :
 [91](#erreur_91)
 [92](#erreur_92)
 [93](#erreur_93)
+[94](#erreur_94)
+[95](#erreur_95)
+[96](#erreur_96)
+[97](#erreur_97)
+[98](#erreur_98)
+[99](#erreur_99)
+[100](#erreur_100)
+[101](#erreur_101)
+[102](#erreur_102)
+[103](#erreur_103)
+[103](#erreur_104)
 
 #### erreur_0
 
@@ -1584,6 +1595,88 @@ Voir [l’aide de la commande Type](#sym-Type).
 
 Il faut au minimum le nom de la variable et une valeur.  
 Voir [l’aide de la commande Affecter_a](#sym-Affecter_a).
+
+#### erreur_94
+
+> `Declarer` : le type est manquant.
+
+Après `De_type`, il faut indiquer le type des variables déclarées avec un type
+entre guillemets.
+
+Voir [l’aide de la commande Declarer](#sym-Declarer).
+
+#### erreur_95
+
+> `Texte` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Texte](#sym-Texte).
+
+#### erreur_96
+
+> `Nombre` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Nombre](#sym-Nombre).
+
+#### erreur_97
+
+> `Nombre` ne peut pas travailler sur le texte `truc`.
+
+Vous avez passé à `Nombre` un texte qui ne ressemble pas à un nombre.
+Affichez-le avant pour le vérifier.
+
+#### erreur_98
+
+> `Nombre` ne peut pas travailler sur la valeur `truc`.
+
+Vous avez passé à `Nombre` une valeur qui n’est pas un texte. Vérifiez son type.
+
+#### erreur_99
+
+> `Si` : Le mot-clef `Alors` doit être le deuxième argument.
+
+Le mot-clef `Alors` n’a pas été trouvé. Soit il est manquant, soit vous avez
+ouvert ou fermé une parenthèse qui place votre `Alors` au mauvais endroit.
+
+Voir [l’aide de la commande Si](#sym-Si).
+
+#### erreur_100
+
+> `Si` : La condition `truc` n’est pas un booléen.
+
+La condition de la commande `Si` doit être `Vrai` ou `Faux`.
+Vérifiez sa valeur.
+
+#### erreur_101
+
+> `Tant_que` : La condition `truc` n’est pas un booléen.
+
+La condition de la commande `Tant_que` doit être `Vrai` ou `Faux`.
+Vérifiez sa valeur.
+
+#### erreur_102
+
+> `Faire` : La condition `truc` n’est pas un booléen.
+
+La condition de la commande `Faire` doit être `Vrai` ou `Faux`.
+Vérifiez sa valeur.
+
+#### erreur_103
+
+> `Demander_un_nombre_pour` attend exactement un argument. Vous en donnez
+> `truc`.
+
+Il faut taper `(Demander_un_nombre_pour ...)`, avec la variable qui reçoit la
+valeur de l’utilisateur à la place des points de suspension.
+
+Voir [l’aide de la commande Demander_un_nombre_pour](#sym-Demander_un_nombre_pour).
+
+#### erreur_104
+
+> `Demander_un_nombre_pour` : La valeur entrée n’est pas un nombre.
+
+Ce n’est pas une erreur liée au programme.  
+Cette erreur survient lorsque l’utilisateur du programme tape autre chose qu’un
+nombre lorsque le programme lui en demande un.
 
 ## Outils d’édition
 
