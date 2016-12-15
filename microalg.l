@@ -208,11 +208,11 @@ Voir <http://microalg.info>.")
     -> 4
 
 **Attention** : le comportement de cette commande diffère suivant les
-implémentations.  
+implémentations.
 
 * Avec `malg` et `malg-j`, la division donnera toujours un entier.
 * Avec `malg-njs`, `malg-rjs` (configuration par défaut de SciTE) et dans le
-  navigateur, un nombre à virgule flottante sera retourné.
+  navigateur, un nombre à virgule flottante peut être retourné.
 
 Dans le premier cas :
 
@@ -243,6 +243,24 @@ Sinon :
 
     : (\^ 2 3)
     -> 8
+
+**Attention** : le comportement de cette commande diffère suivant les
+implémentations.
+
+* Avec `malg` et `malg-j`, la puissance doit être entière.
+* Avec `malg-njs`, `malg-rjs` (configuration par défaut de SciTE) et dans le
+  navigateur, la puissance peut être un nombre à virgule flottante et un nombre
+  à virgule flottante peut être retourné.
+
+Dans le premier cas :
+
+    : (\^ 2 0.5)
+    -> 2
+
+Sinon :
+
+    : (\^ 2 0.5)
+    -> 1.4142135623730951
 ")
 (put '^ 'text "Commande puissance.")
 (de ^ (!x !y) (** !x !y))
@@ -263,8 +281,18 @@ Exemple :
     : (!!! \"Ceci est un commentaire.\")
     -> Rien
 
-Notez bien que l’argument passé à `!!!` doit être un texte et doit donc être
-entre guillemets.
+Notez bien que :
+
+1. l’argument passé à `!!!` doit être un texte et doit donc être entre
+   guillemets ;
+2. `!!!` ne doit pas être utilisé la place d’un argument ou d’un mot-clé
+   intermédiaire. On ne peut donc pas mettre un commentaire dans :
+    * un `Si` avant le `Alors` ;
+    * un `Repeter` avant le `Fois` ;
+    * un `Tant_que` avant le `Faire` ;
+    * un `Faire` après le `Faire` ;
+    * des opérations sur les nombres, les textes…
+    * …
 ")
 (put '!!! 'text "Commande commentaire.")
 (de !!! !arg_lst
@@ -382,7 +410,7 @@ Exemples :
 
     : (Concatener \"abra\" \"cadabra\")
     -> \"abracadabra\"
-    : (Concatener \"bonjour \" \"tout \" \"le \" \"monde\")
+    : (Concatener \"bonjour\" \" \" \"tout\" \" \" \"le\" \" \" \"monde\")
     -> \"bonjour tout le monde\"
     : (Afficher (Concatener (Liste 1 2) (Liste 3 4)))
     \"(Liste 1 2 3 4)\"
@@ -443,7 +471,7 @@ Exemples :
 
 # Gestion des variables
 (put 'Declarer 'doc
-"Commande qui permet de déclarer une variable, avec son type.
+"Commande qui déclare une variable et lui associe son type.
 
 Utilisation :
 
@@ -517,7 +545,7 @@ Il est possible de déclarer plusieurs variables en une seule instruction :
   (!erreur 15 "`Initialiser` a été abandonnée dans la version 0.4. "
               "Merci d’utiliser `Declarer`."))
 (put 'Affecter_a 'doc
-"Commande qui permet d’affecter une valeur à une variable.
+"Commande qui affecte une valeur à une variable.
 
 Utilisations :
 
@@ -609,7 +637,7 @@ alors l’élément à la `idx` ième position dans `var` est affecté de la val
                  # Affectation à l’élément `idx` du symbole dans `!var`.
                  # Tout d’abord quelques vérifications:
                  (if (<> 'En_position kw)
-                     (!erreur 20 "`Affecter_a` n’est pas bien fermé, "
+                     (!erreur 20 "`Affecter_a` n’est pas bien fermée, "
                                  "ou il manque `En_position`.")
                  )
                  (if cinquieme
@@ -707,7 +735,7 @@ commandes `Demander` et `Demander_un_nombre` (voir `Declarer` et `Affecter_a`)."
 (put 'valeur_utilisateur 'type "rien")
 (setq valeur_utilisateur 'Rien)
 (put 'Demander 'doc
-"Commande qui permet de demander une valeur à l’utilisateur.
+"Commande qui demande un texte à l’utilisateur et retourne ce texte.
 
 Utilisation :
 
@@ -716,8 +744,8 @@ Utilisation :
 Exemples :
 
     : (Afficher (Demander))
-    salut  <--- Ici, c’est l’utilisateur qui tape ;
-    salut  <--- là, c’est MicroAlg qui affiche.
+    salut      <--- Ici, c’est l’utilisateur qui tape ;
+    \"salut\"  <--- là, c’est MicroAlg qui affiche.
     -> Rien
 
 Comme `Demander` retourne un texte, il est parfois nécessaire de convertir la
@@ -1505,20 +1533,23 @@ Exemples :
 Utilisation :
 
     (Si booléen
-     Alors instruction_si_Vrai_1
-           instruction_si_Vrai_2
-           ...
-     Sinon instruction_si_Faux_1
-           instruction_si_Faux_2
-           ...
+     Alors
+        instruction_si_Vrai_1
+        instruction_si_Vrai_2
+        ...
+     Sinon
+        instruction_si_Faux_1
+        instruction_si_Faux_2
+        ...
     )
 
 Ou :
 
     (Si booléen
-     Alors instruction_si_Vrai_1
-           instruction_si_Vrai_2
-           ...
+     Alors
+        instruction_si_Vrai_1
+        instruction_si_Vrai_2
+        ...
     )
 ")
 (put 'Si 'text "Commande `Si`.")
