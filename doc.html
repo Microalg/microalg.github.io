@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>Doc - MicroAlg</title>
         <meta name="description"
-              content="Tutoriel en ligne pour MicroAlg." />
+              content="Documentation en ligne pour MicroAlg." />
         <meta name="keywords" content="microalg, algo, algorithme, algorithmique, lisp, environnement" />
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="web/jquery.min.js"><\/script>')</script>
@@ -40,13 +40,14 @@ Aller directement à :
 * [Installation](#installation) - [Architecture](#architecture)
 * [Pourquoi MicroAlg](#pourquoimicroalg) - [Limitations](#limitations)
 * [Syntaxe](#syntaxe) - [Types](#types) - [Forme de Backus-Naur](#formedebackusnaur)
-* [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
+* [Symboles](#symboles) - [Symboles par thèmes](#symbolesparthmes) -
+  [Liste des symboles prédéfinis](#listedessymbolesprdfinis)
 * [Aide sur les messages d’erreur](#aidesurlesmessagesderreur)
 * [Outils d’édition](#outilsddition)
     * [Indentation](#indentation)
     * [Abréviations](#abrviations)
 * [Export](#export)
-    * [Limitations](#limitationsdelexport)
+    * [Limitations](#limitationsgnrales)
     * [Fonctionnement](#fonctionnementdelexport)
 * [Intégrations](#intgrations)
     * [Navigateur](#navigateur)
@@ -56,6 +57,7 @@ Aller directement à :
     * [Sortie graphique](#sortiegraphique) avec Processing
         * [Tortue](#tortue)
         * [Fonctionnement](#communicationavecprocessing)
+    * [LaTeX](#latex)
 * [Feuille de route](#feuillederoute) - [Contribuer](#contribuer)
 * [Remerciements](#remerciements)
 
@@ -175,7 +177,8 @@ en sorte que `(Demander)` attende l’utilisateur.
       `(Commande)`  
       C’est assez rare, les seules commandes qui n’ont pas de paramètre sont
       `BC`, `LC`, `Demander`, `Demander_un_nombre` et `Millisecondes`. De plus,
-      le paramètre de `TG` et de `TD` (l’angle) est facultatif.
+      le ou les paramètres de `Liste`, `TG` et de `TD` (l’angle) sont
+      facultatifs.
 * Les séparateurs possibles sont :
     * l’espace,
     * le retour à la ligne,
@@ -384,48 +387,44 @@ avec deux modifications :
         '(' Queue ' ' <instr_liste> ')' |
         '(' Retirer_de ' ' <instr_liste> ')' « si la valeur retirée est bien une liste »
 
-### Symboles
+## Symboles
 
 À part les **parenthèses**, les **nombres** (le séparateur est le `.`) et les
 **textes** (délimités par des `"`), le langage comporte des symboles. Ils sont
 organisés comme ceci :
 
-* symboles
-    * commandes
-        * prédéfinies
-            * flot (`Si`, `Tant_que`…)
-            * structures de données (`Liste`…)
-            * autres (`Afficher`, `Concatener`…)
-        * définies par l’utilisateur
-    * mots-clefs
-        * intermédiaires (`Alors`, `Sinon`…)
-        * autres (`Vrai`, `Faux`, `Rien`…)
-    * variables (le reste des symboles), qui le plus souvent :
-        * sont définies par l’utilisateur
-        * commencent par une minuscule
-
-<div id="variables"></div>
-
-Les variables sont des symboles qui renferment un valeur. Dans un algorithme,
-elles servent souvent à stocker une valeur qui va servir plusieurs fois ou
-suivre l’évolution d’une quantité.
+* commandes
+    * prédéfinies
+        * flot (`Si`, `Tant_que`…)
+        * structures de données (`Liste`…)
+        * autres (`Afficher`, `Concatener`…)
+    * définies par l’utilisateur
+* mots-clefs
+    * intermédiaires (`Alors`, `Sinon`…)
+    * autres (`Vrai`, `Faux`, `Rien`…)
+* variables (le reste des symboles)
+    * commencent par une minuscule
+    * sont le plus souvent définies par l’utilisateur, sinon ce sont des
+      *variables spéciales* (`credit_iterations`, `nombre_demandé`,
+      `sequence_tirages@` et `texte_demandé`)
 
 ### Conventions
 
 * Les nom des commandes commencent par une majuscule, celui des variables par
-  une minuscule.
+  une minuscule. Les variables à une lettre peuvent être en majuscule.
 * Si le nom d’un symbole comporte plusieurs mots, le séparateur est le « tiret
   du 8 » ou « underscore » (`_`).
 * Les noms des symboles ne contiennent en général pas d’accent, mais certaines
-  commandes parmi les plus simples et fréquentes peuvent s’écrire avec des
-  lettres accentuées (sinon, réessayer sans accent). C’est le cas de :
+  commandes ou variables spéciales peuvent s’écrire avec des lettres accentuées
+  (sinon, réessayer sans accent).  
+  C’est le cas de :
     * `Affecter_à`
     * `Concaténer`
     * `Déclarer`
     * `Définir`
     * `Répéter`
 
-## Liste des symboles prédéfinis
+### Liste des symboles prédéfinis
 
 Cette section est générée directement à partir du fichier `microalg.l`, que
 vous pouvez trouver [ici](microalg.l).
@@ -464,7 +463,7 @@ et `(Faire ... Tant_que ...)`, `(Repeter ... Fois ...)`. Pas de boucle POUR.
 
 **Opérations mathématiques, comparaisons et nombres pseudo-aléatoires**
 
-`+`, `-`, `*`, `/`, `%`, `^`, `1000Cosinus`, `1000Sinus`,
+`+`, `-`, `*`, `/`, `%`, `^`, `Racine`, `1000Cosinus`, `1000Sinus`,
 `=`, `=/`, `<`, `<=`, `>`, `>=`, `(Entier@ ... ...)`, `(Initialiser@ ...)`.
 
 Les six premières opérations peuvent aussi être écrites
@@ -623,11 +622,11 @@ valeur ou de la commande qui est parfois fournie :
     * Le `Tant_que` correspondant a pu être fermé prématurément.  
       `(Tant_que (=/ n 1)) <- une parenthèse fermante en trop`
 * Crédit d’itérations épuisé (1 000 par défaut). Vous pouvez recharger votre
-  crédit en affectant une valeur à la variable `credits_iterations`.
+  crédit en affectant une valeur à la variable `credit_iterations`.
     * Peut-être que vous gérez mal la condition ou le compteur d’une des
       boucles de votre programme. Sinon, si votre programme a vraiment besoin
       de plus d’itérations, vous pouvez recharger votre crédit en affectant
-      une valeur à la variable `credits_iterations`.
+      une valeur à la variable `credit_iterations`.
 * `Definir` : le paramètre X a déjà été déclaré comme variable.
     * Certains symboles comme `fin` préexistent pour des raisons techniques.
       Veuillez ne pas les utiliser comme nom de paramètre.
@@ -725,17 +724,12 @@ le signaler en :
 ### Récursion infinie
 
 Le programme est perdu dans une récursion infinie : une commande s’appelle
-elle-même sans cesse.
-
-Avant que l’ordinateur ne *plante* franchement, un mécanisme de la plate-forme
-que vous utilisez (et non MicroAlg, d’où la variété des messages d’erreur)
-arrête ce qui lui semble être un travail infini car un certain nombre d’appels
-a été dépassé. Ce nombre est variable suivant les plate-formes et ne peut que
-très rarement être modifié.
+elle-même sans cesse (voir les détails plus bas).
 
 Vous êtes peut-être dans un des cas suivants :
 
 * Vos appels récursifs ne trouvent pas de point d’appui. Votre test est-il bon ?
+* Vous avez doublé une parenthèse ouvrante : `((`.
 * Un texte est utilisé comme une commande alors qu’il ne devrait pas.
 * Un mot-clef est utilisé comme une commande alors qu’il ne devrait pas. Dans
   ce cas, enlevez la parenthèse devant :
@@ -750,6 +744,14 @@ Vous êtes peut-être dans un des cas suivants :
 * Vous utilisez les parenthèses comme des accolades. Attention, la première
   parenthèse est toujours *devant* la commande (voir la section
   [syntaxe](#syntaxe)).
+
+**Détails** :  
+Après un certain nombre d’appels récursifs, un mécanisme de la plate-forme que
+vous utilisez arrête ce qui lui semble être un travail infini, ceci afin
+d’éviter que l’ordinateur ne *plante* franchement. Ce nombre d’appels est
+variable suivant les plate-formes et ne peut être que très rarement être
+modifié, c’est pourquoi MicroAlg n’a parfois pas de contrôle dessus. Ceci
+explique aussi la variété des messages d’erreur.
 
 ### Espaces dans les noms de fichiers
 
@@ -864,7 +866,17 @@ Vous êtes peut-être dans un des cas suivants :
 [101](#erreur_101)
 [102](#erreur_102)
 [103](#erreur_103)
-[103](#erreur_104)
+[104](#erreur_104)
+[105](#erreur_105)
+[106](#erreur_106)
+[107](#erreur_107)
+[108](#erreur_108)
+[109](#erreur_109)
+[110](#erreur_110)
+[111](#erreur_111)
+[112](#erreur_112)
+[113](#erreur_113)
+[114](#erreur_114)
 
 #### erreur_0
 
@@ -874,8 +886,8 @@ Vous êtes peut-être dans un des cas suivants :
   devant), mais elle n’existe pas. La commande est sans doute mal
   orthographiée (attention aux majuscules), ou vous utilisez une vieille
   version de MicroAlg.
-* « `Affecter` -- Undefined » indique qu’il vous manque un « _ ».
-* « `Tant` -- Undefined » indique qu’il vous manque un « _ ».
+* « La commande `Affecter` n’existe pas. » indique qu’il vous manque un « _ ».
+* « La commande `Tant` n’existe pas. » indique qu’il vous manque un « _ ».
 
 **Remarque** : hors web, cette erreur apparaît sous la forme
 `truc -- Undefined`.
@@ -1031,7 +1043,7 @@ type. Vérifiez le type de votre variable ou de votre valeur.
 
 #### erreur_20
 
-> `Affecter_a` n’est pas bien fermé, ou il manque `En_position`.
+> `Affecter_a` n’est pas bien fermée, ou il manque `En_position`.
 
 Vous fournissez un troisième argument à `Affecter_a` qui n’est pas
 `En_position`.
@@ -1678,6 +1690,90 @@ Ce n’est pas une erreur liée au programme.
 Cette erreur survient lorsque l’utilisateur du programme tape autre chose qu’un
 nombre lorsque le programme lui en demande un.
 
+#### erreur_105
+
+> `Demander_un_nombre_pour` : le premier argument doit être une variable.
+> Vous avez donné le texte vide `""`.
+
+#### erreur_106
+
+> `Demander_un_nombre_pour` : le premier argument doit être une variable.
+> Vous avez donné le texte `"truc"`.
+
+Il ne faut pas mettre de guillemets autour du nom de la variable dans laquelle
+vous voulez stocker le nombre tapé par l’utilisateur.
+
+#### erreur_107
+
+> `Demander_un_nombre_pour` : le premier argument doit être une variable.
+> Vous avez donné `truc`.
+
+Cette commande attend le nom de la variable dans laquelle vous voulez stocker
+le nombre tapé par l’utilisateur.
+
+#### erreur_108
+
+> `Demander_un_nombre_pour` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_109
+
+> `Racine` attend exactement un argument. Vous en donnez `truc`.
+
+Voir [l’aide de la commande Racine](#sym-Racine).
+
+#### erreur_110
+
+> `Racine` : L’argument doit être un nombre. Vous avez donné `truc`.
+
+Vérifiez le type ou la valeur de ce que vous passez à `Racine`.
+
+#### erreur_111
+
+> `Racine` : L’argument doit être un nombre positif ou nul. Vous avez donné
+> `truc`.
+
+On ne peut calculer la racine carrée que d’un nombre positif ou nul.
+Vérifiez la valeur de ce que vous passez à `Racine`.
+
+#### erreur_112
+
+> `Racine` : la variable `truc` n’a pas été déclarée.
+
+Vous utilisez une variable inconnue de MicroAlg.
+
+* Déclarez-la si ce n’est pas fait.
+* Sinon vérifiez l’orthographe de la variable, et respectez les majuscules et
+  minuscules.
+
+#### erreur_113
+
+> La fenêtre graphique n’existe pas.
+
+Dans la configuration de l’échantillon, il faut fixer `processing` à `true`.
+Par exemple, sur la galerie, il faut ajouter `{"processing": true}`
+au moment de déclarer l’échantillon.
+
+Voir [la section correspondante de la documentation](#sortiegraphique).
+
+#### erreur_114
+
+> Crédit d’itérations épuisé (... par défaut). Vous pouvez recharger votre
+> crédit en affectant une valeur à la variable `credit_iterations`.
+
+Une des boucles de votre programme effectue trop de tours. Si votre programme
+a besoin d’effectuer plus de tours que la limite par défaut, il faut changer
+cette limite en ajoutant en tête de fichier :
+
+    (Affecter_a credit_iterations 10000)
+
+Voir [la documentation de `credit_iterations`](#sym-credit_iterations).
+
 ## Outils d’édition
 
 ### Indentation
@@ -1701,6 +1797,7 @@ un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
     (Co  ->  (Concatener |)
     (D   ->  (Declarer | De_type "")
     (De  ->  (Definir |...
+    (Di  ->  (Diff |)
     (Dm  ->  (Demander)|
     (Dn  ->  (Demander_un_nombre)|
     (E   ->  (Exemples_de |...
@@ -1714,13 +1811,19 @@ un appui sur `Ctrl`+`B` vous complètera les débuts de commandes suivants :
     (Ni  ->  (Nieme |)
     (N@  ->  (Nieme@ |)
     (No  ->  (Nombre |)
+    (Pr  ->  (Produit |)
+    (Pu  ->  (Puissance |)
+    (Q   ->  (Quotient |)
     (R   ->  (Repeter | Fois...
+    (Ra  ->  (Racine |)
     (Rd  ->  (Retirer_de |)
-    (Re   -> (Retourner |)
-    (Rp   -> (Repere |)
+    (Re  ->  (Retourner |)
+    (Rp  ->  (Repere |)
+    (Rs  ->  (Reste |)
     (S   ->  (Si (|) Alors...
+    (So  ->  (Somme |)
     (Ss  ->  (Si (|) Alors () Sinon...
-    (Te   -> (Tester |)
+    (Te  ->  (Tester |)
     # Pour Tant_que, deux lignes vides pour aider à penser au compteur.
     (Tq  ->  (Tant_que (|) ...
 
@@ -1773,6 +1876,19 @@ L’export vers Processing est spécial pour deux raisons :
 
 Ces spécificités permettent de créer des animations avec MicroAlg, même si le
 langage n’est pas prévu pour.
+
+#### Limitations de l’export vers Blockly
+
+L’export vers Blockly sert principalement à mettre en place les blocs au
+chargement d’une page (dans les tutoriels ou la galerie).
+
+Pour l’instant, certains programmes ne peuvent pas être reconstitués. Par
+exemple les programmes où :
+
+* `(Demander)` ou `(Demander_un_nombre)` sont utilisés comme instruction et non
+  comme argument à une autre commande ;
+* `Si` est utilisé comme une valeur ;
+* …
 
 #### Précisions sur la visualisation sous forme d’arbre
 
@@ -1896,6 +2012,23 @@ La commande `Next` étant définie un peu plus loin simplement ainsi :
       (pack "<next>"
             content
             "</next>"))
+
+### LaTeX
+
+Un paquet LaTeX a été écrit pour colorer les parenthèses des programmes
+écrits en MicroAlg.
+
+* [un exemple de fichier .tex](https://raw.githubusercontent.com/Microalg/microalg.sty/master/microalg.tex) ;
+* [le rendu .pdf correspondant](https://raw.githubusercontent.com/Microalg/microalg.sty/master/microalg.pdf).
+
+#### Paquets requis
+
+Le paquet MicroAlg a besoin de `listings` et `xcolor`.
+
+#### Limitations
+
+* Les textes ne sont pas soulignés en gris.
+* On ne peut pas accentuer des lettres dans les blocs de code.
 
 ## Feuille de route
 
@@ -2229,7 +2362,9 @@ Dans le cas où vous avez accès à la fois aux blocs et au code textuel, le cod
 textuel est mis à jour à chaque modification faite sur les blocs.
 
 Inversement, il est possible de reconstituer les blocs correspondant au code
-textuel avec `Ctrl`+`Shift`+`B` depuis l’éditeur textuel.
+textuel avec `Ctrl`+`Shift`+`B` depuis l’éditeur textuel. Ce n’est pas toujours
+possible : voir les
+[limitations de l’export Blockly](#limitationsdelexportversblockly).
 
 #### Bloc Programme
 
@@ -2266,7 +2401,7 @@ bloc et non le symbole de l’opération :
 
 Voir aussi les commandes 
 [`+`](#sym-+), [`-`](#sym--), [`*`](#sym-*), [`/`](#sym-/), [`%`](#sym-%) et
-[`^`](#sym-^).
+[`^`](#sym-^), [`Racine`](#sym-Racine).
 
 #### Comparaisons avec Blockly
 
@@ -2315,9 +2450,6 @@ Certaines commandes de langage MicroAlg n’ont pas encore de bloc.
 Pour sa sortie graphique, MicroAlg utilise
 <a href="http://processing.org/" class="offi">Processing</a> et
 <a href="http://processingjs.org/" class="offi">Processing.js</a>.
-
-**Attention** : Pour l’instant, les programmes qui permettent une sortie
-graphique ne peuvent pas être codés avec les blocs de Blockly.
 
 ### Mise en place de la sortie graphique
 
@@ -2517,6 +2649,8 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
   [Benoît Delahaye](http://pagesperso.lina.univ-nantes.fr/~delahaye-b/) pour
   respectivement leur validation et leur mise en garde autour du nouveau
   comportement de `Declarer`.
+* [Christophe Declercq](https://www.univ-nantes.fr/mauras-c) à la fois pour son
+  aide et ses questions techniques, mais aussi son aide au niveau du marketing.
 
 <p id="modeles">Modèles et contre-modèles :</p>
 
@@ -2532,6 +2666,8 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * **SICP**, par Abelson et Sussman &mdash;
   [article Wikipedia](http://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs)
   (en anglais)
+* **Python**, par [Guido van Rossum](https://fr.wikipedia.org/wiki/Guido_van_Rossum) &mdash;
+  [site officiel](https://www.python.org/)
 * **Arc**, par [Paul Graham](http://fr.wikipedia.org/wiki/Paul_Graham) &mdash;
   [site officiel](http://arclanguage.org/)
 
@@ -2544,9 +2680,11 @@ Voir [cet exemple](tuto_graphique.html#tortue) dans le tutoriel graphique.
 * **jQuery-term**, par Jakub T. Jankiewicz &mdash; [site officiel](http://terminal.jcubic.pl/)
 * **parenedit** &mdash; [basé sur cette réponse](http://stackoverflow.com/questions/14043727/auto-resizing-textarea-is-bumpy-highlighting-parentheses)
 * **tabIndent**, par Julian Lam &mdash; [site officiel](http://julianlam.github.io/tabIndent.js/)
-* **Blockly**, par Neil Fraser et la communauté &mdash; [site officiel](http://code.google.com/p/blockly/)
+* **jQuery.textcomplete**, par Yuku Takahashi &mdash; [site officiel](https://yuku-t.com/jquery-textcomplete/)
+* **Blockly**, par Neil Fraser et la communauté &mdash; [site officiel](https://developers.google.com/blockly/)
 * **SciTE**, par Neil Hodgson &mdash; [site officiel](http://www.scintilla.org/SciTE.html)
 * **svg-tree-drawer**, par Weston Ruter &mdash; [GitHub](https://github.com/westonruter/svg-tree-drawer/)
+* **readline-sync**, par AnSeki &mdash; [npm](https://www.npmjs.com/package/readline-sync)
 
 <p id="annexes">Pour les parties annexes du site :</p>
 
