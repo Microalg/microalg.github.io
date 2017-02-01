@@ -263,7 +263,8 @@ ou retournés par les commandes.
           <texte>  ::= '"' « une chaîne de caractères » '"'
         <booleen>  ::= Vrai | Faux
        <variable>  ::= « caractères alphanum. sauf espace » | <var_spéciale>
-    <var_spéciale> ::= credit_iterations | sequence_tirages@ | valeur_utilisateur
+    <var_spéciale> ::=
+        credit_iterations | nombre_demandé | sequence_tirages@ | texte_demandé
     <mot-clef_intermédiaire> ::=
         Alors | Sinon | Faire | Tant_que | Fois | En_position | De_type
 
@@ -294,7 +295,8 @@ avec deux modifications :
       <booleen>   ::= Vrai | Faux
       <variable>  ::= « caractères alphanum. sauf espace » | <var_spéciale>
       <commande>  ::= « caractères alphanum. sauf espace »
-    <var_spéciale> ::= credit_iterations | sequence_tirages@ | valeur_utilisateur
+    <var_spéciale> ::=
+        credit_iterations | nombre_demandé | sequence_tirages@ | texte_demandé
     <instruction>  ::=
         '(' Afficher <instr_valeur> ')' |
         '(' Aide <instr_valeur> ')' |
@@ -423,6 +425,7 @@ organisés comme ceci :
     * `Déclarer`
     * `Définir`
     * `Répéter`
+    * `nombre_demandé` et `texte_demandé`
 
 ### Liste des symboles prédéfinis
 
@@ -514,12 +517,13 @@ Les six premières opérations peuvent aussi être écrites
 
 **Variables spéciales**
 
-`credit_iterations`, `sequence_tirages@`, `valeur_utilisateur`.
+`credit_iterations`, `nombre_demandé`, `sequence_tirages@`, `texte_demandé`.
 
 **Divers**
 
 `Rien`, `(Afficher ...)`, `(!!! "commentaire")`, `(Aide ...)`,
-`(Demander)`, `(Demander_un_nombre)`, `(Geler ...)`, `(Millisecondes)`.
+`(Demander)`, `(Demander_un_nombre)`, `(Demander_un_nombre_pour)`,
+`(Geler ...)`, `(Millisecondes)`.
 
 ## Types
 
