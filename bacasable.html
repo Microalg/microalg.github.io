@@ -37,9 +37,12 @@
         txtarea.focus().selectRange(txtarea.val().length, txtarea.val().length);
     </script>
     <script type="text/javascript" src="web/tabIndent.js"></script>
+    <script type="text/javascript" src="web/jquery.textcomplete.min.js"></script>
+    <link type="text/css" href="web/jquery.textcomplete.css" rel="stylesheet" />
     <script>
       tabIndent.config.tab = ' ';
       tabIndent.renderAll();
+      attachTextComplete();
     </script>
 </body>
 </html>
