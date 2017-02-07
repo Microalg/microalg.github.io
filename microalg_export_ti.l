@@ -19,6 +19,16 @@
 (de / (A B) (pack "(" A "÷" B ")"))
 (de % (A B) (pack "Mod(" A "," B ")"))
 (de ^ (A B) (pack "(" A "\^" B ")"))
+(de Carre (A) (pack "(" A ")²"))
+(setq Carré Carre)
+(de Racine (A) (pack "√(" A ")"))
+
+(setq Somme +)
+(setq Diff -)
+(setq Produit *)
+(setq Quotient /)
+(setq Reste %)
+(setq Puissance ^)
 
 (de !!! (comz) (pack "\" " (cdr (reverse (cdr (reverse (chop comz))))) "^J"))
 (de Afficher (obj) (pack "Disp " obj "^J"))
@@ -47,6 +57,11 @@
                       "`Affecter_a`. --"))
 (de Demander_un_nombre () (pack "-- La commande `Demander_un_nombre` doit être utilisée avec "
                                 "`Affecter_a`. --"))
+(de Demander_un_nombre_pour !arg_lst
+  (let (!var (cadr (car !arg_lst)))  # var name is in (Variable ...)
+       (pack "Prompt " !var "^J")
+  )
+)
 (de Entier@ (A B) (pack "randInt(" A "," B ")"))
 (setq Vrai "1")
 (setq Faux "0")
