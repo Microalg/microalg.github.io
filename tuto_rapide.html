@@ -87,19 +87,20 @@
             au créateur de MicroAlg</a>.</li>
     </ul>
 
-    <h2 id="affichage"><a href="#affichage">: </a>Affichage</a></h2>
+    <h2 id="affichage"><a href="#affichage">: </a>Affichage</h2>
     <div id="script-afficher"></div>
     <script>inject_microalg_editor_in('script-afficher', {
      src:
         '(Afficher "Bonjour tout le monde !")'
     });</script>
     <p>Remarquez bien la forme de ce premier programme. Il contient une seule
-    <em>instruction</em>, de la forme :</p>
+    <em>instruction</em>, qui se décompose ainsi :</p>
     <ol>
-        <li>une parenthèse ouvrante ;</li>
-        <li>une <em>commande</em> ;</li>
-        <li>d’éventuels <em>arguments</em> ;</li>
-        <li>une parenthèse fermante.</li>
+        <li>une parenthèse ouvrante, sur fond rouge ;</li>
+        <li>une <em>commande</em>, ici la commande <code>Afficher</code> ;</li>
+        <li>d’éventuels <em>arguments</em>, ici le texte
+            <code>"Bonjour tout le monde !"</code> ;</li>
+        <li>une parenthèse fermante, sur fond rouge aussi.</li>
     </ol>
     <p>La parenthèse ouvrante marque le début d’une instruction, comme une
     majuscule marque le début d’une phrase. La parenthèse fermante marque la
@@ -433,6 +434,11 @@ Bonjour,
      src:
         '(Afficher (/ 6 (+ 1 1 1)))'
     });</script>
+    <div id="script-calc5"></div>
+    <script>inject_microalg_editor_in('script-calc5', {
+     src:
+        '(Afficher (Racine 49))'
+    });</script>
     <div id="script-oppose"></div>
     <script>inject_microalg_editor_in('script-oppose', {
      src:
@@ -498,6 +504,10 @@ Bonjour,
      src:
         '(Afficher (+ 1 (Nombre (Demander))))'
     });</script>
+    <p>Plus de détails sur les différentes façons de « demander » sont
+    disponibles sur
+    <a href="http://galerie.microalg.info/microalg:demander">cette page
+    de la galerie</a>.</p>
     <p>Pour finir cette section en beauté, voici un programme qui réutilise
     tout ce que l’on a appris jusqu’ici. Pourrez-vous deviner ce qu’il va
     afficher ?</p>
@@ -836,6 +846,15 @@ Bonjour,
     <h2 id="affectation-circulaire"><a href="#affectation-circulaire">: </a>Affectation circulaire</h2>
     <p>Il n’est pas interdit d’utiliser une variable dans un calcul dont le
     résultat sera affectée à cette même variable.</p>
+    <p>Dans <code>(Affecter_a var (Calcul var))</code>, il faut comprendre
+    que :</p>
+    <ol>
+      <li>le second <code>var</code> désigne la <strong>valeur</strong> qui est
+        stockée dans la variable, qui sera envoyée à <code>Calcul</code> ;</li>
+      <li>le premier <code>var</code> désigne le <strong>nom</strong> de la
+        variable à mettre à jour avec le résultat de
+        <code>(Calcul var)</code>.</li>
+    </ol>
     <p>Dans ce premier exemple, on accumule des nombres avec une instruction de
     la forme :<br>
     <code>(Affecter_a valeur (+ valeur valeur_a_ajouter))</code></p>

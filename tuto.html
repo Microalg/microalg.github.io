@@ -99,7 +99,7 @@
             au créateur de MicroAlg</a>.</li>
     </ul>
 
-    <h2 id="affichage"><a href="#affichage">: </a>Affichage</a></h2>
+    <h2 id="affichage"><a href="#affichage">: </a>Affichage</h2>
     <p>Pourquoi ne pas commencer tout de suite !</p>
     <div id="script-afficher"></div>
     <script>inject_microalg_editor_in('script-afficher', {
@@ -109,13 +109,18 @@
     <p>Après avoir cliqué sur <code>Exécuter</code>, un message de bienvenue devrait
     s’être affiché dans la barre un peu arrondie ci-dessus (sinon, suivre les
     instructions de <a href="#contact">cette section</a>).</p>
+    <p>Dans toute la suite, vous pourrez modifier les programmes pour tester des
+    idées ou répondre aux questions. Essayez tout de suite avec le programme
+    ci-dessus ! Notez que vous pouvez revenir à la version originale grâce à
+    <code>Control</code>+<code>Z</code> ou en rechargeant la page.</p>
     <p>Remarquez bien la forme de ce premier programme. Il contient une seule
-    <em>instruction</em> :</p>
+    <em>instruction</em>, qui se décompose ainsi :</p>
     <ol>
-        <li>une parenthèse ouvrante ;</li>
-        <li>une <em>commande</em> ;</li>
-        <li>d’éventuels <em>arguments</em> ;</li>
-        <li>une parenthèse fermante.</li>
+        <li>une parenthèse ouvrante, sur fond rouge ;</li>
+        <li>une <em>commande</em>, ici la commande <code>Afficher</code> ;</li>
+        <li>d’éventuels <em>arguments</em>, ici le texte
+            <code>"Bonjour tout le monde !"</code> ;</li>
+        <li>une parenthèse fermante, sur fond rouge aussi.</li>
     </ol>
     <p>La parenthèse ouvrante marque le début d’une instruction, comme une
     majuscule marque le début d’une phrase. La parenthèse fermante marque la
@@ -498,10 +503,11 @@ Bonjour,
         '(!!! "acceptent plusieurs paramètres:")\n' +
         '(Afficher (+ 2 2 2))'
     });</script>
-    <p>Autres exemples avec <code>+</code>, <code>-</code>, <code>*</code> et
-    <code>/</code> (papier crayon ou calculatrice autorisés si vous n’êtes pas
-    fort en calcul mental).</p>
-    <p><strong>Remarque :</strong>La touche <code>TAB</code> (à gauche du
+    <p>Voici d’autres exemples avec peut-être d’autres opérations. Essayez de
+    deviner ce que va afficher MicroAlg, puis vérifiez en cliquant sur
+    <code>Exécuter</code>. Vous pouvez utiliser un crayon et du papier ou une
+    calculatrice si votre calcul mental n’est pas encore solide.</p>
+    <p><strong>Remarque : </strong>La touche <code>TAB</code> (à gauche du
     <code>A</code>) permet de passer de zone de code en zone de code, en
     passant aussi sur les liens. En appuyant deux fois dessus, vous arrivez à
     la prochaine zone. Pratique, pas besoin de toucher la souris.</p>
@@ -529,6 +535,11 @@ Bonjour,
     <script>inject_microalg_editor_in('script-calc4', {
      src:
         '(Afficher (/ 6 (+ 1 1 1)))'
+    });</script>
+    <div id="script-calc5"></div>
+    <script>inject_microalg_editor_in('script-calc5', {
+     src:
+        '(Afficher (Racine 49))'
     });</script>
     <p>Pour calculer l’opposé d’un nombre, on peut toujours de retirer ce
     nombre à 0 ou le multiplier par -1, mais on peut aussi ne passer qu’un
@@ -608,7 +619,12 @@ Bonjour,
      src:
         '(Afficher (+ 1 (Nombre (Demander))))'
     });</script>
-    <p>Plus tard, vous pourrez vous-même créer une commande qui sera un
+    <p>Plus de détails sur les différentes façons de « demander » sont
+    disponibles sur
+    <a href="http://galerie.microalg.info/microalg:demander">cette page
+    de la galerie</a>.</p>
+    <p>Plus tard, grâce à <a href="#demandernbre">ce paragraphe</a>,
+    vous pourrez vous-même créer une commande qui sera un
     raccourci pour cette combinaison de <code>Nombre</code> et de
     <code>Demander</code> : <code>DemanderNbre</code>.</p>
     <p>Pour finir cette section en beauté, voici un programme qui réutilise
@@ -1054,7 +1070,17 @@ Bonjour,
     <p>Il n’est pas interdit d’utiliser une variable dans un calcul dont le
     résultat sera affectée à cette même variable. C’est même parfois utile en
     vue d’<em>accumuler</em> des valeurs, qu’elles soient textuelles,
-    numériques ou d’un autre type. Nous allons donner deux exemples.</p>
+    numériques ou d’un autre type.</p>
+    <p>Dans <code>(Affecter_a var (Calcul var))</code>, il faut bien comprendre
+    que :</p>
+    <ol>
+      <li>le second <code>var</code> désigne la <strong>valeur</strong> qui est
+        stockée dans la variable, qui sera envoyée à <code>Calcul</code> ;</li>
+      <li>le premier <code>var</code> désigne le <strong>nom</strong> de la
+        variable à mettre à jour avec le résultat de
+        <code>(Calcul var)</code>.</li>
+    </ol>
+    <p>Nous allons donner deux exemples.</p>
     <p>Dans le premier, on accumule des nombres avec une instruction de la
     forme :<br>
     <code>(Affecter_a valeur (+ valeur valeur_a_ajouter))</code></p>
@@ -1581,6 +1607,7 @@ Bonjour,
     });</script>
     <p>Voir <a href="doc.html#cmd-Definir">la documentation</a> pour plus de
     détails.</p>
+    <div id="demandernbre"></div>
     <p>Comme promis, voici un moyen de définir une commande qui demande un
     nombre à l’utilisateur..</p>
     <div id="script-demandernbre"></div>
