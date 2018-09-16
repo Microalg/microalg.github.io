@@ -32,16 +32,19 @@ Blockly.Msg.RENAME_VARIABLE_TITLE = "Renommer toutes les variables '%1' en :";
 Blockly.MicroAlg = new Blockly.Generator('MicroAlg');
 Blockly.MicroAlg.INDENT = '  ';
 Blockly.MicroAlg.addReservedWords(
+    'credit_iterations, sequence_tirages@, nombre_demandé, texte_demandé, ' +
     'RAZ, AV, BC, LC, TD, TG, Cercle, Contour, Ellipse, Epaisseur, ' +
     'Rectangle, Remplissage, Repere, Segment, Triangle, ' +
+    '1000Cosinus, 1000Sinus, ' +
     'Affecter_a, Afficher, Aide, Ajouter_a, Alors, Concatener, ' +
     'Declarer', 'Definir, Demander, Demander_un_nombre, ' +
+    'Demander_un_nombre_pour, Diff, ' +
     'En_position, Entier@, Et, Exemples_de, ' +
-    'Faire, Faux, Initialiser@, ' +
+    'Faire, Faux, Fois, Geler, Initialiser@, ' +
     'Liste, Longueur, Millisecondes, ' +
-    'Nieme, Nieme@, Nombre, Non, Ou, ' +
-    'Queue, Retirer_de, Retourner, Rien, Si, Sinon, ' +
-    'Tant_que, Tester, Tete, Texte, Type, ' +
+    'Nieme, Nieme@, Nombre, Non, Ou, Produit, Puissance, ' +
+    'Queue, Quotient, Racine, Repeter, Reste, Retirer_de, Retourner, Rien, ' +
+    'Si, Sinon, Somme, Tant_que, Tester, Tete, Texte, Type, ' +
     'Vide?, Vrai');
 Blockly.MicroAlg.newQuote = function(open) {
     if (open == Blockly.RTL) {
@@ -586,6 +589,39 @@ Blockly.Blocks['demander_un_nombre'] = {
 // Gen Demander un nombre
 Blockly.MicroAlg['demander_un_nombre'] = function(block) {
   return '(Demander_un_nombre)';
+};
+
+// Bloc Demander un nombre pour
+Blockly.Blocks['demander_un_nombre_pour'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Demander_un_nombre_pour');
+    this.setColour(colour);
+    this.setOutput(false);
+    this.setPreviousStatement(true);
+    this.setNextStatement(true);
+    this.setTooltip('Demander un nombre et le stocker dans une variable.');
+    this.interpolateMsg(
+      'Demander un nombre pour' + ' %1',
+      ['VAR', new Blockly.FieldVariable("ma_variable")],
+      Blockly.ALIGN_RIGHT);
+    this.setInputsInline(false);
+    this.contextMenuMsg_ = "Créer truc"; // ???
+    this.contextMenuType_ = 'variable';
+  },
+  getVars: function() {
+    return [this.getFieldValue('VAR')];
+  },
+  renameVar: function(oldName, newName) {
+    if (Blockly.Names.equals(oldName, this.getFieldValue('VAR'))) {
+        this.setFieldValue(newName, 'VAR');
+    }
+  },
+  customContextMenu: Blockly.Blocks['variable'].customContextMenu
+};
+
+// Gen Demander un nombre pour
+Blockly.MicroAlg['demander_un_nombre_pour'] = function(block) {
+  return '(Demander_un_nombre_pour ' + this.getFieldValue('VAR') + ')';
 };
 
 // Bloc Entier@
@@ -1603,6 +1639,32 @@ Blockly.MicroAlg['comparaisons'] = function(block) {
   return code;
 };
 
+// Bloc Racine
+Blockly.Blocks['racine'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-Racine');
+    this.setColour(colour);
+    this.appendValueInput('A')
+        .appendField('Racine')
+        .setCheck('Number');
+    this.setOutput(true, 'Number');
+    this.setTooltip('Convertir une valeur en racine.');
+  }
+};
+
+// Gen Racine
+Blockly.MicroAlg['racine'] = function(block) {
+  var arg = Blockly.MicroAlg.statementToCode(block, 'A') || '';
+  if (arg === '') return '(Racine)';
+  var num_lines = arg.split('\n').length;
+  if (num_lines == 1) {
+    // Prevent indentation if we only have one line.
+    return '(Racine ' + arg.substring(Blockly.MicroAlg.INDENT.length) + ')';
+  } else {
+    return '(Racine\n' + arg + '\n)';
+  }
+};
+
 // Bloc Faux
 Blockly.Blocks['faux'] = {
   init: function() {
@@ -2266,7 +2328,7 @@ Blockly.Blocks['td90'] = {
         .appendField('TD');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
-    this.setTooltip('Tourne la tortue vers la gauche (en degrés).');
+    this.setTooltip('Tourne la tortue vers la droite à angle droit.');
   }
 };
 
@@ -2310,7 +2372,7 @@ Blockly.Blocks['tg90'] = {
         .appendField('TG');
     this.setPreviousStatement(true);
     this.setNextStatement(true);
-    this.setTooltip('Tourne la tortue vers la gauche (en degrés).');
+    this.setTooltip('Tourne la tortue vers la gauche à angle droit.');
   }
 };
 
@@ -2319,21 +2381,38 @@ Blockly.MicroAlg['tg90'] = function(block) {
   return '(TG)';
 };
 
-// Bloc valeur_utilisateur
-Blockly.Blocks['valeur_utilisateur'] = {
+// Bloc texte_demandé
+Blockly.Blocks['texte_demande'] = {
   init: function() {
-    this.setHelpUrl(malg_url + '#sym-valeur_utilisateur');
+    this.setHelpUrl(malg_url + '#sym-texte_demandé');
     this.setColour(colour);
     this.appendDummyInput()
-        .appendField('valeur_utilisateur');
+        .appendField('texte_demandé');
     this.setOutput(true);
-    this.setTooltip('Dernière valeur entrée par l’utilisateur.');
+    this.setTooltip('Dernier texte entré par l’utilisateur.');
   }
 };
 
-// Gen valeur_utilisateur
-Blockly.MicroAlg['valeur_utilisateur'] = function(block) {
-  return 'valeur_utilisateur';
+// Gen texte_demandé
+Blockly.MicroAlg['texte_demande'] = function(block) {
+  return 'texte_demandé';
+};
+
+// Bloc nombre_demandé
+Blockly.Blocks['nombre_demande'] = {
+  init: function() {
+    this.setHelpUrl(malg_url + '#sym-nombre_demandé');
+    this.setColour(colour);
+    this.appendDummyInput()
+        .appendField('nombre_demandé');
+    this.setOutput(true);
+    this.setTooltip('Dernier nombre entré par l’utilisateur.');
+  }
+};
+
+// Gen nombre_demandé
+Blockly.MicroAlg['nombre_demande'] = function(block) {
+  return 'nombre_demandé';
 };
 
 // Bloc credit_iterations

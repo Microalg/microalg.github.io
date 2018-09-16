@@ -430,7 +430,8 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="texte_litteral"></block>' +
                 '  <block type="nombre_litteral"></block>' +
                 '  <block type="variable"></block>' +
-                '  <block type="valeur_utilisateur"></block>' +
+                '  <block type="texte_demande"></block>' +
+                '  <block type="nombre_demande"></block>' +
                 '  <block type="vrai"></block>' +
                 '  <block type="faux"></block>' +
                 '  <block type="liste"></block>' +
@@ -442,6 +443,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="commentaire"></block>' +
                 '  <block type="afficher"></block>' +
                 '  <block type="repeter"></block>' +
+                '  <block type="demander_un_nombre_pour"></block>' +
                 '  <block type="si"></block>' +
                 '  <block type="faire"></block>' +
                 '  <block type="tant_que"></block>' +
@@ -455,6 +457,7 @@ function inject_microalg_editor_in(elt_id, config) {
                 '  <block type="demander"></block>' +
                 '  <block type="demander_un_nombre"></block>' +
                 '  <block type="operations"></block>' +
+                '  <block type="racine"></block>' +
                 '  <block type="comparaisons"></block>' +
                 '  <block type="entier_pseudo_aleatoire"></block>' +
                 '  <block type="longueur"></block>' +
